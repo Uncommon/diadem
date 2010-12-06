@@ -1,0 +1,811 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		DD6803F61277648900CB9EF5 /* Test */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = DD68040A127764A200CB9EF5 /* Build configuration list for PBXAggregateTarget "Test" */;
+			buildPhases = (
+				DD6803F51277648900CB9EF5 /* ShellScript */,
+			);
+			dependencies = (
+				DD6803FA1277648F00CB9EF5 /* PBXTargetDependency */,
+			);
+			name = Test;
+			productName = Test;
+		};
+		DD6D4FF612935CFF006DF425 /* pyadem */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = DD6D500B12935D17006DF425 /* Build configuration list for PBXAggregateTarget "pyadem" */;
+			buildPhases = (
+				DD6D4FF512935CFF006DF425 /* ShellScript */,
+			);
+			dependencies = (
+				DD6D4FFA12935D0B006DF425 /* PBXTargetDependency */,
+			);
+			name = pyadem;
+			productName = pyadem;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		DD6801D81277426300CB9EF5 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.cc */; };
+		DD6801D91277426300CB9EF5 /* Entity.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806D5911F12B73005E4C56 /* Entity.cc */; };
+		DD6801DA1277426300CB9EF5 /* Value.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806D5E11F12B73005E4C56 /* Value.cc */; };
+		DD6801DB1277426300CB9EF5 /* Layout.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806E2C11F7C7D6005E4C56 /* Layout.cc */; };
+		DD6801DC1277426300CB9EF5 /* Factory.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806E8611F91565005E4C56 /* Factory.cc */; };
+		DD6801DD1277426300CB9EF5 /* LibXMLParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = DDC32ABC120B64310098E044 /* LibXMLParser.cc */; };
+		DD6801DE1277426300CB9EF5 /* NativeCarbon.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD5848ED12274C2900C66683 /* NativeCarbon.cc */; };
+		DD6801E01277426300CB9EF5 /* Native.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD3C9FA81248FF0200F536B7 /* Native.cc */; };
+		DD6801E11277426300CB9EF5 /* NativeCocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD18340D124A54B400FF34FB /* NativeCocoa.mm */; };
+		DD6801E21277426300CB9EF5 /* pyadem.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD68FA121275DAFD00CB9EF5 /* pyadem.cc */; };
+		DD6803561277427400CB9EF5 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD18348D124C2AD900FF34FB /* AppKit.framework */; };
+		DD6803571277427400CB9EF5 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD18348E124C2AD900FF34FB /* Carbon.framework */; };
+		DD6803581277427400CB9EF5 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD18348F124C2AD900FF34FB /* Cocoa.framework */; };
+		DD6803811277478600CB9EF5 /* Diadem.xib in Resources */ = {isa = PBXBuildFile; fileRef = DD6803801277478600CB9EF5 /* Diadem.xib */; };
+		DD6803E9127763AD00CB9EF5 /* BasicWindowTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD584AD4122A01C300C66683 /* BasicWindowTest.cc */; };
+		DD6803EA127763AD00CB9EF5 /* EntityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806E6211F8F238005E4C56 /* EntityTest.cc */; };
+		DD6803EB127763AD00CB9EF5 /* FactoryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806EA311F919A4005E4C56 /* FactoryTest.cc */; };
+		DD6803EC127763AD00CB9EF5 /* GroupTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD3C9E761247AE1500F536B7 /* GroupTest.cc */; };
+		DD6803ED127763AD00CB9EF5 /* LayoutTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DDB3DCEE123077B9006C742F /* LayoutTest.cc */; };
+		DD6803EE127763AD00CB9EF5 /* LibXMLTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DDC32B2F120E07330098E044 /* LibXMLTest.cc */; };
+		DD6803EF127763AD00CB9EF5 /* PythonTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD68004112761C8A00CB9EF5 /* PythonTest.cc */; };
+		DD6803F0127763AD00CB9EF5 /* ValueTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD5849081227585600C66683 /* ValueTest.cc */; };
+		DD6803F1127763AD00CB9EF5 /* WindowTestBase.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD584AD7122A01E300C66683 /* WindowTestBase.cc */; };
+		DD6803F2127763AD00CB9EF5 /* XMLTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DDC32B33120E08DE0098E044 /* XMLTest.cc */; };
+		DD68043E12776ABA00CB9EF5 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD68043A12776A5700CB9EF5 /* Python.framework */; };
+		DD9E0D8112946CFA0088F160 /* test.dem in Resources */ = {isa = PBXBuildFile; fileRef = DD9E0D8012946CFA0088F160 /* test.dem */; };
+		DDC1C10A128B52A900D63161 /* Entity.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806D5911F12B73005E4C56 /* Entity.cc */; };
+		DDC1C10B128B52A900D63161 /* Factory.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806E8611F91565005E4C56 /* Factory.cc */; };
+		DDC1C10C128B52AA00D63161 /* Layout.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806E2C11F7C7D6005E4C56 /* Layout.cc */; };
+		DDC1C10D128B52AC00D63161 /* LibXMLParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = DDC32ABC120B64310098E044 /* LibXMLParser.cc */; };
+		DDC1C10E128B52B000D63161 /* Native.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD3C9FA81248FF0200F536B7 /* Native.cc */; };
+		DDC1C10F128B52B200D63161 /* NativeCocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD18340D124A54B400FF34FB /* NativeCocoa.mm */; };
+		DDC1C110128B52B700D63161 /* Value.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806D5E11F12B73005E4C56 /* Value.cc */; };
+		DDEE2E4E1284AD4400EFF651 /* image.png in Resources */ = {isa = PBXBuildFile; fileRef = DDEE2E4D1284AD4400EFF651 /* image.png */; };
+		DDF2C4B012777B67008DBFDB /* CocoaTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = DDF2C4AF12777B67008DBFDB /* CocoaTest.mm */; };
+		DDF2C668127898F8008DBFDB /* DiademDocument.mm in Sources */ = {isa = PBXBuildFile; fileRef = DDF2C667127898F8008DBFDB /* DiademDocument.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DD1836D71253F3AE00FF34FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DD18369C1253EDF900FF34FB /* gtest.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4539C8FF0EC27F6400A70F4C;
+			remoteInfo = "gtest-framework";
+		};
+		DD1836D91253F3AE00FF34FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DD18369C1253EDF900FF34FB /* gtest.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 40C848FA101A209C0083642A;
+			remoteInfo = "gtest-static";
+		};
+		DD1836DB1253F3AE00FF34FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DD18369C1253EDF900FF34FB /* gtest.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 40C8490B101A217E0083642A;
+			remoteInfo = "gtest_main-static";
+		};
+		DD1836DD1253F3AE00FF34FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DD18369C1253EDF900FF34FB /* gtest.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 40899F430FFA7184000B29AE;
+			remoteInfo = "gtest_unittest-framework";
+		};
+		DD1836DF1253F3AE00FF34FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DD18369C1253EDF900FF34FB /* gtest.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 40C84987101A36850083642A;
+			remoteInfo = "gtest_unittest-static";
+		};
+		DD1836E11253F3AE00FF34FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DD18369C1253EDF900FF34FB /* gtest.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4089A0130FFACEFC000B29AE;
+			remoteInfo = "sample1_unittest-framework";
+		};
+		DD1836E31253F3AE00FF34FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DD18369C1253EDF900FF34FB /* gtest.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 40C84997101A36A60083642A;
+			remoteInfo = "sample1_unittest-static";
+		};
+		DD6803F91277648F00CB9EF5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DD6801D21277423700CB9EF5;
+			remoteInfo = Diadem;
+		};
+		DD68044112776B2A00CB9EF5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DD18369C1253EDF900FF34FB /* gtest.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 40C848F9101A209C0083642A;
+			remoteInfo = "gtest-static";
+		};
+		DD6D4FF912935D0B006DF425 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DDC1C105128B526600D63161;
+			remoteInfo = Library;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		08FB7796FE84155DC02AAC07 /* main.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
+		DD18340B124A542100FF34FB /* NativeCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeCocoa.h; sourceTree = "<group>"; };
+		DD18340D124A54B400FF34FB /* NativeCocoa.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NativeCocoa.mm; sourceTree = "<group>"; };
+		DD18348D124C2AD900FF34FB /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		DD18348E124C2AD900FF34FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		DD18348F124C2AD900FF34FB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		DD18369C1253EDF900FF34FB /* gtest.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = gtest.xcodeproj; path = ../gtest/xcode/gtest.xcodeproj; sourceTree = SOURCE_ROOT; };
+		DD3C9E761247AE1500F536B7 /* GroupTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GroupTest.cc; sourceTree = "<group>"; };
+		DD3C9FA81248FF0200F536B7 /* Native.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Native.cc; sourceTree = "<group>"; };
+		DD5848E712274A6800C66683 /* NativeCarbon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeCarbon.h; sourceTree = "<group>"; };
+		DD5848ED12274C2900C66683 /* NativeCarbon.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NativeCarbon.cc; sourceTree = "<group>"; };
+		DD5849081227585600C66683 /* ValueTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ValueTest.cc; sourceTree = "<group>"; };
+		DD584AD4122A01C300C66683 /* BasicWindowTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicWindowTest.cc; sourceTree = "<group>"; };
+		DD584AD6122A01D600C66683 /* WindowTestBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowTestBase.h; sourceTree = "<group>"; };
+		DD584AD7122A01E300C66683 /* WindowTestBase.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WindowTestBase.cc; sourceTree = "<group>"; };
+		DD584AE1122A0FBB00C66683 /* Window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Window.h; sourceTree = "<group>"; };
+		DD68004112761C8A00CB9EF5 /* PythonTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PythonTest.cc; sourceTree = "<group>"; };
+		DD680076127624F300CB9EF5 /* pyadem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pyadem.h; sourceTree = "<group>"; };
+		DD6801CD1277414200CB9EF5 /* Diadem-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Diadem-Info.plist"; sourceTree = "<group>"; };
+		DD6801D31277423700CB9EF5 /* Diadem.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Diadem.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD680360127743E500CB9EF5 /* Diadem.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Diadem.pch; sourceTree = "<group>"; };
+		DD6803801277478600CB9EF5 /* Diadem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Diadem.xib; sourceTree = "<group>"; };
+		DD68043A12776A5700CB9EF5 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
+		DD68FA121275DAFD00CB9EF5 /* pyadem.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pyadem.cc; sourceTree = "<group>"; };
+		DD806D5911F12B73005E4C56 /* Entity.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Entity.cc; sourceTree = "<group>"; };
+		DD806D5A11F12B73005E4C56 /* Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Entity.h; sourceTree = "<group>"; };
+		DD806D5B11F12B73005E4C56 /* Factory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Factory.h; sourceTree = "<group>"; };
+		DD806D5C11F12B73005E4C56 /* Layout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Layout.h; sourceTree = "<group>"; };
+		DD806D5D11F12B73005E4C56 /* Native.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Native.h; sourceTree = "<group>"; };
+		DD806D5E11F12B73005E4C56 /* Value.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Value.cc; sourceTree = "<group>"; };
+		DD806D5F11F12B73005E4C56 /* Value.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Value.h; sourceTree = "<group>"; };
+		DD806D6011F12B73005E4C56 /* Wrappers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wrappers.h; sourceTree = "<group>"; };
+		DD806D8611F12F5E005E4C56 /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base.h; sourceTree = "<group>"; };
+		DD806E2C11F7C7D6005E4C56 /* Layout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Layout.cc; sourceTree = "<group>"; };
+		DD806E6211F8F238005E4C56 /* EntityTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EntityTest.cc; sourceTree = "<group>"; };
+		DD806E8611F91565005E4C56 /* Factory.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Factory.cc; sourceTree = "<group>"; };
+		DD806EA311F919A4005E4C56 /* FactoryTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FactoryTest.cc; sourceTree = "<group>"; };
+		DD806ED711FA2F9A005E4C56 /* Metrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Metrics.h; sourceTree = "<group>"; };
+		DD9E0D8012946CFA0088F160 /* test.dem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = test.dem; path = Test/test.dem; sourceTree = "<group>"; };
+		DDB3DCEE123077B9006C742F /* LayoutTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayoutTest.cc; sourceTree = "<group>"; };
+		DDC1C106128B526600D63161 /* libDiadem.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDiadem.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		DDC32ABA120B63C20098E044 /* LibXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibXMLParser.h; sourceTree = "<group>"; };
+		DDC32ABC120B64310098E044 /* LibXMLParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LibXMLParser.cc; sourceTree = "<group>"; };
+		DDC32B2F120E07330098E044 /* LibXMLTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LibXMLTest.cc; sourceTree = "<group>"; };
+		DDC32B33120E08DE0098E044 /* XMLTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XMLTest.cc; sourceTree = "<group>"; };
+		DDC32B75121378060098E044 /* XMLTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLTest.h; sourceTree = "<group>"; };
+		DDEE2E4D1284AD4400EFF651 /* image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = image.png; sourceTree = "<group>"; };
+		DDF2C4AF12777B67008DBFDB /* CocoaTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CocoaTest.mm; sourceTree = "<group>"; };
+		DDF2C666127898F8008DBFDB /* DiademDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiademDocument.h; sourceTree = "<group>"; };
+		DDF2C667127898F8008DBFDB /* DiademDocument.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DiademDocument.mm; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DD6801D11277423700CB9EF5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD6803561277427400CB9EF5 /* AppKit.framework in Frameworks */,
+				DD6803571277427400CB9EF5 /* Carbon.framework in Frameworks */,
+				DD6803581277427400CB9EF5 /* Cocoa.framework in Frameworks */,
+				DD68043E12776ABA00CB9EF5 /* Python.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DDC1C104128B526600D63161 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* Diadem */ = {
+			isa = PBXGroup;
+			children = (
+				08FB7795FE84155DC02AAC07 /* Source */,
+				DD806E6111F8F20B005E4C56 /* Test */,
+				DD6801CC1277413200CB9EF5 /* Resources */,
+				DD18348C124C2AB100FF34FB /* Frameworks */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = Diadem;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				DD680360127743E500CB9EF5 /* Diadem.pch */,
+				DD806D8611F12F5E005E4C56 /* Base.h */,
+				DD806D5911F12B73005E4C56 /* Entity.cc */,
+				DD806D5A11F12B73005E4C56 /* Entity.h */,
+				DD806E8611F91565005E4C56 /* Factory.cc */,
+				DD806D5B11F12B73005E4C56 /* Factory.h */,
+				DD806E2C11F7C7D6005E4C56 /* Layout.cc */,
+				DD806D5C11F12B73005E4C56 /* Layout.h */,
+				DDC32ABC120B64310098E044 /* LibXMLParser.cc */,
+				DDC32ABA120B63C20098E044 /* LibXMLParser.h */,
+				DD806ED711FA2F9A005E4C56 /* Metrics.h */,
+				DD3C9FA81248FF0200F536B7 /* Native.cc */,
+				DD806D5D11F12B73005E4C56 /* Native.h */,
+				DD5848ED12274C2900C66683 /* NativeCarbon.cc */,
+				DD5848E712274A6800C66683 /* NativeCarbon.h */,
+				DD18340D124A54B400FF34FB /* NativeCocoa.mm */,
+				DD18340B124A542100FF34FB /* NativeCocoa.h */,
+				DD806D5E11F12B73005E4C56 /* Value.cc */,
+				DD806D5F11F12B73005E4C56 /* Value.h */,
+				DD584AE1122A0FBB00C66683 /* Window.h */,
+				DD806D6011F12B73005E4C56 /* Wrappers.h */,
+				DD68FA121275DAFD00CB9EF5 /* pyadem.cc */,
+				DD680076127624F300CB9EF5 /* pyadem.h */,
+				08FB7796FE84155DC02AAC07 /* main.cc */,
+				DDF2C666127898F8008DBFDB /* DiademDocument.h */,
+				DDF2C667127898F8008DBFDB /* DiademDocument.mm */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DD6801D31277423700CB9EF5 /* Diadem.app */,
+				DDC1C106128B526600D63161 /* libDiadem.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DD18348C124C2AB100FF34FB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DD18369C1253EDF900FF34FB /* gtest.xcodeproj */,
+				DD18348D124C2AD900FF34FB /* AppKit.framework */,
+				DD18348E124C2AD900FF34FB /* Carbon.framework */,
+				DD18348F124C2AD900FF34FB /* Cocoa.framework */,
+				DD68043A12776A5700CB9EF5 /* Python.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DD1836CC1253F3AE00FF34FB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DD1836D81253F3AE00FF34FB /* gtest.framework */,
+				DD1836DA1253F3AE00FF34FB /* libgtest.a */,
+				DD1836DC1253F3AE00FF34FB /* libgtest_main.a */,
+				DD1836DE1253F3AE00FF34FB /* gtest_unittest-framework */,
+				DD1836E01253F3AE00FF34FB /* gtest_unittest */,
+				DD1836E21253F3AE00FF34FB /* sample1_unittest-framework */,
+				DD1836E41253F3AE00FF34FB /* sample1_unittest-static */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DD6801CC1277413200CB9EF5 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DD9E0D8012946CFA0088F160 /* test.dem */,
+				DD6801CD1277414200CB9EF5 /* Diadem-Info.plist */,
+				DD6803801277478600CB9EF5 /* Diadem.xib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		DD806E6111F8F20B005E4C56 /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				DD584AD4122A01C300C66683 /* BasicWindowTest.cc */,
+				DDF2C4AF12777B67008DBFDB /* CocoaTest.mm */,
+				DD806E6211F8F238005E4C56 /* EntityTest.cc */,
+				DD806EA311F919A4005E4C56 /* FactoryTest.cc */,
+				DD3C9E761247AE1500F536B7 /* GroupTest.cc */,
+				DDB3DCEE123077B9006C742F /* LayoutTest.cc */,
+				DDC32B2F120E07330098E044 /* LibXMLTest.cc */,
+				DD68004112761C8A00CB9EF5 /* PythonTest.cc */,
+				DD5849081227585600C66683 /* ValueTest.cc */,
+				DD584AD7122A01E300C66683 /* WindowTestBase.cc */,
+				DD584AD6122A01D600C66683 /* WindowTestBase.h */,
+				DDC32B75121378060098E044 /* XMLTest.h */,
+				DDC32B33120E08DE0098E044 /* XMLTest.cc */,
+				DDEE2E4D1284AD4400EFF651 /* image.png */,
+			);
+			path = Test;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DD6801D21277423700CB9EF5 /* Diadem */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DD6801D71277425D00CB9EF5 /* Build configuration list for PBXNativeTarget "Diadem" */;
+			buildPhases = (
+				DD6801CF1277423700CB9EF5 /* Resources */,
+				DD6801D01277423700CB9EF5 /* Sources */,
+				DD6801D11277423700CB9EF5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DD68044212776B2A00CB9EF5 /* PBXTargetDependency */,
+			);
+			name = Diadem;
+			productName = Diadem;
+			productReference = DD6801D31277423700CB9EF5 /* Diadem.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DDC1C105128B526600D63161 /* Library */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DDC1C109128B529400D63161 /* Build configuration list for PBXNativeTarget "Library" */;
+			buildPhases = (
+				DDC1C103128B526600D63161 /* Sources */,
+				DDC1C104128B526600D63161 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Library;
+			productName = Library;
+			productReference = DDC1C106128B526600D63161 /* libDiadem.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "Diadem" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 08FB7794FE84155DC02AAC07 /* Diadem */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = DD1836CC1253F3AE00FF34FB /* Products */;
+					ProjectRef = DD18369C1253EDF900FF34FB /* gtest.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				DD6801D21277423700CB9EF5 /* Diadem */,
+				DD6803F61277648900CB9EF5 /* Test */,
+				DDC1C105128B526600D63161 /* Library */,
+				DD6D4FF612935CFF006DF425 /* pyadem */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		DD1836D81253F3AE00FF34FB /* gtest.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = gtest.framework;
+			remoteRef = DD1836D71253F3AE00FF34FB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DD1836DA1253F3AE00FF34FB /* libgtest.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libgtest.a;
+			remoteRef = DD1836D91253F3AE00FF34FB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DD1836DC1253F3AE00FF34FB /* libgtest_main.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libgtest_main.a;
+			remoteRef = DD1836DB1253F3AE00FF34FB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DD1836DE1253F3AE00FF34FB /* gtest_unittest-framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = "gtest_unittest-framework";
+			remoteRef = DD1836DD1253F3AE00FF34FB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DD1836E01253F3AE00FF34FB /* gtest_unittest */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = gtest_unittest;
+			remoteRef = DD1836DF1253F3AE00FF34FB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DD1836E21253F3AE00FF34FB /* sample1_unittest-framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = "sample1_unittest-framework";
+			remoteRef = DD1836E11253F3AE00FF34FB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DD1836E41253F3AE00FF34FB /* sample1_unittest-static */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = "sample1_unittest-static";
+			remoteRef = DD1836E31253F3AE00FF34FB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DD6801CF1277423700CB9EF5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD6803811277478600CB9EF5 /* Diadem.xib in Resources */,
+				DD9E0D8112946CFA0088F160 /* test.dem in Resources */,
+				DDEE2E4E1284AD4400EFF651 /* image.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		DD6803F51277648900CB9EF5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${CONFIGURATION_BUILD_DIR}/Diadem.app/Contents/MacOS/Diadem -test\n";
+		};
+		DD6D4FF512935CFF006DF425 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/pyadem.cc",
+				"$(CONFIGURATION_BUILD_DIR)/libDiadem.a",
+			);
+			outputPaths = (
+				"/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/pyadem.so",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export ARCHFLAGS=\"-arch x86_64 -arch i386\"\n/Library/Frameworks/Python.framework/Versions/2.7/bin/python setup.py install\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DD6801D01277423700CB9EF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD6801D81277426300CB9EF5 /* main.cc in Sources */,
+				DD6801D91277426300CB9EF5 /* Entity.cc in Sources */,
+				DD6801DA1277426300CB9EF5 /* Value.cc in Sources */,
+				DD6801DB1277426300CB9EF5 /* Layout.cc in Sources */,
+				DD6801DC1277426300CB9EF5 /* Factory.cc in Sources */,
+				DD6801DD1277426300CB9EF5 /* LibXMLParser.cc in Sources */,
+				DD6801DE1277426300CB9EF5 /* NativeCarbon.cc in Sources */,
+				DD6801E01277426300CB9EF5 /* Native.cc in Sources */,
+				DD6801E11277426300CB9EF5 /* NativeCocoa.mm in Sources */,
+				DD6801E21277426300CB9EF5 /* pyadem.cc in Sources */,
+				DD6803E9127763AD00CB9EF5 /* BasicWindowTest.cc in Sources */,
+				DD6803EA127763AD00CB9EF5 /* EntityTest.cc in Sources */,
+				DD6803EB127763AD00CB9EF5 /* FactoryTest.cc in Sources */,
+				DD6803EC127763AD00CB9EF5 /* GroupTest.cc in Sources */,
+				DD6803ED127763AD00CB9EF5 /* LayoutTest.cc in Sources */,
+				DD6803EE127763AD00CB9EF5 /* LibXMLTest.cc in Sources */,
+				DD6803EF127763AD00CB9EF5 /* PythonTest.cc in Sources */,
+				DD6803F0127763AD00CB9EF5 /* ValueTest.cc in Sources */,
+				DD6803F1127763AD00CB9EF5 /* WindowTestBase.cc in Sources */,
+				DD6803F2127763AD00CB9EF5 /* XMLTest.cc in Sources */,
+				DDF2C4B012777B67008DBFDB /* CocoaTest.mm in Sources */,
+				DDF2C668127898F8008DBFDB /* DiademDocument.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DDC1C103128B526600D63161 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDC1C10A128B52A900D63161 /* Entity.cc in Sources */,
+				DDC1C10B128B52A900D63161 /* Factory.cc in Sources */,
+				DDC1C10C128B52AA00D63161 /* Layout.cc in Sources */,
+				DDC1C10D128B52AC00D63161 /* LibXMLParser.cc in Sources */,
+				DDC1C10E128B52B000D63161 /* Native.cc in Sources */,
+				DDC1C10F128B52B200D63161 /* NativeCocoa.mm in Sources */,
+				DDC1C110128B52B700D63161 /* Value.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DD6803FA1277648F00CB9EF5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DD6801D21277423700CB9EF5 /* Diadem */;
+			targetProxy = DD6803F91277648F00CB9EF5 /* PBXContainerItemProxy */;
+		};
+		DD68044212776B2A00CB9EF5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "gtest-static";
+			targetProxy = DD68044112776B2A00CB9EF5 /* PBXContainerItemProxy */;
+		};
+		DD6D4FFA12935D0B006DF425 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DDC1C105128B526600D63161 /* Library */;
+			targetProxy = DD6D4FF912935D0B006DF425 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB923608733DC60010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../\"";
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 x86_64";
+			};
+			name = Debug;
+		};
+		1DEB923708733DC60010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../\"";
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 x86_64";
+			};
+			name = Release;
+		};
+		DD6801D51277423800CB9EF5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Diadem.pch;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../\"",
+					"$(SDKROOT)/usr/include/libxml2/",
+					"\"$(SRCROOT)/../gtest/include/\"",
+				);
+				INFOPLIST_FILE = "Diadem-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = $SRCROOT/../gtest/xcode/build/$CONFIGURATION/;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+					"-lxml2",
+					"-lgtest",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Diadem;
+			};
+			name = Debug;
+		};
+		DD6801D61277423800CB9EF5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Diadem.pch;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../\"",
+					"$(SDKROOT)/usr/include/libxml2/",
+					"\"$(SRCROOT)/../gtest/include/\"",
+				);
+				INFOPLIST_FILE = "Diadem-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = $SRCROOT/../gtest/xcode/build/$CONFIGURATION/;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+					"-lxml2",
+					"-lgtest",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Diadem;
+			};
+			name = Release;
+		};
+		DD6803F71277648900CB9EF5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = Test;
+			};
+			name = Debug;
+		};
+		DD6803F81277648900CB9EF5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = Test;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		DD6D4FF712935CFF006DF425 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = pyadem;
+			};
+			name = Debug;
+		};
+		DD6D4FF812935CFF006DF425 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = pyadem;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		DDC1C107128B526700D63161 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Diadem.pch;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../\"",
+					"$(SDKROOT)/usr/include/libxml2/",
+				);
+				INSTALL_PATH = /usr/local/lib;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Diadem;
+			};
+			name = Debug;
+		};
+		DDC1C108128B526700D63161 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Diadem.pch;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../\"",
+					"$(SDKROOT)/usr/include/libxml2/",
+				);
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Diadem;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "Diadem" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB923608733DC60010E9CD /* Debug */,
+				1DEB923708733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DD6801D71277425D00CB9EF5 /* Build configuration list for PBXNativeTarget "Diadem" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD6801D51277423800CB9EF5 /* Debug */,
+				DD6801D61277423800CB9EF5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DD68040A127764A200CB9EF5 /* Build configuration list for PBXAggregateTarget "Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD6803F71277648900CB9EF5 /* Debug */,
+				DD6803F81277648900CB9EF5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DD6D500B12935D17006DF425 /* Build configuration list for PBXAggregateTarget "pyadem" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD6D4FF712935CFF006DF425 /* Debug */,
+				DD6D4FF812935CFF006DF425 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DDC1C109128B529400D63161 /* Build configuration list for PBXNativeTarget "Library" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DDC1C107128B526700D63161 /* Debug */,
+				DDC1C108128B526700D63161 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

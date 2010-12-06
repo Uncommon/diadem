@@ -1,0 +1,3 @@
+<window text="Test">
+  <label text="Loaded from a file."/>
+</window>
