@@ -154,17 +154,17 @@ TEST_F(CocoaTest, Image) {
   ASSERT_EQ(1, windowRoot_->ChildrenCount());
   ASSERT_FALSE(windowRoot_->ChildAt(0)->GetNative() == NULL);
 
-  NSImageView *imageView = (NSImageView*)
+  NSImageView *image_view = (NSImageView*)
       windowRoot_->ChildAt(0)->GetNative()->GetNativeRef();
 
-  ASSERT_FALSE(imageView == nil);
-  ASSERT_TRUE([imageView isKindOfClass:[NSImageView class]]);
-  ASSERT_FALSE([imageView image] == nil);
+  ASSERT_FALSE(image_view == nil);
+  ASSERT_TRUE([image_view isKindOfClass:[NSImageView class]]);
+  ASSERT_FALSE([image_view image] == nil);
 
-  const NSSize imageSize = [[imageView image] size];
+  const NSSize image_size = [[image_view image] size];
 
-  EXPECT_EQ(289, imageSize.width);
-  EXPECT_EQ( 95, imageSize.height);
+  EXPECT_EQ(289, image_size.width);
+  EXPECT_EQ( 95, image_size.height);
 }
 
 static void ButtonCallback(Diadem::Entity *target, void *data) {

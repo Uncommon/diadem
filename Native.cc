@@ -25,15 +25,15 @@ PropertyName
     kPropURL        = "url";
 
 Location Native::GetViewOffset() const {
-  Location viewLocation;
+  Location view_location;
 
   if (entity_->GetParent() != NULL) {
-    Layout *parentLayout = entity_->GetParent()->GetLayout();
+    Layout *parent_layout = entity_->GetParent()->GetLayout();
 
-    if (parentLayout != NULL)
-      viewLocation = parentLayout->GetViewLocation();
+    if (parent_layout != NULL)
+      view_location = parent_layout->GetViewLocation();
   }
-  return viewLocation;
+  return view_location;
 }
 
 }  // namespace Diadem

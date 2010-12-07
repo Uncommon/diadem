@@ -78,8 +78,8 @@ class Entity : public Base {
   typedef void (*ButtonCallback)(Entity *target, void *data);
 
   void SetButtonCallback(ButtonCallback callback, void *data = NULL) {
-    buttonCallback_ = callback;
-    buttonData_ = data;
+    button_callback_ = callback;
+    button_data_ = data;
   }
 
   // Text is included here because it's so common
@@ -91,8 +91,8 @@ class Entity : public Base {
   Array<Entity*> children_;
   Layout *layout_;
   Native *native_;
-  ButtonCallback buttonCallback_;
-  void *buttonData_;
+  ButtonCallback button_callback_;
+  void *button_data_;
 
   virtual void Finalize() {}
 

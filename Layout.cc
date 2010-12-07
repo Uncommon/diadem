@@ -70,14 +70,14 @@ void ParseWidth(const char *value, ExplicitSize *size) {
   DASSERT(size != NULL);
   if (strcmp(value, "indent") == 0) {
     size->width_ = 1;
-    size->widthUnits_ = kUnitIndent;
+    size->width_units_ = kUnitIndent;
   } else {
     const char *letters = FirstLetter(value);
 
     if ((letters != NULL) && (strcmp(letters, "em") == 0))
-      size->widthUnits_ = kUnitEms;
+      size->width_units_ = kUnitEms;
     else
-      size->widthUnits_ = kUnitPixels;
+      size->width_units_ = kUnitPixels;
     size->width_ = strtof(value, NULL);
   }
 }
@@ -87,9 +87,9 @@ void ParseHeight(const char *value, ExplicitSize *size) {
   const char *letters = FirstLetter(value);
 
   if ((letters != NULL) && (strcmp(letters, "li") == 0))
-    size->heightUnits_ = kUnitLines;
+    size->height_units_ = kUnitLines;
   else
-    size->heightUnits_ = kUnitPixels;
+    size->height_units_ = kUnitPixels;
   size->height_ = strtof(value, NULL);
 }
 
@@ -105,7 +105,7 @@ AlignOption ReverseAlignment(AlignOption a) {
 void Layout::InitializeProperties(const PropertyMap &properties) {
   const Array<String> keys = properties.AllKeys();
 
-  for (int32_t i = 0; i < keys.size(); ++i)
+  for (size_t i = 0; i < keys.size(); ++i)
     SetProperty(keys[i], properties[keys[i]]);
 }
 
@@ -124,35 +124,35 @@ const LayoutContainer* Layout::GetLayoutParent() const {
 
 Bool Layout::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropInLayout) == 0) {
-    inLayout_ = value.Coerce<Bool>();
+    in_layout_ = value.Coerce<Bool>();
     return true;
   }
   if (strcmp(name, kPropWidthOption) == 0) {
-    const String widthString = value.Coerce<String>();
+    const String width_string = value.Coerce<String>();
 
-    if (!ParseSizeOption(widthString, &hSize_)) {
-      ParseWidth(widthString, &explicitSize_);
-      hSize_ = kSizeExplicit;
+    if (!ParseSizeOption(width_string, &h_size_)) {
+      ParseWidth(width_string, &explicit_size_);
+      h_size_ = kSizeExplicit;
     }
     return true;
   }
   if (strcmp(name, kPropHeightOption) == 0) {
-    const String heightString = value.Coerce<String>();
+    const String height_string = value.Coerce<String>();
 
-    if (!ParseSizeOption(heightString, &vSize_)) {
-      ParseHeight(heightString, &explicitSize_);
-      vSize_ = kSizeExplicit;
+    if (!ParseSizeOption(height_string, &v_size_)) {
+      ParseHeight(height_string, &explicit_size_);
+      v_size_ = kSizeExplicit;
     }
     return true;
   }
   if (strcmp(name, kPropAlign) == 0) {
-    const String alignString = value.Coerce<String>();
+    const String align_string = value.Coerce<String>();
 
-    if (alignString == "start")
+    if (align_string == "start")
       align_ = kAlignStart;
-    else if (alignString == "center")
+    else if (align_string == "center")
       align_ = kAlignCenter;
-    else if (alignString == "end")
+    else if (align_string == "end")
       align_ = kAlignEnd;
     return true;
   }
@@ -161,31 +161,31 @@ Bool Layout::SetProperty(PropertyName name, const Value &value) {
 
 Value Layout::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropInLayout) == 0) {
-    return Value(inLayout_);
+    return Value(in_layout_);
   }
   if (strcmp(name, kPropWidthOption) == 0) {
-    return Value(static_cast<int>(hSize_));
+    return Value(static_cast<int>(h_size_));
   }
   return Value();
 }
 
 Location Layout::GetViewLocation() const {
   const Location loc = GetLocation();
-  const LayoutContainer* const layoutParent = GetLayoutParent();
+  const LayoutContainer* const layout_parent = GetLayoutParent();
 
-  if (layoutParent == NULL)
+  if (layout_parent == NULL)
     return loc;
   else
-    return loc + layoutParent->GetViewLocation();
+    return loc + layout_parent->GetViewLocation();
 }
 
 void Layout::ParentLocationChanged(const Location &offset) {
   if (offset != Location()) {
-    const Value oldLocation = entity_->GetProperty(kPropLocation);
+    const Value old_location = entity_->GetProperty(kPropLocation);
 
-    if (oldLocation.IsValid())
+    if (old_location.IsValid())
       entity_->SetProperty(
-          kPropLocation, oldLocation.Coerce<Location>() + offset);
+          kPropLocation, old_location.Coerce<Location>() + offset);
   }
 }
 
@@ -194,52 +194,52 @@ Size Layout::CalculateMinimumSize() const {
 }
 
 Size Layout::EnforceExplicitSize(const Size &size) const {
-  if ((hSize_ != kSizeExplicit) && (vSize_ != kSizeExplicit))
+  if ((h_size_ != kSizeExplicit) && (v_size_ != kSizeExplicit))
     return size;
 
   Size result = size;
   const PlatformMetrics &metrics = GetPlatformMetrics();
 
-  if (hSize_ == kSizeExplicit) {
-    uint32_t hMultiplier = 1;
+  if (h_size_ == kSizeExplicit) {
+    uint32_t h_multiplier = 1;
 
-    switch (explicitSize_.widthUnits_) {
+    switch (explicit_size_.width_units_) {
       case kUnitEms:
-        hMultiplier = metrics.emSize;
+        h_multiplier = metrics.em_size;
         break;
       case kUnitIndent:
-        hMultiplier = metrics.indentSize;
+        h_multiplier = metrics.indent_size;
         break;
       default:
         break;
     }
     result.width =
-        std::max<long>(size.width, explicitSize_.width_ * hMultiplier);
+        std::max<long>(size.width, explicit_size_.width_ * h_multiplier);
   }
-  if (vSize_ == kSizeExplicit) {
-    uint32_t vMultiplier = 1;
+  if (v_size_ == kSizeExplicit) {
+    uint32_t v_multiplier = 1;
 
-    switch (explicitSize_.widthUnits_) {
+    switch (explicit_size_.width_units_) {
       case kUnitEms:
-        vMultiplier = metrics.emSize;
+        v_multiplier = metrics.em_size;
         break;
       case kUnitIndent:
-        vMultiplier = metrics.indentSize;
+        v_multiplier = metrics.indent_size;
         break;
       case kUnitLines:
-        vMultiplier = metrics.lineHeight;
+        v_multiplier = metrics.line_height;
       default:
         break;
     }
     result.height =
-        std::max<long>(size.height, explicitSize_.height_ * vMultiplier);
+        std::max<long>(size.height, explicit_size_.height_ * v_multiplier);
   }
   return result;
 }
 
-void Layout::SetInLayout(Bool inLayout) {
-  inLayout_ = inLayout;
-  SetVisible(inLayout);
+void Layout::SetInLayout(Bool in_layout) {
+  in_layout_ = in_layout;
+  SetVisible(in_layout);
 }
 
 const PlatformMetrics& Layout::GetPlatformMetrics() const {
@@ -250,20 +250,20 @@ const PlatformMetrics& Layout::GetPlatformMetrics() const {
       return native->GetPlatformMetrics();
   }
 
-  static PlatformMetrics noMetrics = {};
+  static PlatformMetrics no_metrics = {};
 
   DASSERT(false);
-  return noMetrics;
+  return no_metrics;
 }
 
 Bool LayoutContainer::SetProperty(const char *name, const Value &value) {
   if (strcmp(name, kPropDirection) == 0) {
     if (value.IsValueType<String>()) {
-      const String directionString = value.Coerce<String>();
+      const String direction_string = value.Coerce<String>();
 
-      if (directionString == "row")
+      if (direction_string == "row")
         direction_ = kLayoutRow;
-      else if (directionString == "column")
+      else if (direction_string == "column")
         direction_ = kLayoutColumn;
       return true;
     } else {
@@ -293,16 +293,16 @@ Value LayoutContainer::GetProperty(const char *name) const {
 }
 
 Spacing LayoutContainer::GetMargins() const {
-  const Value nativeMargins = entity_->GetNativeProperty(kPropMargins);
+  const Value native_margins = entity_->GetNativeProperty(kPropMargins);
 
-  if (nativeMargins.IsValid())
-    return nativeMargins.Coerce<Spacing>();
+  if (native_margins.IsValid())
+    return native_margins.Coerce<Spacing>();
   return Spacing();
 }
 
 void LayoutContainer::InvalidateLayout() {
-  cachedMinSize_ = Size();
-  layoutValid_ = false;
+  cached_min_size_ = Size();
+  layout_valid_ = false;
 
   LayoutContainer *parent = GetLayoutParent();
 
@@ -311,14 +311,14 @@ void LayoutContainer::InvalidateLayout() {
 }
 
 void LayoutContainer::SetSize(const Size &s) {
-  if (layoutValid_ && (s == GetSize()))
+  if (layout_valid_ && (s == GetSize()))
     return;
 
-  Size newSize;
+  Size new_size;
   long extra;
 
-  SetObjectSizes(s, &newSize, &extra);
-  ArrangeObjects(newSize, extra);
+  SetObjectSizes(s, &new_size, &extra);
+  ArrangeObjects(new_size, extra);
 }
 
 void LayoutContainer::SetLocation(const Location &loc) {
@@ -327,20 +327,20 @@ void LayoutContainer::SetLocation(const Location &loc) {
 
   SetLocationImp(loc);
   for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
-    Layout *layoutChild = entity_->ChildAt(i)->GetLayout();
+    Layout *layout_child = entity_->ChildAt(i)->GetLayout();
 
-    if (layoutChild != NULL)
-      layoutChild->ParentLocationChanged(offset);
+    if (layout_child != NULL)
+      layout_child->ParentLocationChanged(offset);
   }
 }
 
 void LayoutContainer::ParentLocationChanged(const Location &offset) {
   if (offset != Location())
     for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
-      Layout *layoutChild = entity_->ChildAt(i)->GetLayout();
+      Layout *layout_child = entity_->ChildAt(i)->GetLayout();
 
-      if (layoutChild != NULL)
-        layoutChild->ParentLocationChanged(offset);
+      if (layout_child != NULL)
+        layout_child->ParentLocationChanged(offset);
     }
 }
 
@@ -359,25 +359,25 @@ uint32_t LayoutContainer::FillChildCount() const {
 }
 
 void LayoutContainer::SetObjectSizes(
-    const Size &s, Size *newSize, long *extra) {
+    const Size &s, Size *new_size, long *extra) {
   const Spacing margins = GetMargins();
-  const unsigned int fillCount = FillChildCount();
+  const unsigned int fill_count = FillChildCount();
 
-  layoutValid_ = false;
-  for (int i = 0; !layoutValid_ && (i < 3); ++i) {  // limit the recalculations
-    layoutValid_ = true;
-    if (cachedMinSize_ == Size())
-      cachedMinSize_ = GetMinimumSize();
+  layout_valid_ = false;
+  for (int i = 0; !layout_valid_ && (i < 3); ++i) {  // limit the recalculations
+    layout_valid_ = true;
+    if (cached_min_size_ == Size())
+      cached_min_size_ = GetMinimumSize();
 
-    *newSize = Size(
-        std::max(s.width, cachedMinSize_.width),
-        std::max(s.height, cachedMinSize_.height));
-    *extra = ExtraSpace(StreamDim(*newSize));
+    *new_size = Size(
+        std::max(s.width, cached_min_size_.width),
+        std::max(s.height, cached_min_size_.height));
+    *extra = ExtraSpace(StreamDim(*new_size));
 
-    SetSizeImp(*newSize);
+    SetSizeImp(*new_size);
 
-    const long fill = (fillCount == 0) ? 0 : (*extra / fillCount);
-    long remainder  = (fillCount == 0) ? 0 : (*extra % fillCount);
+    const long fill = (fill_count == 0) ? 0 : (*extra / fill_count);
+    long remainder  = (fill_count == 0) ? 0 : (*extra % fill_count);
 
     for (uint32_t j = 0; j < entity_->ChildrenCount(); ++j) {
       Layout* const child = entity_->ChildAt(j)->GetLayout();
@@ -392,100 +392,100 @@ void LayoutContainer::SetObjectSizes(
 
       if ((CrossSizeOption(*child) == kSizeFill) ||
           (CrossDim(max) == kSizeFill))
-        CrossDim(size) = CrossDim(*newSize) -
+        CrossDim(size) = CrossDim(*new_size) -
             (CrossBefore(margins)+CrossAfter(margins));
       else
         CrossDim(size) = CrossDim(min);
 
-      if (fillCount == 0) {
+      if (fill_count == 0) {
         StreamDim(size) = StreamDim(min);
       } else {  // Distribute the extra space among the fill objects
         if ((StreamSizeOption(*child) == kSizeFill) ||
             (StreamDim(max) == kSizeFill)) {
-          long itemFill = fill + StreamDim(min);
+          long item_fill = fill + StreamDim(min);
           if (remainder > 0) {
-            ++itemFill;
+            ++item_fill;
             --remainder;
           }
-          StreamDim(size) = itemFill;
+          StreamDim(size) = item_fill;
         } else {
           StreamDim(size) = StreamDim(min);
         }
       }
       child->SetSize(size);
     }
-    if (!layoutValid_) {
-      cachedMinSize_ = Size();
+    if (!layout_valid_) {
+      cached_min_size_ = Size();
       CalculateMinimumSize();
     }
   }
-  if (fillCount != 0)
+  if (fill_count != 0)
     *extra = 0;
 }
 
-void LayoutContainer::ArrangeObjects(const Size &newSize, long extra) {
+void LayoutContainer::ArrangeObjects(const Size &new_size, long extra) {
   if (entity_->ChildrenCount() == 0)
     return;
 
   const Spacing margins = GetMargins();
-  long prevPad = StreamBefore(margins);
-  long lastEdge = 0;
-  const Bool reverseRow = (direction_ == kLayoutRow) && IsRTL();
-  const Bool reverseCol = (direction_ == kLayoutColumn) && IsRTL();
+  long prev_pad = StreamBefore(margins);
+  long last_edge = 0;
+  const Bool reverse_row = (direction_ == kLayoutRow) && IsRTL();
+  const Bool reverse_col = (direction_ == kLayoutColumn) && IsRTL();
 
-  switch (reverseRow ? ReverseAlignment(streamAlign_) : streamAlign_) {
+  switch (reverse_row ? ReverseAlignment(stream_align_) : stream_align_) {
     case kAlignStart:
       break;
     case kAlignCenter:
-      lastEdge += extra / 2;
+      last_edge += extra / 2;
       break;
     case kAlignEnd:
-      lastEdge += extra;
+      last_edge += extra;
       break;
   }
 
-  long crossExtra;
+  long cross_extra;
   Bool first = true;
-  const uint32_t end = reverseRow ? UINT32_MAX : entity_->ChildrenCount();
-  const int inc = reverseRow ? -1 : 1;
+  const uint32_t end = reverse_row ? UINT32_MAX : entity_->ChildrenCount();
+  const int inc = reverse_row ? -1 : 1;
 
-  for (uint32_t i = reverseRow ? entity_->ChildrenCount()-1 : 0;
+  for (uint32_t i = reverse_row ? entity_->ChildrenCount()-1 : 0;
        i != end; i += inc) {
     Layout *child = entity_->ChildAt(i)->GetLayout();
 
     if ((child == NULL) || !child->IsInLayout())
       continue;
 
-    const Spacing pPadding = child->GetPadding();
-    const Size childSize(child->GetSize());
+    const Spacing padding = child->GetPadding();
+    const Size child_size(child->GetSize());
     Location loc;
     long before = 0;
 
     if (first)
       before = StreamBefore(margins);
-    else if ((prevPad >= 0) && (StreamBefore(pPadding) >= 0))
-      before = std::max(StreamBefore(pPadding), prevPad);
-    StreamLoc(loc) = before + lastEdge;
+    else if ((prev_pad >= 0) && (StreamBefore(padding) >= 0))
+      before = std::max(StreamBefore(padding), prev_pad);
+    StreamLoc(loc) = before + last_edge;
     CrossLoc(loc)  = CrossBefore(margins);
-    const AlignOption childAlign = reverseCol ?
+    const AlignOption child_align = reverse_col ?
         ReverseAlignment(child->GetAlignment()) : child->GetAlignment();
 
-    switch (childAlign) {
+    switch (child_align) {
       case kAlignStart:
         break;
       case kAlignCenter:
       case kAlignEnd:
-        crossExtra = CrossDim(newSize)-CrossDim(childSize) -
+        cross_extra = CrossDim(new_size)-CrossDim(child_size) -
             (CrossBefore(margins) + CrossAfter(margins));
-        if (childAlign == kAlignEnd)
-          CrossLoc(loc) += crossExtra;
+        if (child_align == kAlignEnd)
+          CrossLoc(loc) += cross_extra;
         else
-          CrossLoc(loc) += crossExtra / 2;
+          CrossLoc(loc) += cross_extra / 2;
         break;
     }
     child->SetLocation(loc);
-    lastEdge = StreamLoc(child->GetLocation()) + StreamDim(child->GetSize());
-    prevPad = StreamAfter(pPadding);
+    last_edge = StreamLoc(child->GetLocation()) + StreamDim(child->GetSize());
+    prev_pad = StreamAfter(padding);
     first = false;
   }
   AlignBaselines();
@@ -495,9 +495,9 @@ void LayoutContainer::AlignBaselines() {
   if (direction_ != kLayoutRow)
     return;
 
-  Layout *bestItems[3] = { NULL, NULL, NULL };
+  Layout *best_items[3] = { NULL, NULL, NULL };
   long baselines[3] = { 0, 0, GetSize().height };
-  long centerHeight = 0;
+  long center_height = 0;
   AlignOption a;
   uint32 i;
   Layout *child = NULL;
@@ -513,20 +513,20 @@ void LayoutContainer::AlignBaselines() {
       case kAlignStart:
         if (baseline > baselines[0]) {
           baselines[0] = baseline;
-          bestItems[0] = child;
+          best_items[0] = child;
         }
         break;
       case kAlignCenter:
-        if (child->GetSize().height > centerHeight) {
-          centerHeight = child->GetSize().height;
+        if (child->GetSize().height > center_height) {
+          center_height = child->GetSize().height;
           baselines[1] = baseline;
-          bestItems[1] = child;
+          best_items[1] = child;
         }
         break;
       case kAlignEnd:
         if (child->GetBaseline() < baselines[2]) {
           baselines[2] = baseline;
-          bestItems[2] = child;
+          best_items[2] = child;
         }
         break;
     }
@@ -537,7 +537,7 @@ void LayoutContainer::AlignBaselines() {
       continue;
 
     a = child->GetAlignment();
-    if (child == bestItems[a])
+    if (child == best_items[a])
       continue;
 
     const long baseline = child->GetBaseline();
@@ -552,24 +552,24 @@ void LayoutContainer::AlignBaselines() {
 }
 
 Size LayoutContainer::CalculateMinimumSize() const {
-  if (cachedMinSize_ != Size())
-    return cachedMinSize_;
+  if (cached_min_size_ != Size())
+    return cached_min_size_;
 
-  Size minSize;
+  Size min_size;
 
-  maxSize_ = Size();
+  max_size_ = Size();
   if (entity_->ChildrenCount() != 0) {
     const Spacing margins = GetMargins();
-    long prevPadding = 0;
-    const Layout* const firstChild =
+    long prev_padding = 0;
+    const Layout* const first_child =
         entity_->ChildAt(0)->GetLayout();
 
-    const long firstPadding = StreamBefore(firstChild->GetPadding());
+    const long first_padding = StreamBefore(first_child->GetPadding());
 
-    // TODO(catmull): is this really useful? minSize should be empty
-    if (firstPadding > 0) {
-      StreamDim(minSize)  = -firstPadding;
-      StreamDim(maxSize_) = StreamDim(minSize);
+    // TODO(catmull): is this really useful? min_size_ should be empty
+    if (first_padding > 0) {
+      StreamDim(min_size)  = -first_padding;
+      StreamDim(max_size_) = StreamDim(min_size);
     }
 
     for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
@@ -579,50 +579,51 @@ Size LayoutContainer::CalculateMinimumSize() const {
       if ((child == NULL) || !child->IsInLayout())
         continue;
 
-      const Size childMin = child->GetMinimumSize();
-      const Spacing childPad = child->GetPadding();
+      const Size child_min = child->GetMinimumSize();
+      const Spacing child_pad = child->GetPadding();
 
-      StreamDim(minSize) += StreamDim(childMin);
-      if ((prevPadding >= 0) && (StreamBefore(childPad) >= 0))
-        StreamDim(minSize) += std::max(prevPadding, StreamBefore(childPad));
+      StreamDim(min_size) += StreamDim(child_min);
+      if ((prev_padding >= 0) && (StreamBefore(child_pad) >= 0))
+        StreamDim(min_size) += std::max(prev_padding, StreamBefore(child_pad));
 
-      CrossDim(minSize) = std::max(
-          CrossDim(minSize),
-          CrossDim(childMin) +
+      CrossDim(min_size) = std::max(
+          CrossDim(min_size),
+          CrossDim(child_min) +
               std::max<long>(0, CrossBefore(margins)) +
               std::max<long>(0, CrossAfter(margins)));
 
-      const Size childMax = child->GetMaximumSize();
+      const Size child_max = child->GetMaximumSize();
 
-      if (((hSize_ == kSizeDefault) &&
+      if (((h_size_ == kSizeDefault) &&
            (child->GetHSizeOption() == kSizeFill)) ||
-          (childMax.width == kSizeFill))
-        maxSize_.width = kSizeFill;
-      if (((vSize_ == kSizeDefault) &&
+          (child_max.width == kSizeFill))
+        max_size_.width = kSizeFill;
+      if (((v_size_ == kSizeDefault) &&
            (child->GetVSizeOption() == kSizeFill)) ||
-          (childMax.height == kSizeFill))
-        maxSize_.height = kSizeFill;
+          (child_max.height == kSizeFill))
+        max_size_.height = kSizeFill;
 
-      if (StreamDim(maxSize_) != kSizeFill) {
-        StreamDim(maxSize_) += StreamDim(childMax);
-        if ((prevPadding >= 0) && (StreamBefore(childPad) >= 0))
-          StreamDim(maxSize_) += std::max(prevPadding, StreamBefore(childPad));
+      if (StreamDim(max_size_) != kSizeFill) {
+        StreamDim(max_size_) += StreamDim(child_max);
+        if ((prev_padding >= 0) && (StreamBefore(child_pad) >= 0))
+          StreamDim(max_size_) +=
+              std::max(prev_padding, StreamBefore(child_pad));
       }
-      if (CrossDim(maxSize_) != kSizeFill) {
-        CrossDim(maxSize_) = std::max(
-            CrossDim(maxSize_),
-            CrossDim(childMax) +
+      if (CrossDim(max_size_) != kSizeFill) {
+        CrossDim(max_size_) = std::max(
+            CrossDim(max_size_),
+            CrossDim(child_max) +
               std::max<long>(0, CrossBefore(margins)) +
               std::max<long>(0, CrossAfter(margins)));
       }
 
-      prevPadding = StreamAfter(child->GetPadding());
+      prev_padding = StreamAfter(child->GetPadding());
     }
   }
-  maxSize_.width =  std::min(maxSize_.width,  minSize.width);
-  maxSize_.height = std::min(maxSize_.height, minSize.height);
-  cachedMinSize_ = minSize;
-  return minSize;
+  max_size_.width =  std::min(max_size_.width,  min_size.width);
+  max_size_.height = std::min(max_size_.height, min_size.height);
+  cached_min_size_ = min_size;
+  return min_size;
 }
 
 void LayoutContainer::SetSizeImp(const Size &size) {
@@ -636,8 +637,8 @@ void LayoutContainer::SetLocationImp(const Location &loc) {
 }
 
 void LayoutContainer::ResizeToMinimum() {
-  cachedMinSize_ = Size();
-  layoutValid_ = false;
+  cached_min_size_ = Size();
+  layout_valid_ = false;
 
   for (int i = 0; i < 3; ++i) {
     const Size min = GetMinimumSize();
@@ -649,19 +650,19 @@ void LayoutContainer::ResizeToMinimum() {
 }
 
 Size BorderedContainer::CalculateMinimumSize() const {
-  if (cachedMinSize_ != Size())
-    return cachedMinSize_;
+  if (cached_min_size_ != Size())
+    return cached_min_size_;
 
-  cachedMinSize_ = LayoutContainer::CalculateMinimumSize();
+  cached_min_size_ = LayoutContainer::CalculateMinimumSize();
 
   if (entity_->ChildrenCount() != 0) {
     const Spacing margins = GetMargins();
 
-    StreamDim(cachedMinSize_) += StreamBefore(margins) + StreamAfter(margins);
-    if (StreamDim(maxSize_) != kSizeFill)
-      StreamDim(maxSize_) += StreamBefore(margins) + StreamAfter(margins);
+    StreamDim(cached_min_size_) += StreamBefore(margins) + StreamAfter(margins);
+    if (StreamDim(max_size_) != kSizeFill)
+      StreamDim(max_size_) += StreamBefore(margins) + StreamAfter(margins);
   }
-  return cachedMinSize_;
+  return cached_min_size_;
 }
 
 void Group::ChildAdded(Entity *child) {
@@ -669,18 +670,18 @@ void Group::ChildAdded(Entity *child) {
     const Value padding = child->GetProperty(kPropPadding);
 
     if (padding.IsValid())
-      minPadding_ = padding.Coerce<Spacing>();
+      min_padding_ = padding.Coerce<Spacing>();
   }
   LayoutContainer::ChildAdded(child);
 }
 
-void Group::SetSize(const Size &newSize) {
-  LayoutContainer::SetSize(newSize);
+void Group::SetSize(const Size &new_size) {
+  LayoutContainer::SetSize(new_size);
 
   // Recalculate the container's padding, which is determined by the children's
   // padding extending outside the container's bounds.
   if (entity_->ChildrenCount() != 0) {
-    Spacing newMinPadding;
+    Spacing new_min_padding;
     Layout *front = NULL, *back = NULL, *child;
     uint32_t i;
 
@@ -693,15 +694,15 @@ void Group::SetSize(const Size &newSize) {
       }
     }
     if (back == NULL) {  // All children are hidden
-      minPadding_ = Spacing();
+      min_padding_ = Spacing();
       return;
     }
 
-    StreamBefore(newMinPadding) = StreamBefore(front->GetPadding());
-    StreamAfter(newMinPadding)  = StreamAfter(back->GetPadding());
+    StreamBefore(new_min_padding) = StreamBefore(front->GetPadding());
+    StreamAfter(new_min_padding)  = StreamAfter(back->GetPadding());
 
-    long &before = CrossBefore(newMinPadding);
-    long &after = CrossAfter(newMinPadding);
+    long &before = CrossBefore(new_min_padding);
+    long &after = CrossAfter(new_min_padding);
 
     for (i = 0; i < entity_->ChildrenCount(); ++i) {
       child = entity_->ChildAt(i)->GetLayout();
@@ -714,13 +715,13 @@ void Group::SetSize(const Size &newSize) {
 
       before = std::max(before, CrossBefore(pad) - CrossLoc(loc));
       after  = std::max(before, CrossAfter(pad) -
-           (CrossDim(newSize) - (CrossLoc(loc) + CrossDim(size))));
+           (CrossDim(new_size) - (CrossLoc(loc) + CrossDim(size))));
     }
 
-    if (newMinPadding != minPadding_) {
+    if (new_min_padding != min_padding_) {
       LayoutContainer *parent = GetLayoutParent();
 
-      minPadding_ = newMinPadding;
+      min_padding_ = new_min_padding;
       if (parent != NULL)
         parent->InvalidateLayout();
     }
@@ -745,10 +746,10 @@ Size Spacer::CalculateMinimumSize() const {
   const PlatformMetrics &metrics = GetPlatformMetrics();
   Size result;
 
-  if (hSize_ == kSizeExplicit)
-    result.width = explicitSize_.CalculateWidth(metrics);
-  if (vSize_ == kSizeExplicit)
-    result.height = explicitSize_.CalculateHeight(metrics);
+  if (h_size_ == kSizeExplicit)
+    result.width = explicit_size_.CalculateWidth(metrics);
+  if (v_size_ == kSizeExplicit)
+    result.height = explicit_size_.CalculateHeight(metrics);
 
   return result;
 }

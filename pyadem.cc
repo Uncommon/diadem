@@ -35,14 +35,14 @@ static PyademEntity* WrapEntity(Diadem::Entity *entity) {
 }
 
 static void ButtonCallback(Diadem::Entity *button, PyademEntity *self) {
-  if ((self->buttonCallback != NULL) &&
-      (PyCallable_Check(self->buttonCallback))) {
-    PyademEntity *buttonObject = WrapEntity(button);
-    PyObject *args = PyTuple_Pack(2, self, buttonObject);
+  if ((self->button_callback != NULL) &&
+      (PyCallable_Check(self->button_callback))) {
+    PyademEntity *button_object = WrapEntity(button);
+    PyObject *args = PyTuple_Pack(2, self, button_object);
 
-    PyEval_CallObject(self->buttonCallback, args);
+    PyEval_CallObject(self->button_callback, args);
     Py_DECREF(args);
-    Py_DECREF(buttonObject);
+    Py_DECREF(button_object);
     if (PyErr_Occurred()) {
       PyErr_Print();
       PyErr_Clear();
@@ -69,21 +69,21 @@ static char* GetResourcePath(const char *path) {
     return NULL;
   }
 
-  CFStringRef pathString = CFURLCopyPath(url);
+  CFStringRef path_string = CFURLCopyPath(url);
 
   CFRelease(url);
-  if (pathString == NULL) {
+  if (path_string == NULL) {
     PyErr_SetString(PyExc_RuntimeError, "can't make path string");
     return NULL;
   }
 
-  const CFIndex pathLength =
-      CFStringGetMaximumSizeOfFileSystemRepresentation(pathString);
-  char *result = new char[pathLength];
+  const CFIndex path_length =
+      CFStringGetMaximumSizeOfFileSystemRepresentation(path_string);
+  char *result = new char[path_length];
   bool converted =
-      CFStringGetFileSystemRepresentation(pathString, result, pathLength);
+      CFStringGetFileSystemRepresentation(path_string, result, path_length);
 
-  CFRelease(pathString);
+  CFRelease(path_string);
   if (!converted) {
     PyErr_SetString(PyExc_RuntimeError, "failed to copy path string");
     delete[] result;
@@ -97,7 +97,7 @@ static int Entity_init(PyademEntity *self, PyObject *args, PyObject *keywords) {
   static const char *keys[] = { "path", "data" };
 
   self->object = NULL;
-  self->buttonCallback = Py_None;
+  self->button_callback = Py_None;
   self->context = NULL;
   if (!PyArg_ParseTupleAndKeywords(
       args, keywords, "|SS", const_cast<char**>(keys), &path, &data))
@@ -199,15 +199,15 @@ static PyObject* Entity_findByName(PyademEntity *self, PyObject *name) {
 }
 
 static PyMethodDef Entity_methods[] = {
-    { "getProperty", (PyCFunction)Entity_getProperty, METH_O, NULL },
-    { "setProperty", (PyCFunction)Entity_setProperty, METH_VARARGS, NULL },
-    { "findByName",  (PyCFunction)Entity_findByName,  METH_O, NULL },
+    { "GetProperty", (PyCFunction)Entity_getProperty, METH_O, NULL },
+    { "SetProperty", (PyCFunction)Entity_setProperty, METH_VARARGS, NULL },
+    { "FindByName",  (PyCFunction)Entity_findByName,  METH_O, NULL },
     { NULL },
     };
 
 static PyMemberDef Entity_members[] = {
-    { (char*)"buttonCallback", T_OBJECT,
-      offsetof(PyademEntity, buttonCallback), 0, NULL },
+    { (char*)"button_callback", T_OBJECT,
+      offsetof(PyademEntity, button_callback), 0, NULL },
     { (char*)"context", T_OBJECT,
       offsetof(PyademEntity, context), 0, NULL },
     { NULL },
@@ -298,10 +298,10 @@ static PyObject* Window_endModal(PyademWindow *self) {
 
 
 static PyMethodDef Window_methods[] = {
-    { "showModeless", (PyCFunction)Window_showModeless, METH_NOARGS, NULL },
-    { "close",        (PyCFunction)Window_close,        METH_NOARGS, NULL },
-    { "showModal",    (PyCFunction)Window_showModal,    METH_NOARGS, NULL },
-    { "endModal",     (PyCFunction)Window_endModal,     METH_NOARGS, NULL },
+    { "ShowModeless", (PyCFunction)Window_showModeless, METH_NOARGS, NULL },
+    { "Close",        (PyCFunction)Window_close,        METH_NOARGS, NULL },
+    { "ShowModal",    (PyCFunction)Window_showModal,    METH_NOARGS, NULL },
+    { "EndModal",     (PyCFunction)Window_endModal,     METH_NOARGS, NULL },
     { NULL },
     };
 
@@ -346,13 +346,13 @@ PyTypeObject WindowType = {
     };
 
 static PyObject* ChooseFolder(PyObject *self, PyObject *args) {
-  PyObject *startString;
-  Diadem::String startFolder;
+  PyObject *start_string;
+  Diadem::String start_folder;
 
-  if (PyArg_ParseTuple(args, "S", &startString))
-    startFolder = PyString_AsString(startString);
+  if (PyArg_ParseTuple(args, "S", &start_string))
+    start_folder = PyString_AsString(start_string);
 
-  const Diadem::String result = Diadem::Cocoa::ChooseFolder(startFolder);
+  const Diadem::String result = Diadem::Cocoa::ChooseFolder(start_folder);
 
   if (strlen(result.Get()) == 0)
     return Py_None;

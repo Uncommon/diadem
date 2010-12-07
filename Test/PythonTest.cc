@@ -53,7 +53,7 @@ TEST_F(PythonTest, ValueCoersions) {
 TEST_F(PythonTest, Window) {
   PyObject *result = PyRun_String(
       "window = pyadem.window(data=\"<window text='spiny'/>\")\n"
-      "didShow = window.showModeless()",
+      "did_show = window.ShowModeless()",
       Py_file_input, globals_, locals_);
   PyObject *error = PyErr_Occurred();
 
@@ -70,10 +70,10 @@ TEST_F(PythonTest, Window) {
   EXPECT_TRUE(PyObject_TypeCheck(window, &EntityType));
   EXPECT_TRUE(PyObject_TypeCheck(window, &WindowType));
 
-  PyObject *didShow = PyDict_GetItemString(locals_, "didShow");
+  PyObject *did_show = PyDict_GetItemString(locals_, "did_show");
 
-  ASSERT_FALSE(didShow == NULL);
-  EXPECT_TRUE(PyObject_IsTrue(didShow));
+  ASSERT_FALSE(did_show == NULL);
+  EXPECT_TRUE(PyObject_IsTrue(did_show));
 }
 
 TEST_F(PythonTest, GetSetName) {
@@ -98,20 +98,20 @@ TEST_F(PythonTest, GetSetName) {
   EXPECT_STREQ("spiny", PyString_AsString(name));
   Py_DECREF(name);
 
-  PyademEntity *pyEntity = (PyademEntity*)window;
+  PyademEntity *py_entity = (PyademEntity*)window;
 
-  EXPECT_STREQ("spiny", pyEntity->object->GetName());
-  pyEntity->object->SetName("norman");
+  EXPECT_STREQ("spiny", py_entity->object->GetName());
+  py_entity->object->SetName("norman");
   name = PyObject_GetAttrString(window, "name");
   ASSERT_FALSE(name == NULL);
   ASSERT_TRUE(PyString_Check(name));
   EXPECT_STREQ("norman", PyString_AsString(name));
   Py_DECREF(name);
 
-  PyObject *newName = PyString_FromString("dinsdale");
-  PyObject_SetAttrString(window, "name", newName);
-  Py_DECREF(newName);
-  EXPECT_STREQ("dinsdale", pyEntity->object->GetName());
+  PyObject *new_name = PyString_FromString("dinsdale");
+  PyObject_SetAttrString(window, "name", new_name);
+  Py_DECREF(new_name);
+  EXPECT_STREQ("dinsdale", py_entity->object->GetName());
 
   Py_DECREF(window);
 }
@@ -119,8 +119,8 @@ TEST_F(PythonTest, GetSetName) {
 TEST_F(PythonTest, Properties) {
   PyObject *result = PyRun_String(
       "window = pyadem.window(data=\"<window text='spiny'/>\")\n"
-      "text = window.getProperty(\"text\")\n"
-      "window.setProperty(\"text\", \"Norman\")",
+      "text = window.GetProperty(\"text\")\n"
+      "window.SetProperty(\"text\", \"Norman\")",
       Py_file_input, globals_, locals_);
   PyObject *error = PyErr_Occurred();
 
@@ -142,18 +142,18 @@ TEST_F(PythonTest, Properties) {
   ASSERT_TRUE(PyString_Check(text));
   EXPECT_STREQ("spiny", PyString_AsString(text));
 
-  Diadem::Entity *windowEntity = ((PyademEntity*)window)->object;
+  Diadem::Entity *window_entity = ((PyademEntity*)window)->object;
 
   EXPECT_STREQ("Norman",
-      windowEntity->GetProperty("text").Coerce<Diadem::String>().Get());
+      window_entity->GetProperty("text").Coerce<Diadem::String>().Get());
 }
 
 TEST_F(PythonTest, FindByName) {
   PyObject *result = PyRun_String(
       "window = pyadem.window(data=\""
         "<window><button name='A'/><button name='B'/></window>\")\n"
-      "buttonA = window.findByName(\"A\")\n"
-      "buttonB = window.findByName(\"B\")\n",
+      "buttonA = window.FindByName(\"A\")\n"
+      "buttonB = window.FindByName(\"B\")\n",
       Py_file_input, globals_, locals_);
   PyObject *error = PyErr_Occurred();
 
@@ -186,7 +186,7 @@ TEST_F(PythonTest, ButtonCallback) {
       "window.context = False\n"
       "def callback(win, button):\n"
       "  win.context = True\n"
-      "window.buttonCallback = callback\n",
+      "window.button_callback = callback\n",
       Py_file_input, globals_, locals_);
   PyObject *error = PyErr_Occurred();
 
@@ -236,7 +236,7 @@ TEST_F(PythonTest, LoadFromFile) {
 #if RUN_INTERACTING_TESTS  // TODO(catmull): automate the button clicking
 TEST_F(PythonTest, MessagePlain) {
   PyObject *result = PyRun_String(
-      "button = pyadem.showMessage('Something happened!')",
+      "button = pyadem.ShowMessage('Something happened!')",
       Py_file_input, globals_, locals_);
   PyObject *error = PyErr_Occurred();
 
@@ -256,7 +256,7 @@ TEST_F(PythonTest, MessagePlain) {
 
 TEST_F(PythonTest, MessageCancel) {
   PyObject *result = PyRun_String(
-      "button = pyadem.showMessage('Click Cancel for me.', cancel=True)",
+      "button = pyadem.ShowMessage('Click Cancel for me.', cancel=True)",
       Py_file_input, globals_, locals_);
   PyObject *error = PyErr_Occurred();
 
@@ -276,7 +276,7 @@ TEST_F(PythonTest, MessageCancel) {
 
 TEST_F(PythonTest, MessageSuppress) {
   PyObject *result = PyRun_String(
-      "msg_result = pyadem.showMessage('Somebody stop me!', suppress='Stop')",
+      "msg_result = pyadem.ShowMessage('Somebody stop me!', suppress='Stop')",
       Py_file_input, globals_, locals_);
   PyObject *error = PyErr_Occurred();
 

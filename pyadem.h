@@ -33,7 +33,7 @@ class Window;
 struct PyademEntity {
   PyObject_HEAD
   Diadem::Entity *object;
-  PyObject *buttonCallback;
+  PyObject *button_callback;
   PyObject *context;
 };
 

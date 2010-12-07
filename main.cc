@@ -20,12 +20,12 @@ extern "C" int NSApplicationMain(int argc, const char *argv[]);
 extern "C" void NSApplicationLoad();
 
 int InitPython() {
-  static const char *pyademModule = "pyadem";
+  static const char *pyadem_module = "pyadem";
 
-  PyImport_AppendInittab(const_cast<char*>(pyademModule), initpyadem);
+  PyImport_AppendInittab(const_cast<char*>(pyadem_module), initpyadem);
   Py_Initialize();
 
-  PyObject *module = PyImport_ImportModule(pyademModule);
+  PyObject *module = PyImport_ImportModule(pyadem_module);
 
   if (module == NULL)
     return -1;

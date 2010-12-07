@@ -93,9 +93,9 @@ class Value {
   T Coerce() const {
     if (holder_ == NULL)
       return T();
-    ValueHolder<T> *tHolder = dynamic_cast<ValueHolder<T>*>(holder_);
-    if (tHolder != NULL)
-      return tHolder->data;
+    ValueHolder<T> *t_holder = dynamic_cast<ValueHolder<T>*>(holder_);
+    if (t_holder != NULL)
+      return t_holder->data;
     return holder_->Coerce(type<T>());
   }
 

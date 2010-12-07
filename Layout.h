@@ -46,8 +46,8 @@ extern const PropertyName
 class Layout : public EntityDelegate {
  public:
   Layout()
-      : inLayout_(true),
-        hSize_(kSizeDefault), vSize_(kSizeDefault),
+      : in_layout_(true),
+        h_size_(kSizeDefault), v_size_(kSizeDefault),
         align_(kAlignStart) {}
   virtual ~Layout() {}
 
@@ -105,22 +105,22 @@ class Layout : public EntityDelegate {
 
   // "Not in layout" means it takes up no space in the layout. It also implies
   // not visible.
-  void SetInLayout(Bool inLayout);
-  Bool IsInLayout() const { return inLayout_; }
+  void SetInLayout(Bool in_layout);
+  Bool IsInLayout() const { return in_layout_; }
 
   virtual void ParentLocationChanged(const Location &offset);
 
-  SizeOption GetHSizeOption() const { return hSize_; }
-  SizeOption GetVSizeOption() const { return vSize_; }
-  void SetHSizeOption(SizeOption hSize) { hSize_ = hSize; }
-  void SetVSizeOption(SizeOption vSize) { vSize_ = vSize; }
+  SizeOption GetHSizeOption() const { return h_size_; }
+  SizeOption GetVSizeOption() const { return v_size_; }
+  void SetHSizeOption(SizeOption h_size) { h_size_ = h_size; }
+  void SetVSizeOption(SizeOption v_size) { v_size_ = v_size; }
 
   const PlatformMetrics& GetPlatformMetrics() const;
 
  protected:
-  Bool inLayout_;
-  SizeOption hSize_, vSize_;
-  ExplicitSize explicitSize_;
+  Bool in_layout_;
+  SizeOption h_size_, v_size_;
+  ExplicitSize explicit_size_;
   AlignOption align_;
 
   Size EnforceExplicitSize(const Size &size) const;
@@ -153,8 +153,8 @@ class SelfMeasured : public Layout {
 class LayoutContainer : public Layout {
  public:
   LayoutContainer()
-      : direction_(kLayoutRow), visible_(true), layoutValid_(false),
-        streamAlign_(kAlignStart), crossAlign_(kAlignStart) {}
+      : direction_(kLayoutRow), visible_(true), layout_valid_(false),
+        stream_align_(kAlignStart), cross_align_(kAlignStart) {}
   virtual ~LayoutContainer() {}
 
   virtual Bool SetProperty(PropertyName name, const Value &value);
@@ -175,22 +175,22 @@ class LayoutContainer : public Layout {
 
  protected:
   LayoutDirection direction_;
-  Bool visible_, layoutValid_;
-  AlignOption streamAlign_, crossAlign_;
-  mutable Size cachedMinSize_;
-  mutable Size maxSize_;
+  Bool visible_, layout_valid_;
+  AlignOption stream_align_, cross_align_;
+  mutable Size cached_min_size_;
+  mutable Size max_size_;
 
   // Layout is done in two main phases: setting sizes, and setting locations.
-  void SetObjectSizes(const Size &s, Size *newSize, long *extra);
-  void ArrangeObjects(const Size &newSize, long extra);
+  void SetObjectSizes(const Size &s, Size *new_size, long *extra);
+  void ArrangeObjects(const Size &new_size, long extra);
 
   virtual void SetSizeImp(const Size &size);
   virtual void SetLocationImp(const Location &loc);
   virtual void ParentLocationChanged(const Location &offset);
 
   // Extra space available to child objects that may want to expand to fill it
-  virtual long ExtraSpace(long newSize)
-    { return newSize - StreamDim(CalculateMinimumSize()); }
+  virtual long ExtraSpace(long new_size)
+    { return new_size - StreamDim(CalculateMinimumSize()); }
 
   void AlignBaselines();
   uint32_t FillChildCount() const;
@@ -262,7 +262,7 @@ class Group : public LayoutContainer {
 
   virtual void ChildAdded(Entity *child);
 
-  Spacing GetPadding() const { return minPadding_; }
+  Spacing GetPadding() const { return min_padding_; }
 
   virtual void SetSize(const Size &size);
   virtual Size GetSize() const { return size_; }
@@ -274,7 +274,7 @@ class Group : public LayoutContainer {
  protected:
   Size size_;
   Location location_;
-  Spacing minPadding_;
+  Spacing min_padding_;
 
   void CalculatePadding();
 

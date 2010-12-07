@@ -25,12 +25,12 @@ const PropertyName
     Entity::kPropEnabled = "enabled";
 
 Entity::Entity()
-    : parent_(NULL), native_(NULL), layout_(NULL),
-      buttonCallback_(NULL), buttonData_(NULL) {
+    : parent_(NULL), layout_(NULL), native_(NULL),
+      button_callback_(NULL), button_data_(NULL) {
 }
 
 Entity::~Entity() {
-  for (int i = 0; i < children_.size(); ++i)
+  for (size_t i = 0; i < children_.size(); ++i)
     delete children_[i];
   delete layout_;
   delete native_;
@@ -39,7 +39,7 @@ Entity::~Entity() {
 void Entity::InitializeProperties(const PropertyMap &properties) {
   const Array<String> keys = properties.AllKeys();
 
-  for (int32_t i = 0; i < keys.size(); ++i)
+  for (size_t i = 0; i < keys.size(); ++i)
     SetProperty(keys[i], properties[keys[i]]);
 }
 
@@ -99,7 +99,7 @@ Entity* Entity::FindByName(const char *name) {
   if (name_ == name)
     return this;
 
-  for (int32_t i = 0; i < children_.size(); ++i) {
+  for (size_t i = 0; i < children_.size(); ++i) {
     Entity* result = children_[i]->FindByName(name);
 
     if (result != NULL)
@@ -124,10 +124,10 @@ Value Entity::GetProperty(const char *name) const {
   if (strcmp(name, kPropName) == 0)
     return GetName();
 
-  Value layoutResult = GetLayoutProperty(name);
+  Value layout_result = GetLayoutProperty(name);
 
-  if (layoutResult.IsValid())
-    return layoutResult;
+  if (layout_result.IsValid())
+    return layout_result;
   return GetNativeProperty(name);
 }
 
@@ -166,8 +166,8 @@ String Entity::GetText() const {
 }
 
 void Entity::Clicked(Entity *target) {
-  if (buttonCallback_ != NULL)
-    (*buttonCallback_)(target, buttonData_);
+  if (button_callback_ != NULL)
+    (*button_callback_)(target, button_data_);
   else if (GetParent() != NULL)
     GetParent()->Clicked(target);
 }

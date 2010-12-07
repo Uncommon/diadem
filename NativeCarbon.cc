@@ -27,9 +27,9 @@ CFStringRef CFStringFromString(const Diadem::String &dstring) {
 
 }  // namespace
 
-Diadem::String StringFromCFString(CFStringRef cfString) {
+Diadem::String StringFromCFString(CFStringRef cf_string) {
   const CFIndex length = ::CFStringGetBytes(
-      cfString, CFRangeMake(0, ::CFStringGetLength(cfString)),
+      cf_string, CFRangeMake(0, ::CFStringGetLength(cf_string)),
       kCFStringEncodingUTF8, '.', false, NULL, 0, NULL);
 
   if (length == 0)
@@ -38,7 +38,7 @@ Diadem::String StringFromCFString(CFStringRef cfString) {
   char *buffer = new char[length+1];
 
   ::CFStringGetBytes(
-      cfString, CFRangeMake(0, ::CFStringGetLength(cfString)),
+      cf_string, CFRangeMake(0, ::CFStringGetLength(cf_string)),
       kCFStringEncodingUTF8, '.', false,
       reinterpret_cast<UInt8*>(buffer), length, NULL);
   buffer[length] = '\0';
@@ -100,7 +100,7 @@ void Carbon::SetUpFactory(Factory *factory) {
 }
 
 void Carbon::Window::InitializeProperties(const PropertyMap &properties) {
-  const Rect defaultBounds = { 40, 0, 50, 50 };
+  const Rect default_bounds = { 40, 0, 50, 50 };
   OSStatus err;
 
   err = ::CreateNewWindow(
@@ -108,42 +108,43 @@ void Carbon::Window::InitializeProperties(const PropertyMap &properties) {
       kWindowAsyncDragAttribute |
           kWindowStandardHandlerAttribute |
           kWindowCompositingAttribute,
-      &defaultBounds, &windowRef_);
-  if ((err == noErr) && (windowRef_ != NULL)) {
+      &default_bounds, &window_ref_);
+  if ((err == noErr) && (window_ref_ != NULL)) {
     if (properties.Exists(Entity::kPropText)) {
-      const String titleString = properties[Entity::kPropText].Coerce<String>();
-      ScopedCFType<CFStringRef> cfTitle(
-          CFStringFromString(titleString),
+      const String title_string =
+          properties[Entity::kPropText].Coerce<String>();
+      ScopedCFType<CFStringRef> cf_title(
+          CFStringFromString(title_string),
           kDontRetain);
 
-      ::SetWindowTitleWithCFString(windowRef_, cfTitle);
+      ::SetWindowTitleWithCFString(window_ref_, cf_title);
     }
   }
 }
 
 Carbon::Window::~Window() {
-  if (windowRef_ != NULL)
-    ::CFRelease(windowRef_);
+  if (window_ref_ != NULL)
+    ::CFRelease(window_ref_);
 }
 
 Bool Carbon::Window::SetProperty(PropertyName name, const Value &value) {
-  if (windowRef_ == NULL)
+  if (window_ref_ == NULL)
     return false;
   if (strcmp(name, Entity::kPropText) == 0) {
     ScopedCFType<CFStringRef> title(
         CFStringFromString(value.Coerce<String>()),
         kDontRetain);
-    ::SetWindowTitleWithCFString(windowRef_, title);
+    ::SetWindowTitleWithCFString(window_ref_, title);
     return true;
   }
   if (strcmp(name, kPropSize) == 0) {
     const Size size = value.Coerce<Size>();
     Rect bounds;
 
-    ::GetWindowBounds(windowRef_, kWindowContentRgn, &bounds);
+    ::GetWindowBounds(window_ref_, kWindowContentRgn, &bounds);
     bounds.right = bounds.left + size.width;
     bounds.bottom = bounds.top + size.height;
-    ::SetWindowBounds(windowRef_, kWindowContentRgn, &bounds);
+    ::SetWindowBounds(window_ref_, kWindowContentRgn, &bounds);
     // TODO(catmull): reposition?
     return true;
   }
@@ -151,18 +152,18 @@ Bool Carbon::Window::SetProperty(PropertyName name, const Value &value) {
 }
 
 Value Carbon::Window::GetProperty(PropertyName name) const {
-  if (windowRef_ == NULL)
+  if (window_ref_ == NULL)
     return false;
   if (strcmp(name, Entity::kPropText) == 0) {
     ScopedCFType<CFStringRef> title;
 
-    ::CopyWindowTitleAsCFString(windowRef_, title.RetainedOutPtr());
+    ::CopyWindowTitleAsCFString(window_ref_, title.RetainedOutPtr());
     return StringFromCFString(title);
   }
   if (strcmp(name, kPropSize) == 0) {
     Rect bounds;
 
-    ::GetWindowBounds(windowRef_, kWindowContentRgn, &bounds);
+    ::GetWindowBounds(window_ref_, kWindowContentRgn, &bounds);
     return Size(bounds.right-bounds.left, bounds.bottom-bounds.top);
   }
   if (strcmp(name, kPropMargins) == 0) {
@@ -175,37 +176,37 @@ void Carbon::Window::AddChild(Native *child) {
   if (!::HIViewIsValid((HIViewRef)child->GetNativeRef()))
     return;
 
-  HIViewRef contentView = NULL;
+  HIViewRef content_view = NULL;
 
   ::HIViewFindByID(
-      ::HIViewGetRoot(windowRef_), kHIViewWindowContentID, &contentView);
-  if (contentView != NULL)
-    ::HIViewAddSubview(contentView, (HIViewRef)child->GetNativeRef());
+      ::HIViewGetRoot(window_ref_), kHIViewWindowContentID, &content_view);
+  if (content_view != NULL)
+    ::HIViewAddSubview(content_view, (HIViewRef)child->GetNativeRef());
 }
 
 Bool Carbon::Window::ShowModeless() {
-  if (windowRef_ == NULL)
+  if (window_ref_ == NULL)
     return false;
-  ::SelectWindow(windowRef_);
-  ::ShowWindow(windowRef_);
+  ::SelectWindow(window_ref_);
+  ::ShowWindow(window_ref_);
   return true;
 }
 
 Bool Carbon::Window::Close() {
-  if (windowRef_ == NULL)
+  if (window_ref_ == NULL)
     return false;
-  ::HideWindow(windowRef_);
+  ::HideWindow(window_ref_);
   return true;
 }
 
-Bool Carbon::Window::ShowModal(void *onParent) {
-  if (windowRef_ == NULL)
+Bool Carbon::Window::ShowModal(void *on_parent) {
+  if (window_ref_ == NULL)
     return false;
 
   // TODO(catmull): defer to main thread
 
   WindowPtr parent = ::GetFrontWindowOfClass(kDocumentWindowClass, true);
-  WindowPositionMethod windowPosition;
+  WindowPositionMethod window_position;
 
   if (parent == NULL)
     parent = ::GetFrontWindowOfClass(kMovableModalWindowClass, true);
@@ -215,110 +216,110 @@ Bool Carbon::Window::ShowModal(void *onParent) {
     // has been marked as an alert and has a parent window, we assume it's
     // strongly associated with that window (i.e., it would be a sheet if
     // not for our modality needs), so we give it window alert position.
-    windowPosition = isAlert_ ? kWindowAlertPositionOnParentWindow
+    window_position = is_alert_ ? kWindowAlertPositionOnParentWindow
                               : kWindowAlertPositionOnParentWindowScreen;
   } else {
-    windowPosition = kWindowAlertPositionOnMainScreen;
+    window_position = kWindowAlertPositionOnMainScreen;
   }
-  ::RepositionWindow(windowRef_, parent, windowPosition);
+  ::RepositionWindow(window_ref_, parent, window_position);
   ::SetThemeCursor(kThemeArrowCursor);
-  ::ShowWindow(windowRef_);
-  ::SelectWindow(windowRef_);
-  ::RunAppModalLoopForWindow(windowRef_);
+  ::ShowWindow(window_ref_);
+  ::SelectWindow(window_ref_);
+  ::RunAppModalLoopForWindow(window_ref_);
   return true;
 }
 
 Bool Carbon::Window::EndModal() {
-  if (windowRef_ == NULL)
+  if (window_ref_ == NULL)
     return false;
 
   // TODO(catmull): defer to main thread
 
   // TODO(catmull): maybe check window modality for good measure
 
-  ::QuitAppModalLoopForWindow(windowRef_);
-  ::HideWindow(windowRef_);
+  ::QuitAppModalLoopForWindow(window_ref_);
+  ::HideWindow(window_ref_);
   return true;
 }
 
-Bool Carbon::Window::SetFocus(Entity *newFocus) {
-  if ((windowRef_ == NULL) || (newFocus == NULL) ||
-      (newFocus->GetNative() == NULL) ||
-      (newFocus->GetNative()->GetNativeRef() == NULL))
+Bool Carbon::Window::SetFocus(Entity *new_focus) {
+  if ((window_ref_ == NULL) || (new_focus == NULL) ||
+      (new_focus->GetNative() == NULL) ||
+      (new_focus->GetNative()->GetNativeRef() == NULL))
     return false;
   if (!::IsValidControlHandle((HIViewRef)
-      newFocus->GetNative()->GetNativeRef()))
+      new_focus->GetNative()->GetNativeRef()))
     return false;
 
   ::SetKeyboardFocus(
-      windowRef_,
-      (HIViewRef)newFocus->GetNative()->GetNativeRef(),
+      window_ref_,
+      (HIViewRef)new_focus->GetNative()->GetNativeRef(),
       kControlFocusNextPart);
   return true;
 }
 
 Carbon::Control::~Control() {
-  if (viewRef_ != NULL)
-    ::CFRelease(viewRef_);
+  if (view_ref_ != NULL)
+    ::CFRelease(view_ref_);
 }
 
 Bool Carbon::Control::SetProperty(PropertyName name, const Value &value) {
-  if (viewRef_ == NULL)
+  if (view_ref_ == NULL)
     return false;
   if (strcmp(name, kPropLocation) == 0) {
     const Location loc = value.Coerce<Location>() + GetViewOffset();
 
-    ::HIViewPlaceInSuperviewAt(viewRef_, loc.x, loc.y);
+    ::HIViewPlaceInSuperviewAt(view_ref_, loc.x, loc.y);
     return true;
   }
   if (strcmp(name, kPropSize) == 0) {
     const Size size = value.Coerce<Size>() + GetInset();
     HIRect frame;
 
-    ::HIViewGetFrame(viewRef_, &frame);
+    ::HIViewGetFrame(view_ref_, &frame);
     frame.size.width = size.width;
     frame.size.height = size.height;
-    ::HIViewSetFrame(viewRef_, &frame);
+    ::HIViewSetFrame(view_ref_, &frame);
     return true;
   }
   if (strcmp(name, Entity::kPropText) == 0) {
-    ScopedCFType<CFStringRef> cfText(
+    ScopedCFType<CFStringRef> cf_text(
         CFStringFromString(value.Coerce<String>()),
         kDontRetain);
 
-    return ::HIViewSetText(viewRef_, cfText) == noErr;
+    return ::HIViewSetText(view_ref_, cf_text) == noErr;
   }
   if (strcmp(name, kPropVisible) == 0) {
-    ::HIViewSetVisible(viewRef_, value.Coerce<Bool>());
+    ::HIViewSetVisible(view_ref_, value.Coerce<Bool>());
   }
   return false;
 }
 
 Value Carbon::Control::GetProperty(PropertyName name) const {
-  if (viewRef_ == NULL)
+  if (view_ref_ == NULL)
     return Value();
   if (strcmp(name, Entity::kPropText) == 0) {
-    ScopedCFType<CFStringRef> cfText(::HIViewCopyText(viewRef_), kDontRetain);
+    ScopedCFType<CFStringRef> cf_text(::HIViewCopyText(view_ref_), kDontRetain);
 
-    return StringFromCFString(cfText);
+    return StringFromCFString(cf_text);
   }
   if (strcmp(name, kPropMinimumSize) == 0) {
     HIRect bounds;
 
-    ::HIViewGetOptimalBounds(viewRef_, &bounds, NULL);
+    ::HIViewGetOptimalBounds(view_ref_, &bounds, NULL);
     return Size(bounds.size.width, bounds.size.height) - GetInset();
   }
   if (strcmp(name, kPropLocation) == 0) {
     HIRect frame;
 
-    ::HIViewGetFrame(viewRef_, &frame);
+    ::HIViewGetFrame(view_ref_, &frame);
     return Location(frame.origin.x, frame.origin.y) - GetViewOffset();
   }
   if (strcmp(name, kPropSize) == 0) {
     return GetSize() - GetInset();
   }
   if (strcmp(name, kPropVisible) == 0) {
-    return (Bool)::HIViewIsVisible(viewRef_);
+    return (Bool)::HIViewIsVisible(view_ref_);
   }
   return Value();
 }
@@ -326,7 +327,7 @@ Value Carbon::Control::GetProperty(PropertyName name) const {
 Size Carbon::Control::GetSize() const {
   HIRect frame;
 
-  ::HIViewGetFrame(viewRef_, &frame);
+  ::HIViewGetFrame(view_ref_, &frame);
   return Size(frame.size.width, frame.size.height);
 }
 
@@ -338,9 +339,9 @@ void Carbon::Button::InitializeProperties(const PropertyMap &properties) {
         CFStringFromString(properties[Entity::kPropText].Coerce<String>()),
         kDontRetain);
 
-  const Rect defaultBounds = { 0, 0, 20, 50 };
+  const Rect default_bounds = { 0, 0, 20, 50 };
 
-  ::CreatePushButtonControl(NULL, &defaultBounds, title, &viewRef_);
+  ::CreatePushButtonControl(NULL, &default_bounds, title, &view_ref_);
 }
 
 Bool Carbon::Button::SetProperty(PropertyName name, const Value &value) {
@@ -362,9 +363,9 @@ void Carbon::Checkbox::InitializeProperties(const PropertyMap &properties) {
         CFStringFromString(properties[Entity::kPropText].Coerce<String>()),
         kDontRetain);
 
-  const Rect defaultBounds = { 0, 0, 20, 50 };
+  const Rect default_bounds = { 0, 0, 20, 50 };
 
-  ::CreateCheckBoxControl(NULL, &defaultBounds, title, 0, true, &viewRef_);
+  ::CreateCheckBoxControl(NULL, &default_bounds, title, 0, true, &view_ref_);
 }
 
 void Carbon::Label::InitializeProperties(const PropertyMap &properties) {
@@ -375,9 +376,9 @@ void Carbon::Label::InitializeProperties(const PropertyMap &properties) {
         CFStringFromString(properties[Entity::kPropText].Coerce<String>()),
         kDontRetain);
 
-  const Rect defaultBounds = { 0, 0, 20, 50 };
+  const Rect default_bounds = { 0, 0, 20, 50 };
 
-  ::CreateStaticTextControl(NULL, &defaultBounds, title, NULL, &viewRef_);
+  ::CreateStaticTextControl(NULL, &default_bounds, title, NULL, &view_ref_);
 }
 
 Value Carbon::Label::GetProperty(PropertyName name) const {
@@ -385,37 +386,37 @@ Value Carbon::Label::GetProperty(PropertyName name) const {
     return Spacing(8, 8, 8, 8);
   }
   if (strcmp(name, kPropMinimumSize) == 0) {
-    float wrapWidth = 0;
+    float wrap_width = 0;
     Bool variable = false;
 
 #if 0  // TODO(catmull): variable height
-    GetControlProperty(viewRef_, kFenSig, 'VHgt', variable);
+    GetControlProperty(view_ref_, kFenSig, 'VHgt', variable);
     if (variable)
-      wrapWidth = GetSize().width;
+      wrap_width = GetSize().width;
 #endif
 
     ControlSize size = kControlSizeNormal;
-    ThemeFontID fontID = kThemeSystemFont;
+    ThemeFontID font_ID = kThemeSystemFont;
 
     ::GetControlData(
-        viewRef_, kControlEntireControl, kControlSizeTag,
+        view_ref_, kControlEntireControl, kControlSizeTag,
         sizeof(size), &size, NULL);
     switch (size) {
-      case kControlSizeSmall: fontID = kThemeSmallSystemFont; break;
-      case kControlSizeMini:  fontID = kThemeMiniSystemFont;  break;
+      case kControlSizeSmall: font_ID = kThemeSmallSystemFont; break;
+      case kControlSizeMini:  font_ID = kThemeMiniSystemFont;  break;
     }
 
     // HIViewGetOptimalBounds for static text only adjusts the height,
     // so we calculate the text width manually
     HIThemeTextInfo info = {
-      0, kThemeStateActive, fontID,
+      0, kThemeStateActive, font_ID,
       kHIThemeTextHorizontalFlushLeft,
       kHIThemeTextVerticalFlushTop,
       0, kHIThemeTextTruncationNone, 0, false };
-    CFStringRef title = ::HIViewCopyText(viewRef_);
+    CFStringRef title = ::HIViewCopyText(view_ref_);
     float width, height;
 
-    ::HIThemeGetTextDimensions(title, wrapWidth, &info, &width, &height, NULL);
+    ::HIThemeGetTextDimensions(title, wrap_width, &info, &width, &height, NULL);
     ::CFRelease(title);
     return Size(width, variable ? std::max(height, 16.0f) : GetSize().height);
   }
@@ -430,16 +431,16 @@ void Carbon::EditField::InitializeProperties(const PropertyMap &properties) {
         CFStringFromString(properties[Entity::kPropText].Coerce<String>()),
         kDontRetain);
 
-  const Rect defaultBounds = { 0, 0, 20, 50 };
+  const Rect default_bounds = { 0, 0, 20, 50 };
 
   ::CreateEditUnicodeTextControl(
-      NULL, &defaultBounds, title, false, NULL, &viewRef_);
+      NULL, &default_bounds, title, false, NULL, &view_ref_);
 }
 
 void Carbon::Separator::InitializeProperties(const PropertyMap &properties) {
-  const Rect defaultBounds = { 0, 0, 2, 50 };
+  const Rect default_bounds = { 0, 0, 2, 50 };
 
-  ::CreateSeparatorControl(NULL, &defaultBounds, &viewRef_);
+  ::CreateSeparatorControl(NULL, &default_bounds, &view_ref_);
 }
 
 void Carbon::Separator::Finalize() {
@@ -448,11 +449,11 @@ void Carbon::Separator::Finalize() {
   if (layout == NULL)
     return;
 
-  LayoutContainer *layoutParent = layout->GetLayoutParent();
+  LayoutContainer *layout_parent = layout->GetLayoutParent();
 
-  if (layoutParent == NULL)
+  if (layout_parent == NULL)
     return;
-  if (layoutParent->GetDirection() == LayoutContainer::kLayoutRow)
+  if (layout_parent->GetDirection() == LayoutContainer::kLayoutRow)
     layout->SetVSizeOption(kSizeFill);
   else  // kLayoutColumn
     layout->SetHSizeOption(kSizeFill);

@@ -88,8 +88,8 @@ struct Location {
 };
 
 struct PlatformMetrics {
-  uint32_t emSize, lineHeight, indentSize;
-  Spacing radioGroupPadding;
+  uint32_t em_size, line_height, indent_size;
+  Spacing radio_group_padding;
 };
 
 enum Unit {
@@ -102,27 +102,27 @@ enum Unit {
 class ExplicitSize {
  public:
   float width_, height_;
-  Unit widthUnits_, heightUnits_;
+  Unit width_units_, height_units_;
 
   ExplicitSize()
     : width_(0), height_(0),
-      widthUnits_(kUnitPixels), heightUnits_(kUnitPixels) {}
+      width_units_(kUnitPixels), height_units_(kUnitPixels) {}
   explicit ExplicitSize(const Size &size)
     : width_(size.width), height_(size.height),
-      widthUnits_(kUnitPixels), heightUnits_(kUnitPixels) {}
+      width_units_(kUnitPixels), height_units_(kUnitPixels) {}
 
   int32_t CalculateWidth(const PlatformMetrics &metrics) const {
-    switch (widthUnits_) {
-      case kUnitIndent: return width_ * metrics.indentSize;
-      case kUnitEms:    return width_ * metrics.emSize;
+    switch (width_units_) {
+      case kUnitIndent: return width_ * metrics.indent_size;
+      case kUnitEms:    return width_ * metrics.em_size;
       case kUnitPixels:
       default:          return width_;
     }
   }
   int32_t CalculateHeight(const PlatformMetrics &metrics) const {
-    switch (heightUnits_) {
-      case kUnitLines:  return height_ * metrics.lineHeight;
-      case kUnitEms:    return height_ * metrics.emSize;
+    switch (height_units_) {
+      case kUnitLines:  return height_ * metrics.line_height;
+      case kUnitEms:    return height_ * metrics.em_size;
       case kUnitPixels:
       default:          return height_;
     }

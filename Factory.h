@@ -30,9 +30,9 @@ class Factory : public Base {
   typedef Native* (*CreateNativeFunction)();
 
   struct CreatorFunctions {
-    CreateEntityFunction entityCreator;
-    CreateLayoutFunction layoutCreator;
-    CreateNativeFunction nativeCreator;
+    CreateEntityFunction entity_creator;
+    CreateLayoutFunction layout_creator;
+    CreateNativeFunction native_creator;
   };
 
   typedef Map<String, CreatorFunctions> CreationRegistry;
@@ -57,34 +57,34 @@ class Factory : public Base {
   const CreationRegistry& Registry() const
     { return registry_; }
   void RegisterCreator(
-      const char *className,
-      CreateEntityFunction entityCreator,
-      CreateLayoutFunction layoutCreator,
-      CreateNativeFunction nativeCreator) {
+      const char *class_name,
+      CreateEntityFunction entity_creator,
+      CreateLayoutFunction layout_creator,
+      CreateNativeFunction native_creator) {
     CreatorFunctions functions = {
-        entityCreator, layoutCreator, nativeCreator };
-    registry_.Insert(String(className), functions);
+        entity_creator, layout_creator, native_creator };
+    registry_.Insert(String(class_name), functions);
   }
 
   template <class T>
-  void Register(const char *className)
-    { RegisterCreator(className, &Creator<T, Entity>::Create, NULL, NULL); }
+  void Register(const char *class_name)
+    { RegisterCreator(class_name, &Creator<T, Entity>::Create, NULL, NULL); }
 
   // Native subclasses should have typedefs named EntityType and LayoutType.
   template <class T>
-  void RegisterNative(const char *className) {
+  void RegisterNative(const char *class_name) {
     RegisterCreator(
-        className,
+        class_name,
         &Creator<typename T::EntityType, Entity>::Create,
         &Creator<typename T::LayoutType, Layout>::Create,
         &Creator<T, Native>::Create);
   }
 
   Entity* CreateEntity(
-      const char *className, const PropertyMap &properties) const;
+      const char *class_name, const PropertyMap &properties) const;
 
-  Bool IsRegistered(const char *className) {
-    return registry_.Exists(className);
+  Bool IsRegistered(const char *class_name) {
+    return registry_.Exists(class_name);
   }
 
   void RegisterBasicClasses();
@@ -105,11 +105,11 @@ class FactorySession : public Base {
 
   Entity* RootEntity() { return root_; }
   Entity* CurrentEntity()
-      { return entityStack_.empty() ? NULL : entityStack_.top(); }
+      { return entity_stack_.empty() ? NULL : entity_stack_.top(); }
 
  protected:
   const Factory &factory_;
-  Stack<Entity*> entityStack_;
+  Stack<Entity*> entity_stack_;
   Entity *root_;
 
  private:  // Disallow copying

@@ -36,7 +36,7 @@ class Cocoa {
 
   // Displays a dialog to ask the user to choose a folder. Returns an empty
   // string if the user cancels.
-  static String ChooseFolder(const String &initialPath);
+  static String ChooseFolder(const String &initial_path);
 
   static ButtonType ShowMessage(MessageData *message);
 
@@ -50,7 +50,7 @@ class Cocoa {
 
   class Window : public NativeCocoa, public WindowInterface {
    public:
-    Window() : windowRef_(NULL), isAlert_(false) {}
+    Window() : window_ref_(NULL), is_alert_(false) {}
     ~Window();
 
     virtual void InitializeProperties(const PropertyMap &properties);
@@ -60,38 +60,38 @@ class Cocoa {
     virtual Value GetProperty(PropertyName name) const;
     virtual void AddChild(Native *child);
 
-    void* GetNativeRef() { return windowRef_; }
+    void* GetNativeRef() { return window_ref_; }
 
     // WindowInterface
     virtual Bool ShowModeless();
     virtual Bool Close();
     virtual Bool ShowModal(void *parent);
     virtual Bool EndModal();
-    virtual Bool SetFocus(Entity *newFocus);
+    virtual Bool SetFocus(Entity *new_focus);
 
     typedef Diadem::Entity EntityType;
     typedef BorderedContainer LayoutType;
 
    protected:
-    NSWindow *windowRef_;
-    Bool isAlert_;
+    NSWindow *window_ref_;
+    Bool is_alert_;
   };
 
   class View : public NativeCocoa {
    public:
-    View() : viewRef_(NULL) {}
+    View() : view_ref_(NULL) {}
     virtual ~View();
 
     virtual Bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
 
-    void* GetNativeRef() { return viewRef_; }
+    void* GetNativeRef() { return view_ref_; }
 
     typedef Entity EntityType;
     typedef Layout LayoutType;
 
    protected:
-    NSView *viewRef_;
+    NSView *view_ref_;
 
     void ConfigureView();
     Size GetSize() const;

@@ -85,10 +85,10 @@ SInt32 GetThemeMetric() {
   if ([super initWithFrame:frame] == nil)
     return nil;
 
-  NSRect subRect = NSInsetRect(frame, 1, 1);
+  NSRect sub_rect = NSInsetRect(frame, 1, 1);
 
-  subRect.origin = NSMakePoint(1, 1);
-  pathControl_ = [[NSPathControl alloc] initWithFrame:subRect];
+  sub_rect.origin = NSMakePoint(1, 1);
+  pathControl_ = [[NSPathControl alloc] initWithFrame:sub_rect];
   [pathControl_ setAutoresizingMask:
       NSViewWidthSizable | NSViewHeightSizable |
       NSViewMinXMargin | NSViewMaxYMargin];
@@ -106,7 +106,6 @@ SInt32 GetThemeMetric() {
 }
 
 - (void)drawRect:(NSRect)frame {
-  const NSRect viewFrame = [self frame];
   const HIThemeFrameDrawInfo info = { 0,
       kHIThemeFrameTextFieldSquare,
       kThemeStateActive,
@@ -144,11 +143,11 @@ void Cocoa::SetUpFactory(Factory *factory) {
   factory->RegisterNative<PopupItem>("item");
 }
 
-String Cocoa::ChooseFolder(const String &initialPath) {
+String Cocoa::ChooseFolder(const String &initial_path) {
   ScopedAutoreleasePool pool;
   NSOpenPanel *panel = [NSOpenPanel openPanel];
-  NSString *initial = strlen(initialPath.Get()) == 0 ? nil :
-      NSStringWithString(initialPath);
+  NSString *initial = strlen(initial_path.Get()) == 0 ? nil :
+      NSStringWithString(initial_path);
 
   [panel setCanChooseFiles:NO];
   [panel setCanChooseDirectories:YES];
@@ -231,16 +230,16 @@ ButtonType Cocoa::ShowMessage(MessageData *message) {
 void Cocoa::Window::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
-  windowRef_ = [[NSWindow alloc]
+  window_ref_ = [[NSWindow alloc]
       initWithContentRect:NSMakeRect(0, 0, 50, 50)
                 styleMask:NSTitledWindowMask
                   backing:NSBackingStoreBuffered
                     defer:NO];
-  [windowRef_ setContentMinSize:NSMakeSize(10, 10)];
-  if ((windowRef_ != nil) && properties.Exists(Entity::kPropText)) {
-    const String titleString = properties[Entity::kPropText].Coerce<String>();
+  [window_ref_ setContentMinSize:NSMakeSize(10, 10)];
+  if ((window_ref_ != nil) && properties.Exists(Entity::kPropText)) {
+    const String title_string = properties[Entity::kPropText].Coerce<String>();
 
-    [windowRef_ setTitle:NSStringWithString(titleString)];
+    [window_ref_ setTitle:NSStringWithString(title_string)];
   }
 }
 
@@ -248,31 +247,31 @@ Cocoa::Window::~Window() {
   ScopedAutoreleasePool pool;
 
   Close();
-  [windowRef_ release];
+  [window_ref_ release];
 }
 
 Bool Cocoa::Window::SetProperty(PropertyName name, const Value &value) {
   ScopedAutoreleasePool pool;
 
-  if (windowRef_ == nil)
+  if (window_ref_ == nil)
     return false;
   if (strcmp(name, Entity::kPropText) == 0) {
-    [windowRef_ setTitle:NSStringWithString(value.Coerce<String>())];
+    [window_ref_ setTitle:NSStringWithString(value.Coerce<String>())];
     return true;
   }
   if (strcmp(name, kPropSize) == 0) {
     const Size size = value.Coerce<Size>();
 
-    [windowRef_ setContentSize:NSMakeSize(size.width, size.height)];
+    [window_ref_ setContentSize:NSMakeSize(size.width, size.height)];
     // TODO: reposition?
     return true;
   }
   if (strcmp(name, kPropLocation) == 0) {
-    const NSRect screenFrame = [[windowRef_ screen] frame];
+    const NSRect screen_frame = [[window_ref_ screen] frame];
     const Location location = value.Coerce<Location>();
 
-    [windowRef_ setFrameTopLeftPoint:NSMakePoint(location.x,
-        screenFrame.size.height - location.y)];
+    [window_ref_ setFrameTopLeftPoint:NSMakePoint(location.x,
+        screen_frame.size.height - location.y)];
   }
   return false;
 }
@@ -280,24 +279,24 @@ Bool Cocoa::Window::SetProperty(PropertyName name, const Value &value) {
 Value Cocoa::Window::GetProperty(PropertyName name) const {
   ScopedAutoreleasePool pool;
 
-  if (windowRef_ == nil)
+  if (window_ref_ == nil)
     return false;
   if (strcmp(name, Entity::kPropText) == 0) {
-    NSString *title = [windowRef_ title];
+    NSString *title = [window_ref_ title];
 
     return String([title UTF8String]);
   }
   if (strcmp(name, kPropSize) == 0) {
-    NSRect contentRect =
-        [windowRef_ contentRectForFrameRect:[windowRef_ frame]];
+    NSRect content_rect =
+        [window_ref_ contentRectForFrameRect:[window_ref_ frame]];
 
-    return Size(contentRect.size.width, contentRect.size.height);
+    return Size(content_rect.size.width, content_rect.size.height);
   }
   if (strcmp(name, kPropMargins) == 0) {
     return Value(Spacing(14, 20, 20, 20));
   }
   if (strcmp(name, kPropVisible) == 0) {
-    return Value((Bool)[windowRef_ isVisible]);
+    return Value((Bool)[window_ref_ isVisible]);
   }
   return Value();
 }
@@ -308,76 +307,76 @@ void Cocoa::Window::AddChild(Native *child) {
   if (![(id)child->GetNativeRef() isKindOfClass:[NSView class]])
     return;
 
-  [[windowRef_ contentView] addSubview:(NSView*)child->GetNativeRef()];
+  [[window_ref_ contentView] addSubview:(NSView*)child->GetNativeRef()];
 }
 
 Bool Cocoa::Window::ShowModeless() {
   ScopedAutoreleasePool pool;
 
-  [windowRef_ center];
-  [windowRef_ makeKeyAndOrderFront:nil];
+  [window_ref_ center];
+  [window_ref_ makeKeyAndOrderFront:nil];
   return true;
 }
 
 Bool Cocoa::Window::Close() {
   ScopedAutoreleasePool pool;
 
-  if ([NSApp modalWindow] == windowRef_)
+  if ([NSApp modalWindow] == window_ref_)
     [NSApp abortModal];
-  [windowRef_ orderOut:nil];
+  [window_ref_ orderOut:nil];
   return true;
 }
 
 Bool Cocoa::Window::ShowModal(void*) {
   ScopedAutoreleasePool pool;
 
-  [NSApp runModalForWindow:windowRef_];
+  [NSApp runModalForWindow:window_ref_];
   return true;
 }
 
 Bool Cocoa::Window::EndModal() {
   ScopedAutoreleasePool pool;
 
-  if ([NSApp modalWindow] != windowRef_)
+  if ([NSApp modalWindow] != window_ref_)
     return false;
   [NSApp stopModal];
   return true;
 }
 
-Bool Cocoa::Window::SetFocus(Entity *newFocus) {
-  if ((newFocus->GetNative() == NULL) ||
-      (newFocus->GetNative()->GetNativeRef() == NULL))
+Bool Cocoa::Window::SetFocus(Entity *new_focus) {
+  if ((new_focus->GetNative() == NULL) ||
+      (new_focus->GetNative()->GetNativeRef() == NULL))
     return false;
 
-  id focus = (id)newFocus->GetNative()->GetNativeRef();
+  id focus = (id)new_focus->GetNative()->GetNativeRef();
 
   if (![focus isKindOfClass:[NSResponder class]])
     return false;
-  [windowRef_ makeFirstResponder:focus];
+  [window_ref_ makeFirstResponder:focus];
   return true;
 }
 
 void Cocoa::View::ConfigureView() {
   // The view needs to be anchored tho the top left of its parent
-  [viewRef_ setAutoresizingMask:NSViewMaxXMargin | NSViewMinYMargin];
+  [view_ref_ setAutoresizingMask:NSViewMaxXMargin | NSViewMinYMargin];
 }
 
 Cocoa::View::~View() {
   ScopedAutoreleasePool pool;
 
-  [viewRef_ release];
+  [view_ref_ release];
 }
 
 NSPoint Cocoa::View::InvertPoint(NSPoint point) const {
-  const NSRect superBounds = [[viewRef_ superview] bounds];
+  const NSRect super_bounds = [[view_ref_ superview] bounds];
 
-  return NSMakePoint(point.x, superBounds.size.height - point.y);
+  return NSMakePoint(point.x, super_bounds.size.height - point.y);
 }
 
 Bool Cocoa::View::SetProperty(PropertyName name, const Value &value) {
   ScopedAutoreleasePool pool;
 
-  if (viewRef_ == NULL)
+  if (view_ref_ == NULL)
     return false;
   if (strcmp(name, kPropLocation) == 0) {
     const Spacing inset = GetInset();
@@ -386,10 +385,10 @@ Bool Cocoa::View::SetProperty(PropertyName name, const Value &value) {
         offset + Location(inset.left, inset.top);
     NSPoint origin = InvertPoint(NSMakePoint(loc.x, loc.y));
 
-    [[viewRef_ superview] setNeedsDisplayInRect:[viewRef_ frame]];
-    origin.y -= [viewRef_ frame].size.height;
-    [viewRef_ setFrameOrigin:origin];
-    [viewRef_ setNeedsDisplay:YES];
+    [[view_ref_ superview] setNeedsDisplayInRect:[view_ref_ frame]];
+    origin.y -= [view_ref_ frame].size.height;
+    [view_ref_ setFrameOrigin:origin];
+    [view_ref_ setNeedsDisplay:YES];
     DASSERT(
         value.Coerce<Location>() ==
         GetProperty(kPropLocation).Coerce<Location>());
@@ -397,18 +396,18 @@ Bool Cocoa::View::SetProperty(PropertyName name, const Value &value) {
   }
   if (strcmp(name, kPropSize) == 0) {
     const Size size = value.Coerce<Size>() - GetInset();
-    NSRect frame = [viewRef_ frame];
+    NSRect frame = [view_ref_ frame];
 
-    [[viewRef_ superview] setNeedsDisplayInRect:frame];
+    [[view_ref_ superview] setNeedsDisplayInRect:frame];
     frame.origin.y += frame.size.height - size.height;
     frame.size.height = size.height;
     frame.size.width = size.width;
-    [viewRef_ setFrame:frame];
-    [viewRef_ setNeedsDisplay:YES];
+    [view_ref_ setFrame:frame];
+    [view_ref_ setNeedsDisplay:YES];
     return true;
   }
   if (strcmp(name, kPropVisible) == 0) {
-    [viewRef_ setHidden:!value.Coerce<Bool>()];
+    [view_ref_ setHidden:!value.Coerce<Bool>()];
     return true;
   }
   return false;
@@ -417,27 +416,27 @@ Bool Cocoa::View::SetProperty(PropertyName name, const Value &value) {
 Value Cocoa::View::GetProperty(PropertyName name) const {
   ScopedAutoreleasePool pool;
 
-  if (viewRef_ == nil)
+  if (view_ref_ == nil)
     return Value();
   if (strcmp(name, kPropLocation) == 0) {
-    const NSPoint location = InvertPoint([viewRef_ frame].origin);
+    const NSPoint location = InvertPoint([view_ref_ frame].origin);
     const Spacing inset = GetInset();
 
-    return Location(location.x, location.y - [viewRef_ frame].size.height) -
+    return Location(location.x, location.y - [view_ref_ frame].size.height) -
         GetViewOffset() - Location(inset.left, inset.top);
   }
   if (strcmp(name, kPropSize) == 0) {
     return GetSize() + GetInset();
   }
   if (strcmp(name, kPropVisible) == 0) {
-    return (Bool)![viewRef_ isHidden];
+    return (Bool)![view_ref_ isHidden];
   }
   return Value();
 }
 
 Size Cocoa::View::GetSize() const {
   ScopedAutoreleasePool pool;
-  const NSRect frame = [viewRef_ frame];
+  const NSRect frame = [view_ref_ frame];
 
   return Size(frame.size.width, frame.size.height);
 }
@@ -446,7 +445,7 @@ Bool Cocoa::Control::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, Entity::kPropEnabled) == 0) {
     ScopedAutoreleasePool pool;
 
-    [(NSControl*)viewRef_ setEnabled:value.Coerce<Bool>()];
+    [(NSControl*)view_ref_ setEnabled:value.Coerce<Bool>()];
     return true;
   }
   return View::SetProperty(name, value);
@@ -459,21 +458,21 @@ Value Cocoa::Control::GetProperty(PropertyName name) const {
   ScopedAutoreleasePool pool;
 
   if (strcmp(name, kPropMinimumSize) == 0) {
-    const NSSize cellSize = [[(NSControl*)viewRef_ cell] cellSize];
+    const NSSize cell_size = [[(NSControl*)view_ref_ cell] cellSize];
 
-    if (NSEqualSizes(cellSize, NSZeroSize) ||
-        NSEqualSizes(cellSize, kMaxCellSize))
+    if (NSEqualSizes(cell_size, NSZeroSize) ||
+        NSEqualSizes(cell_size, kMaxCellSize))
       return GetProperty(kPropSize);
 
-    return Size(cellSize.width, cellSize.height) + GetInset();
+    return Size(cell_size.width, cell_size.height) + GetInset();
   }
   if (strcmp(name, Entity::kPropText) == 0) {
-    NSString *text = [(NSControl*)viewRef_ stringValue];
+    NSString *text = [(NSControl*)view_ref_ stringValue];
 
     return String([text UTF8String]);
   }
   if (strcmp(name, Entity::kPropEnabled) == 0) {
-    return (Bool)[(NSControl*)viewRef_ isEnabled];
+    return (Bool)[(NSControl*)view_ref_ isEnabled];
   }
   return View::GetProperty(name);
 }
@@ -482,7 +481,7 @@ void Cocoa::Button::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
   NSButton *button = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
 
-  viewRef_ = button;
+  view_ref_ = button;
   [button setBezelStyle:NSRoundedBezelStyle];
   [button setButtonType:NSMomentaryPushInButton];
   [button setImagePosition:NSNoImage];
@@ -491,9 +490,9 @@ void Cocoa::Button::InitializeProperties(const PropertyMap &properties) {
     [button setTitle:
         NSStringWithString(properties[Entity::kPropText].Coerce<String>())];
   if (properties.Exists(kPropUISize)) {
-    const String uiSize = properties[kPropUISize].Coerce<String>();
+    const String ui_size = properties[kPropUISize].Coerce<String>();
 
-    if (uiSize == "small") {
+    if (ui_size == "small") {
       [[button cell] setControlSize:NSSmallControlSize];
       [[button cell] setFont:
           [NSFont systemFontOfSize:
@@ -517,10 +516,10 @@ Bool Cocoa::Button::SetProperty(PropertyName name, const Value &value) {
     const String type = value.Coerce<String>();
 
     if (type == "default")
-      [(NSButton*)viewRef_ setKeyEquivalent:@"\r"];
+      [(NSButton*)view_ref_ setKeyEquivalent:@"\r"];
     else if (type == "cancel") {
-      [(NSButton*)viewRef_ setKeyEquivalent:@"."];
-      [(NSButton*)viewRef_ setKeyEquivalentModifierMask:NSCommandKeyMask];
+      [(NSButton*)view_ref_ setKeyEquivalent:@"."];
+      [(NSButton*)view_ref_ setKeyEquivalentModifierMask:NSCommandKeyMask];
     }
     return true;
   }
@@ -534,29 +533,29 @@ Value Cocoa::Button::GetProperty(PropertyName name) const {
   ScopedAutoreleasePool pool;
 
   if (strcmp(name, kPropMinimumSize) == 0) {
-    Size minSize = Control::GetProperty(kPropMinimumSize).Coerce<Size>();
+    Size min_size = Control::GetProperty(kPropMinimumSize).Coerce<Size>();
 
     // cellSize returns 32 instead of 20, so correct it
-    if ([[(NSButton*)viewRef_ cell] controlSize] == NSSmallControlSize)
-      minSize.height = GetThemeMetric<kThemeMetricSmallPushButtonHeight>();
+    if ([[(NSButton*)view_ref_ cell] controlSize] == NSSmallControlSize)
+      min_size.height = GetThemeMetric<kThemeMetricSmallPushButtonHeight>();
     else
-      minSize.height = GetThemeMetric<kThemeMetricPushButtonHeight>();
-    minSize.width += kButtonWidthAdjustment;
-    return minSize;
+      min_size.height = GetThemeMetric<kThemeMetricPushButtonHeight>();
+    min_size.width += kButtonWidthAdjustment;
+    return min_size;
   }
   if (strcmp(name, kPropPadding) == 0) {
-    if ([[(NSButton*)viewRef_ cell] controlSize] == NSSmallControlSize)
+    if ([[(NSButton*)view_ref_ cell] controlSize] == NSSmallControlSize)
       return Spacing(10, 10, 10, 10);
     else
       return Spacing(12, 12, 12, 12);
   }
   if (strcmp(name, Entity::kPropText) == 0) {
-    NSString *text = [(NSButton*)viewRef_ title];
+    NSString *text = [(NSButton*)view_ref_ title];
 
     return String([text cStringUsingEncoding:NSUTF8StringEncoding]);
   }
   if (strcmp(name, kPropBaseline) == 0) {
-    if ([[(NSButton*)viewRef_ cell] controlSize] == NSSmallControlSize)
+    if ([[(NSButton*)view_ref_ cell] controlSize] == NSSmallControlSize)
       return 13;
     else
       return 14;
@@ -567,7 +566,7 @@ Value Cocoa::Button::GetProperty(PropertyName name) const {
 Spacing Cocoa::Button::GetInset() const {
   // extra space on botom for the shadow, apparently
   // the need for the left/right inset is mysterious
-  if ([[(NSButton*)viewRef_ cell] controlSize] == NSSmallControlSize)
+  if ([[(NSButton*)view_ref_ cell] controlSize] == NSSmallControlSize)
     return Spacing(-3, -5, -6, -5);
   else
     return Spacing(0, -6, -4, -6);
@@ -576,10 +575,10 @@ Spacing Cocoa::Button::GetInset() const {
 void Cocoa::Checkbox::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
-  viewRef_ = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
-  [(NSButton*)viewRef_ setButtonType:NSSwitchButton];
+  view_ref_ = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
+  [(NSButton*)view_ref_ setButtonType:NSSwitchButton];
   if (properties.Exists(Entity::kPropText))
-    [(NSButton*)viewRef_ setTitle:
+    [(NSButton*)view_ref_ setTitle:
         NSStringWithString(properties[Entity::kPropText].Coerce<String>())];
   ConfigureView();
 }
@@ -587,24 +586,24 @@ void Cocoa::Checkbox::InitializeProperties(const PropertyMap &properties) {
 void Cocoa::Label::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
-  viewRef_ = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
-  [(NSTextField*)viewRef_ setBezeled:NO];
-  [(NSTextField*)viewRef_ setDrawsBackground:NO];
-  [(NSTextField*)viewRef_ setEditable:NO];
+  view_ref_ = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
+  [(NSTextField*)view_ref_ setBezeled:NO];
+  [(NSTextField*)view_ref_ setDrawsBackground:NO];
+  [(NSTextField*)view_ref_ setEditable:NO];
   if (properties.Exists(Entity::kPropText))
-    [(NSTextField*)viewRef_ setStringValue:
+    [(NSTextField*)view_ref_ setStringValue:
         NSStringWithString(properties[Entity::kPropText].Coerce<String>())];
   if (properties.Exists(kPropTextAlign)) {
     NSTextAlignment align = NSNaturalTextAlignment;
-    const String alignValue = properties[kPropTextAlign].Coerce<String>();
+    const String align_value = properties[kPropTextAlign].Coerce<String>();
 
-    if (alignValue == "left")
+    if (align_value == "left")
       align = NSLeftTextAlignment;
-    else if (alignValue == "center")
+    else if (align_value == "center")
       align = NSCenterTextAlignment;
-    else if (alignValue == "right")
+    else if (align_value == "right")
       align = NSRightTextAlignment;
-    [(NSTextField*)viewRef_ setAlignment:align];
+    [(NSTextField*)view_ref_ setAlignment:align];
   }
   ConfigureView();
 }
@@ -621,7 +620,7 @@ Value Cocoa::Label::GetProperty(PropertyName name) const {
     if (layout == NULL)
       return Size();
     if (layout->GetHSizeOption() == kSizeFill) {
-      NSString *text = [(NSTextField*)viewRef_ stringValue];
+      NSString *text = [(NSTextField*)view_ref_ stringValue];
       CGFloat width = 0.0f, height = 0.0f, baseline = 0.0f;
       HIThemeTextInfo info = { 1,
           kThemeStateActive,
@@ -631,15 +630,15 @@ Value Cocoa::Label::GetProperty(PropertyName name) const {
           0, 0, 0, false, 0, NULL };
 
       HIThemeGetTextDimensions(
-          (CFTypeRef)text, [viewRef_ bounds].size.width,
+          (CFTypeRef)text, [view_ref_ bounds].size.width,
           &info, &width, &height, &baseline);
-      if (height != [viewRef_ bounds].size.height)
+      if (height != [view_ref_ bounds].size.height)
         entity_->GetLayout()->GetLayoutParent()->InvalidateLayout();
       return Size(width, height);
     } else {
-      const NSSize cellSize = [[(NSControl*)viewRef_ cell] cellSize];
+      const NSSize cell_size = [[(NSControl*)view_ref_ cell] cellSize];
 
-      return Size(cellSize.width+1, cellSize.height);
+      return Size(cell_size.width+1, cell_size.height);
     }
   }
   if (strcmp(name, kPropBaseline) == 0) {
@@ -651,10 +650,10 @@ Value Cocoa::Label::GetProperty(PropertyName name) const {
 Bool Cocoa::Label::SetProperty(const PropertyName name, const Value &value) {
   if (strcmp(name, kPropSize) == 0) {
     if (entity_->GetLayout()->GetHSizeOption() == kSizeFill) {
-      const NSSize oldSize = [viewRef_ bounds].size;
+      const NSSize old_size = [view_ref_ bounds].size;
 
       Control::SetProperty(name, value);
-      if (!NSEqualSizes([viewRef_ bounds].size, oldSize)) {
+      if (!NSEqualSizes([view_ref_ bounds].size, old_size)) {
         LayoutContainer *lp =
             dynamic_cast<LayoutContainer*>(entity_->GetParent());
 
@@ -676,8 +675,8 @@ Spacing Cocoa::Label::GetInset() const {
 
 void Cocoa::Link::InitializeProperties(const PropertyMap &properties) {
   Label::InitializeProperties(properties);
-  [(NSTextField*)viewRef_ setAllowsEditingTextAttributes:YES];
-  [(NSTextField*)viewRef_ setSelectable:YES];
+  [(NSTextField*)view_ref_ setAllowsEditingTextAttributes:YES];
+  [(NSTextField*)view_ref_ setSelectable:YES];
   if (properties.Exists(kPropURL)) {
     SetURL(properties[kPropURL].Coerce<String>());
   }
@@ -697,20 +696,20 @@ void Cocoa::Link::SetURL(const String &url) {
       [NSColor blueColor], NSForegroundColorAttributeName,
       nil];
   NSAttributedString *string = [[NSAttributedString alloc]
-      initWithString:[(NSTextField*)viewRef_ stringValue]
+      initWithString:[(NSTextField*)view_ref_ stringValue]
           attributes:attr];
 
-  [(NSTextField*)viewRef_ setAttributedStringValue:string];
+  [(NSTextField*)view_ref_ setAttributedStringValue:string];
   [string release];
 }
 
 void Cocoa::EditField::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
-  viewRef_ = [[GetTextFieldClass() alloc]
+  view_ref_ = [[GetTextFieldClass() alloc]
       initWithFrame:NSMakeRect(0, 0, 50, 20)];
   if (properties.Exists(Entity::kPropText))
-    [(NSTextField*)viewRef_ setStringValue:
+    [(NSTextField*)view_ref_ setStringValue:
         NSStringWithString(properties[Entity::kPropText].Coerce<String>())];
   ConfigureView();
 }
@@ -731,7 +730,7 @@ Value Cocoa::EditField::GetProperty(PropertyName name) const {
 
 Bool Cocoa::EditField::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, Entity::kPropText) == 0) {
-    [(NSTextField*)viewRef_ setStringValue:
+    [(NSTextField*)view_ref_ setStringValue:
         NSStringWithString(value.Coerce<String>())];
     return true;
   }
@@ -745,9 +744,9 @@ Class Cocoa::PasswordField::GetTextFieldClass() {
 void Cocoa::PathBox::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
-  viewRef_ = [[PathBoxControl alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
+  view_ref_ = [[PathBoxControl alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
   if (properties.Exists(Entity::kPropText))
-    [(PathBoxControl*)viewRef_ setURL:[NSURL fileURLWithPath:
+    [(PathBoxControl*)view_ref_ setURL:[NSURL fileURLWithPath:
         NSStringWithString(properties[Entity::kPropText].Coerce<String>())]];
   ConfigureView();
 }
@@ -763,14 +762,14 @@ Value Cocoa::PathBox::GetProperty(PropertyName name) const {
     return 15;
   }
   if (strcmp(name, Entity::kPropText) == 0) {
-    return String([[[(NSPathControl*)viewRef_ URL] path] UTF8String]);
+    return String([[[(NSPathControl*)view_ref_ URL] path] UTF8String]);
   }
   return View::GetProperty(name);
 }
 
 Bool Cocoa::PathBox::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, Entity::kPropText) == 0) {
-    [(NSPathControl*)viewRef_ setURL:
+    [(NSPathControl*)view_ref_ setURL:
         [NSURL fileURLWithPath:NSStringWithString(value.Coerce<String>())]];
     return true;
   }
@@ -780,7 +779,7 @@ Bool Cocoa::PathBox::SetProperty(PropertyName name, const Value &value) {
 void Cocoa::Separator::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
-  viewRef_ = [[NSBox alloc] initWithFrame:NSMakeRect(0, 0, 1, 1)];
+  view_ref_ = [[NSBox alloc] initWithFrame:NSMakeRect(0, 0, 1, 1)];
   ConfigureView();
 }
 
@@ -826,27 +825,27 @@ Value Cocoa::Separator::GetProperty(PropertyName name) const {
 void Cocoa::Image::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
-  viewRef_ = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 0, 20, 20)];
-  [(NSImageView*)viewRef_ setImageScaling:NSScaleProportionally];
+  view_ref_ = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 0, 20, 20)];
+  [(NSImageView*)view_ref_ setImageScaling:NSScaleProportionally];
   if (properties.Exists(kPropFile)) {
-    NSString *fileName =
+    NSString *file_name =
         NSStringWithString(properties[kPropFile].Coerce<String>());
-    NSImage *image = [NSImage imageNamed:fileName];
+    NSImage *image = [NSImage imageNamed:file_name];
 
     if (image != nil)
-      [(NSImageView*)viewRef_ setImage:image];
+      [(NSImageView*)view_ref_ setImage:image];
   }
   ConfigureView();
 }
 
 Value Cocoa::Image::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropMinimumSize) == 0) {
-    if ([(NSImageView*)viewRef_ image] == nil)
+    if ([(NSImageView*)view_ref_ image] == nil)
       return Size(20, 20);
 
-    const NSSize imageSize = [[(NSImageView*)viewRef_ image] size];
+    const NSSize image_size = [[(NSImageView*)view_ref_ image] size];
 
-    return Size(imageSize.width, imageSize.height);
+    return Size(image_size.width, image_size.height);
   }
   return Control::GetProperty(name);
 }
@@ -854,7 +853,7 @@ Value Cocoa::Image::GetProperty(PropertyName name) const {
 void Cocoa::Popup::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
-  viewRef_ = [[NSPopUpButton alloc]
+  view_ref_ = [[NSPopUpButton alloc]
       initWithFrame:NSMakeRect(0, 0, 50, 20)
           pullsDown:NO];
   ConfigureView();
@@ -876,7 +875,7 @@ Spacing Cocoa::Popup::GetInset() const {
 
 void Cocoa::Popup::AddChild(Native *child) {
   if ([(id)child->GetNativeRef() isKindOfClass:[NSMenuItem class]])
-    [[viewRef_ menu] addItem:(NSMenuItem*)child->GetNativeRef()];
+    [[view_ref_ menu] addItem:(NSMenuItem*)child->GetNativeRef()];
 }
 
 void Cocoa::PopupItem::InitializeProperties(const PropertyMap &properties) {

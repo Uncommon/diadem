@@ -35,7 +35,7 @@ class Carbon {
 
   class Window : public NativeCarbon, public WindowInterface {
    public:
-    Window() : windowRef_(NULL), isAlert_(false) {}
+    Window() : window_ref_(NULL), is_alert_(false) {}
     ~Window();
 
     virtual void InitializeProperties(const PropertyMap &properties);
@@ -45,38 +45,38 @@ class Carbon {
     virtual Value GetProperty(PropertyName name) const;
     virtual void AddChild(Native *child);
 
-    void* GetNativeRef() { return windowRef_; }
+    void* GetNativeRef() { return window_ref_; }
 
     // WindowInterface
     virtual Bool ShowModeless();
     virtual Bool Close();
     virtual Bool ShowModal(void *parent);
     virtual Bool EndModal();
-    virtual Bool SetFocus(Entity *newFocus);
+    virtual Bool SetFocus(Entity *new_focus);
 
     typedef Diadem::Entity EntityType;
     typedef BorderedContainer LayoutType;
 
    protected:
-    WindowRef windowRef_;
-    Bool isAlert_;
+    WindowRef window_ref_;
+    Bool is_alert_;
   };
 
   class Control : public NativeCarbon {
    public:
-    Control() : viewRef_(NULL) {}
+    Control() : view_ref_(NULL) {}
     virtual ~Control();
 
     virtual Bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
 
-    void* GetNativeRef() { return viewRef_; }
+    void* GetNativeRef() { return view_ref_; }
 
     typedef Entity EntityType;
     typedef Layout LayoutType;
 
    protected:
-    HIViewRef viewRef_;
+    HIViewRef view_ref_;
 
     Size GetSize() const;
     virtual Spacing GetInset() const { return Spacing(); }

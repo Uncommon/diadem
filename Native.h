@@ -78,7 +78,7 @@ class WindowInterface {
   virtual Bool Close() = 0;
   virtual Bool ShowModal(void *parent) = 0;
   virtual Bool EndModal() = 0;
-  virtual Bool SetFocus(Entity *newFocus) = 0;
+  virtual Bool SetFocus(Entity *new_focus) = 0;
 };
 
 }  // namespace Diadem

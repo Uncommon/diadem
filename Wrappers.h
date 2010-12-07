@@ -128,10 +128,10 @@ class String : public Base {
     if (s == NULL) {
       Clear();
     } else {
-      char *stringCopy = new char[strlen(s)+1];
+      char *string_copy = new char[strlen(s)+1];
 
-      strcpy(stringCopy, s);
-      string_ = stringCopy;
+      strcpy(string_copy, s);
+      string_ = string_copy;
     }
     return *this;
   }

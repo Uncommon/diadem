@@ -43,25 +43,25 @@ void Factory::RegisterBasicClasses() {
 }
 
 Entity* Factory::CreateEntity(
-      const char *className, const PropertyMap &properties) const {
-  if (!registry_.Exists(className))
+      const char *class_name, const PropertyMap &properties) const {
+  if (!registry_.Exists(class_name))
     return NULL;
 
-  const CreatorFunctions creators = registry_[String(className)];
-  Entity* const entity = (*creators.entityCreator)();
+  const CreatorFunctions creators = registry_[String(class_name)];
+  Entity* const entity = (*creators.entity_creator)();
 
   if (entity == NULL)
     return NULL;
-  if (creators.layoutCreator != NULL) {
-    Layout *layout = (*creators.layoutCreator)();
+  if (creators.layout_creator != NULL) {
+    Layout *layout = (*creators.layout_creator)();
 
     if (layout != NULL) {
       layout->InitializeProperties(properties);
       entity->SetLayout(layout);
     }
   }
-  if (creators.nativeCreator != NULL) {
-    Native *native = (*creators.nativeCreator)();
+  if (creators.native_creator != NULL) {
+    Native *native = (*creators.native_creator)();
 
     if (native != NULL) {
       native->InitializeProperties(properties);
@@ -79,26 +79,26 @@ void FactorySession::BeginEntity(
     return;
   }
 
-  Entity* const newEntity = factory_.CreateEntity(name, properties);
+  Entity* const new_entity = factory_.CreateEntity(name, properties);
 
-  if (newEntity != NULL) {
-    Entity* const currentEntity = CurrentEntity();
+  if (new_entity != NULL) {
+    Entity* const current_entity = CurrentEntity();
 
-    if (currentEntity != NULL)
-      currentEntity->AddChild(newEntity);
+    if (current_entity != NULL)
+      current_entity->AddChild(new_entity);
     if (root_ == NULL)
-      root_ = newEntity;
+      root_ = new_entity;
   }
-  entityStack_.push(newEntity);
+  entity_stack_.push(new_entity);
 }
 
 void FactorySession::EndEntity() {
-  Entity* const currentEntity = CurrentEntity();
+  Entity* const current_entity = CurrentEntity();
 
-  if ((currentEntity != NULL) && (currentEntity->GetParent() == NULL))
-    currentEntity->FactoryFinalize();
-  if (!entityStack_.empty())
-    entityStack_.pop();
+  if ((current_entity != NULL) && (current_entity->GetParent() == NULL))
+    current_entity->FactoryFinalize();
+  if (!entity_stack_.empty())
+    entity_stack_.pop();
 }
 
 }  // namespace Diadem
