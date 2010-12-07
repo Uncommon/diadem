@@ -5,3 +5,4 @@ build
 Diadem.xcodeproj/*.mode*
 Diadem.xcodeproj/*.pbx*
 Diadem.xcodeproj/*.perspective*
+.git*
