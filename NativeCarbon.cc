@@ -448,12 +448,7 @@ void Carbon::Separator::Finalize() {
 
   if (layout == NULL)
     return;
-
-  LayoutContainer *layout_parent = layout->GetLayoutParent();
-
-  if (layout_parent == NULL)
-    return;
-  if (layout_parent->GetDirection() == LayoutContainer::kLayoutRow)
+  if (layout->GetDirection() == Layout::kLayoutRow)
     layout->SetVSizeOption(kSizeFill);
   else  // kLayoutColumn
     layout->SetHSizeOption(kSizeFill);

@@ -691,9 +691,14 @@ Bool Cocoa::Link::SetProperty(PropertyName name, const Value &value) {
 }
 
 void Cocoa::Link::SetURL(const String &url) {
+  // Explicity set the underline and font attributes, or else they will change
+  // after a click
   NSDictionary *attr = [NSDictionary dictionaryWithObjectsAndKeys:
       NSStringWithString(url), NSLinkAttributeName,
       [NSColor blueColor], NSForegroundColorAttributeName,
+      [NSNumber numberWithInt:NSUnderlineStyleSingle],
+          NSUnderlineStyleAttributeName,
+      [NSFont systemFontOfSize:[NSFont systemFontSize]], NSFontAttributeName,
       nil];
   NSAttributedString *string = [[NSAttributedString alloc]
       initWithString:[(NSTextField*)view_ref_ stringValue]
@@ -789,12 +794,7 @@ void Cocoa::Separator::Finalize() {
 
   if (layout == NULL)
     return;
-
-  LayoutContainer *layoutParent = layout->GetLayoutParent();
-
-  if (layoutParent == NULL)
-    return;
-  if (layoutParent->GetDirection() == LayoutContainer::kLayoutRow)
+  if (layout->GetDirection() == Layout::kLayoutRow)
     layout->SetVSizeOption(kSizeFill);
   else  // kLayoutColumn
     layout->SetHSizeOption(kSizeFill);
@@ -809,12 +809,7 @@ Value Cocoa::Separator::GetProperty(PropertyName name) const {
 
     if (layout == NULL)
       return Value();
-
-    LayoutContainer *layoutParent = layout->GetLayoutParent();
-
-    if (layoutParent == NULL)
-      return Value();
-    if (layoutParent->GetDirection() == LayoutContainer::kLayoutRow)
+    if (layout->GetDirection() == Layout::kLayoutRow)
       return Spacing(2, 10, 2, 10);
     else  // kLayoutColumn
       return Spacing(10, 2, 10, 2);

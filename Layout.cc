@@ -109,17 +109,31 @@ void Layout::InitializeProperties(const PropertyMap &properties) {
     SetProperty(keys[i], properties[keys[i]]);
 }
 
-LayoutContainer* Layout::GetLayoutParent() {
+Layout* Layout::GetLayoutParent() {
   if ((entity_ == NULL) || (entity_->GetParent() == NULL))
     return NULL;
-  return dynamic_cast<LayoutContainer*>(entity_->GetParent()->GetLayout());
+  return entity_->GetParent()->GetLayout();
 }
 
-const LayoutContainer* Layout::GetLayoutParent() const {
+const Layout* Layout::GetLayoutParent() const {
   if ((entity_ == NULL) || (entity_->GetParent() == NULL))
     return NULL;
-  return dynamic_cast<const LayoutContainer*>(
-      entity_->GetParent()->GetLayout());
+  return entity_->GetParent()->GetLayout();
+}
+
+void Layout::InvalidateLayout() {
+  Layout *parent = GetLayoutParent();
+
+  if (parent != NULL)
+    parent->InvalidateLayout();
+}
+
+Layout::LayoutDirection Layout::GetDirection() const {
+  const Layout *parent = GetLayoutParent();
+
+  if (parent == NULL)
+    return kLayoutRow;
+  return parent->GetDirection();
 }
 
 Bool Layout::SetProperty(PropertyName name, const Value &value) {
@@ -171,7 +185,7 @@ Value Layout::GetProperty(PropertyName name) const {
 
 Location Layout::GetViewLocation() const {
   const Location loc = GetLocation();
-  const LayoutContainer* const layout_parent = GetLayoutParent();
+  const Layout* const layout_parent = GetLayoutParent();
 
   if (layout_parent == NULL)
     return loc;
@@ -303,11 +317,7 @@ Spacing LayoutContainer::GetMargins() const {
 void LayoutContainer::InvalidateLayout() {
   cached_min_size_ = Size();
   layout_valid_ = false;
-
-  LayoutContainer *parent = GetLayoutParent();
-
-  if (parent != NULL)
-    parent->InvalidateLayout();
+  Layout::InvalidateLayout();
 }
 
 void LayoutContainer::SetSize(const Size &s) {
@@ -719,7 +729,7 @@ void Group::SetSize(const Size &new_size) {
     }
 
     if (new_min_padding != min_padding_) {
-      LayoutContainer *parent = GetLayoutParent();
+      Layout *parent = GetLayoutParent();
 
       min_padding_ = new_min_padding;
       if (parent != NULL)

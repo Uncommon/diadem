@@ -45,6 +45,8 @@ extern const PropertyName
 // A layout object manages an Entity's place in the dialog layout.
 class Layout : public EntityDelegate {
  public:
+  enum LayoutDirection { kLayoutRow, kLayoutColumn };
+
   Layout()
       : in_layout_(true),
         h_size_(kSizeDefault), v_size_(kSizeDefault),
@@ -55,17 +57,20 @@ class Layout : public EntityDelegate {
 
   virtual void ChildAdded(Entity *child) {}
 
-  // TODO(catmull): These use dynamic_casts, so they should be eliminated or
-  // modified to just return Layout*
   // These are convenience methods to get the layout object for the parent
   // entity.
-  LayoutContainer* GetLayoutParent();
-  const LayoutContainer* GetLayoutParent() const;
+  Layout* GetLayoutParent();
+  const Layout* GetLayoutParent() const;
 
   virtual Bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
 
   virtual void Finalize() { ResizeToMinimum(); }
+
+  // Layout is done repeatedly until nobody calls InvalidateLayout.
+  virtual void InvalidateLayout();
+
+  virtual LayoutDirection GetDirection() const;
 
   virtual void SetSize(const Size &size)
     { entity_->SetNativeProperty(kPropSize, size); }
@@ -160,9 +165,7 @@ class LayoutContainer : public Layout {
   virtual Bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
 
-  enum LayoutDirection { kLayoutRow, kLayoutColumn };
-
-  LayoutDirection GetDirection() const { return direction_; }
+  virtual LayoutDirection GetDirection() const { return direction_; }
 
   virtual void SetSize(const Size &size);
   virtual void SetLocation(const Location &loc);
@@ -170,8 +173,7 @@ class LayoutContainer : public Layout {
   virtual Size CalculateMinimumSize() const;
   virtual Spacing GetMargins() const;
 
-  // Layout is done repeatedly until nobody calls InvalidateLayout.
-  void InvalidateLayout();
+  virtual void InvalidateLayout();
 
  protected:
   LayoutDirection direction_;
