@@ -72,10 +72,11 @@ SInt32 GetThemeMetric() {
 @interface PathBoxControl : NSView {
  @private
   NSPathControl *pathControl_;
+  NSString *path_;
 }
 
-- (void)setURL:(NSURL *)url;
-- (NSURL*)URL;
+- (void)setPath:(NSString*)path;
+- (NSString*)path;
 
 @end
 
@@ -97,12 +98,63 @@ SInt32 GetThemeMetric() {
   return self;
 }
 
-- (void)setURL:(NSURL *)url {
-  [pathControl_ setURL:url];
+- (void)dealloc {
+  [path_ release];
+  [super dealloc];
 }
 
-- (NSURL*)URL {
-  return [pathControl_ URL];
+// This is the correct value, even though there seems to be no standard
+// constant for it.
+#define kFolderFileType 'fldr'
+
+- (void)setPath:(NSString*)path {
+  // Store a copy of the path because if it doesn't exist on disk, the URL in
+  // the path control will only be the portion that does exist.
+  [path_ autorelease];
+  path_ = [path copy];
+
+  if ([[NSFileManager defaultManager] fileExistsAtPath:path_]) {
+    [pathControl_ setURL:[NSURL fileURLWithPath:path_]];
+  } else {
+    // Find a parent folder that exists, and put in fake entries for the
+    // non-existent children, assuming they're supposed to be folders
+    NSMutableArray *fake_paths = [NSMutableArray array];
+    NSString *parent = [[path_ copy] autorelease];
+
+    while (![parent isEqualToString:@"/"]) {
+      [fake_paths insertObject:parent atIndex:0];
+      parent = [parent stringByDeletingLastPathComponent];
+      if ([[NSFileManager defaultManager] fileExistsAtPath:parent]) {
+        [pathControl_ setURL:[NSURL fileURLWithPath:parent]];
+
+        NSMutableArray *cells =
+            [[pathControl_ pathComponentCells] mutableCopy];
+        NSImage *folder_icon = [[NSWorkspace sharedWorkspace]
+              iconForFileType:NSFileTypeForHFSTypeCode(kFolderFileType)];
+
+        for (NSUInteger i = 0; i < [fake_paths count]; ++i) {
+          NSPathComponentCell *cell =
+              [[[NSPathComponentCell alloc] init] autorelease];
+
+          // TODO(catmull): use a document icon for the last cell if the path
+          // doesn't end in a slash
+          [cell setStringValue:
+              [[fake_paths objectAtIndex:i] lastPathComponent]];
+          [cell setURL:[NSURL fileURLWithPath:[fake_paths objectAtIndex:i]]];
+          [cell setImage:folder_icon];
+          [cells addObject:cell];
+        }
+        [pathControl_ setPathComponentCells:cells];
+        return;
+      }
+    }
+    // Nothing in the path exists
+    [pathControl_ setURL:[NSURL URLWithString:@""]];
+  }
+}
+
+- (NSString*)path {
+  return path_;
 }
 
 - (void)drawRect:(NSRect)frame {
@@ -750,9 +802,6 @@ void Cocoa::PathBox::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
   view_ref_ = [[PathBoxControl alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
-  if (properties.Exists(Entity::kPropText))
-    [(PathBoxControl*)view_ref_ setURL:[NSURL fileURLWithPath:
-        NSStringWithString(properties[Entity::kPropText].Coerce<String>())]];
   ConfigureView();
 }
 
@@ -767,15 +816,17 @@ Value Cocoa::PathBox::GetProperty(PropertyName name) const {
     return 15;
   }
   if (strcmp(name, Entity::kPropText) == 0) {
-    return String([[[(NSPathControl*)view_ref_ URL] path] UTF8String]);
+    return String([[(PathBoxControl*)view_ref_ path] UTF8String]);
   }
   return View::GetProperty(name);
 }
 
 Bool Cocoa::PathBox::SetProperty(PropertyName name, const Value &value) {
+  ScopedAutoreleasePool pool;
+
   if (strcmp(name, Entity::kPropText) == 0) {
-    [(NSPathControl*)view_ref_ setURL:
-        [NSURL fileURLWithPath:NSStringWithString(value.Coerce<String>())]];
+    [(PathBoxControl*)view_ref_ setPath:
+        NSStringWithString(value.Coerce<String>())];
     return true;
   }
   return View::SetProperty(name, value);
