@@ -85,6 +85,8 @@ struct Location {
     y += l.y;
     return *this;
   }
+  Location operator-() const
+    { return Location(-x, -y); }
 };
 
 struct PlatformMetrics {

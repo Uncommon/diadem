@@ -94,9 +94,24 @@ class Cocoa {
     NSView *view_ref_;
 
     void ConfigureView();
-    Size GetSize() const;
+    Location GetLocation() const;
+    Size GetViewSize() const;
     NSPoint InvertPoint(NSPoint point) const;
     virtual Spacing GetInset() const { return Spacing(); }
+  };
+
+  class Box : public View {
+   public:
+    Box() {}
+
+    virtual void InitializeProperties(const PropertyMap &properties);
+    virtual Value GetProperty(PropertyName name) const;
+    virtual Spacing GetInset() const;
+    virtual void AddChild(Native *child);
+    virtual Bool IsSuperview() const { return true; }
+    virtual Location GetSubviewAdjustment() const;
+
+    typedef BorderedContainer LayoutType;
   };
 
   class Control : public View {

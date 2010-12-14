@@ -178,7 +178,7 @@
       !entity->GetProperty(Diadem::kPropVisible).Coerce<Diadem::Bool>())
     return;
 
-  const Diadem::Location loc = (entity->GetParent() == NULL) ?
+  Diadem::Location loc = (entity->GetParent() == NULL) ?
       Diadem::Location() :
       (entity->GetProperty(Diadem::kPropLocation).Coerce<Diadem::Location>() +
        offset);

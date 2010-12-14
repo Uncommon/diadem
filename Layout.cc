@@ -184,13 +184,17 @@ Value Layout::GetProperty(PropertyName name) const {
 }
 
 Location Layout::GetViewLocation() const {
-  const Location loc = GetLocation();
-  const Layout* const layout_parent = GetLayoutParent();
+  const Native* const native = entity_->GetNative();
 
-  if (layout_parent == NULL)
-    return loc;
-  else
-    return loc + layout_parent->GetViewLocation();
+  if ((native != NULL) && (native->IsSuperview()))
+    return Location();
+  if (entity_->GetParent() != NULL) {
+    const Layout* const parent_layout = entity_->GetParent()->GetLayout();
+
+    if (parent_layout != NULL)
+      return GetLocation() + parent_layout->GetViewLocation();
+  }
+  return GetLocation();
 }
 
 void Layout::ParentLocationChanged(const Location &offset) {
@@ -336,12 +340,13 @@ void LayoutContainer::SetLocation(const Location &loc) {
   const Location offset(loc.x-current.x, loc.y-current.y);
 
   SetLocationImp(loc);
-  for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
-    Layout *layout_child = entity_->ChildAt(i)->GetLayout();
+  if ((entity_->GetNative() == NULL) || (!entity_->GetNative()->IsSuperview()))
+    for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+      Layout *layout_child = entity_->ChildAt(i)->GetLayout();
 
-    if (layout_child != NULL)
-      layout_child->ParentLocationChanged(offset);
-  }
+      if (layout_child != NULL)
+        layout_child->ParentLocationChanged(offset);
+    }
 }
 
 void LayoutContainer::ParentLocationChanged(const Location &offset) {

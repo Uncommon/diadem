@@ -184,6 +184,7 @@ void Cocoa::SetUpFactory(Factory *factory) {
   factory->RegisterNative<Label>("label");
   factory->RegisterNative<Link>("link");
   factory->RegisterNative<Window>("window");
+  factory->RegisterNative<Box>("box");
   factory->RegisterNative<Button>("button");
   factory->RegisterNative<Checkbox>("check");
   factory->RegisterNative<EditField>("edit");
@@ -433,17 +434,17 @@ Bool Cocoa::View::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropLocation) == 0) {
     const Spacing inset = GetInset();
     const Location offset = GetViewOffset();
-    const Location loc = value.Coerce<Location>() +
-        offset + Location(inset.left, inset.top);
+    const Location setLoc = value.Coerce<Location>();
+    const Location loc = setLoc + offset + Location(inset.left, inset.top);
     NSPoint origin = InvertPoint(NSMakePoint(loc.x, loc.y));
 
     [[view_ref_ superview] setNeedsDisplayInRect:[view_ref_ frame]];
     origin.y -= [view_ref_ frame].size.height;
     [view_ref_ setFrameOrigin:origin];
     [view_ref_ setNeedsDisplay:YES];
-    DASSERT(
-        value.Coerce<Location>() ==
-        GetProperty(kPropLocation).Coerce<Location>());
+#if 1
+    DASSERT(value.Coerce<Location>() == GetLocation());
+#endif
     return true;
   }
   if (strcmp(name, kPropSize) == 0) {
@@ -471,14 +472,10 @@ Value Cocoa::View::GetProperty(PropertyName name) const {
   if (view_ref_ == nil)
     return Value();
   if (strcmp(name, kPropLocation) == 0) {
-    const NSPoint location = InvertPoint([view_ref_ frame].origin);
-    const Spacing inset = GetInset();
-
-    return Location(location.x, location.y - [view_ref_ frame].size.height) -
-        GetViewOffset() - Location(inset.left, inset.top);
+    return GetLocation();
   }
   if (strcmp(name, kPropSize) == 0) {
-    return GetSize() + GetInset();
+    return GetViewSize() + GetInset();
   }
   if (strcmp(name, kPropVisible) == 0) {
     return (Bool)![view_ref_ isHidden];
@@ -486,11 +483,59 @@ Value Cocoa::View::GetProperty(PropertyName name) const {
   return Value();
 }
 
-Size Cocoa::View::GetSize() const {
+Location Cocoa::View::GetLocation() const {
+  const NSPoint location = InvertPoint([view_ref_ frame].origin);
+  const Spacing inset = GetInset();
+
+  return Location(location.x, location.y - [view_ref_ frame].size.height) -
+      GetViewOffset() - Location(inset.left, inset.top);
+}
+
+Size Cocoa::View::GetViewSize() const {
   ScopedAutoreleasePool pool;
   const NSRect frame = [view_ref_ frame];
 
   return Size(frame.size.width, frame.size.height);
+}
+
+void Cocoa::Box::InitializeProperties(const PropertyMap &properties) {
+  ScopedAutoreleasePool pool;
+  const NSRect defaultBounds = { { 0, 0 }, { 50, 50 } };
+
+  view_ref_ = [[NSBox alloc] initWithFrame:defaultBounds];
+  [(NSBox*)view_ref_ setTitlePosition:NSNoTitle];
+  [(NSBox*)view_ref_ setContentViewMargins:NSMakeSize(0, 0)];
+  [(NSBox*)view_ref_ sizeToFit];  // adjust to new margins
+  [view_ref_ setFrame:defaultBounds];
+  ConfigureView();
+}
+
+Value Cocoa::Box::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropMargins) == 0) {
+    return Spacing(20, 20, 20, 20);
+  }
+  if (strcmp(name, kPropPadding) == 0) {
+    return Spacing(12, 12, 12, 12);
+  }
+  return View::GetProperty(name);
+}
+
+Spacing Cocoa::Box::GetInset() const {
+  return Spacing(-2, -3, -4, -3);
+}
+
+void Cocoa::Box::AddChild(Native *child) {
+  ScopedAutoreleasePool pool;
+  NSView *subview = (NSView*)child->GetNativeRef();
+
+  [[(NSBox*)view_ref_ contentView] addSubview:subview];
+  child->GetEntity()->SetProperty(kPropLocation, Location());
+}
+
+Location Cocoa::Box::GetSubviewAdjustment() const {
+  const Spacing inset = GetInset();
+
+  return Location(-inset.left, -inset.top);
 }
 
 Bool Cocoa::Control::SetProperty(PropertyName name, const Value &value) {
@@ -786,6 +831,8 @@ Value Cocoa::EditField::GetProperty(PropertyName name) const {
 }
 
 Bool Cocoa::EditField::SetProperty(PropertyName name, const Value &value) {
+  ScopedAutoreleasePool pool;
+
   if (strcmp(name, Entity::kPropText) == 0) {
     [(NSTextField*)view_ref_ setStringValue:
         NSStringWithString(value.Coerce<String>())];

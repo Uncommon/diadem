@@ -171,6 +171,34 @@ static void ButtonCallback(Diadem::Entity *target, void *data) {
   *(bool *)data = true;
 }
 
+TEST_F(CocoaTest, Box) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='testBox'>"
+        "<box name='b'>"
+          "<label text='Help!' name='h'/>"
+        "</box>"
+      "</window>"));
+
+  Diadem::Entity* const box = windowRoot_->FindByName("b");
+  Diadem::Entity* const label = windowRoot_->FindByName("h");
+  ASSERT_FALSE(box == NULL);
+  ASSERT_FALSE(label == NULL);
+
+  NSBox *boxView = (NSBox*)box->GetNative()->GetNativeRef();
+  NSView *labelView = (NSView*)label->GetNative()->GetNativeRef();
+
+  EXPECT_EQ([labelView superview], [boxView contentView]);
+
+  const NSRect labelFrame = [labelView frame];
+  const NSRect boxRect = [[boxView contentView] bounds];
+  const Diadem::Spacing boxMargins =
+      box->GetProperty(Diadem::kPropMargins).Coerce<Diadem::Spacing>();
+
+  EXPECT_EQ(boxMargins.left, labelFrame.origin.x + 1);  // 1 for inset
+  EXPECT_EQ(boxMargins.top,
+      boxRect.size.height - labelFrame.origin.y - labelFrame.size.height);
+}
+
 TEST_F(CocoaTest, ButtonCallback) {
   ASSERT_TRUE(ReadWindowData("<window><button/></window>"));
 

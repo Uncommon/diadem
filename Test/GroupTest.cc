@@ -177,3 +177,37 @@ TEST_F(GroupTest, testRowCross) {
       checkL->GetPadding().bottom), locB.y);
   EXPECT_EQ(sizeW.height - margins.bottom, locB.y+sizeB.height);
 }
+
+TEST_F(GroupTest, testBox) {
+  ReadWindowData(
+      "<window text='testBox'>"
+        "<box name='b'>"
+          "<label text='Help!' name='h'/>"
+        "</box>"
+      "</window>");
+
+  Diadem::Entity* const box = windowRoot_->FindByName("b");
+  Diadem::Entity* const label = windowRoot_->FindByName("h");
+  ASSERT_FALSE(box == NULL);
+  ASSERT_FALSE(label == NULL);
+
+  Diadem::Layout* const box_L = box->GetLayout();
+  Diadem::Layout* const label_L = label->GetLayout();
+  const Diadem::Size win_size = windowRoot_->GetLayout()->GetSize();
+  const Diadem::Size box_size = box_L->GetSize();
+  const Diadem::Size label_size = label_L->GetSize();
+  const Diadem::Location box_loc = box_L->GetLocation();
+  const Diadem::Location label_loc = label_L->GetLocation();
+  const Diadem::Spacing margins = GetWindowMargins();
+  const Diadem::Spacing box_margins =
+      box->GetProperty(Diadem::kPropMargins).Coerce<Diadem::Spacing>();
+
+  EXPECT_EQ(margins.left, box_loc.x);
+  EXPECT_EQ(box_margins.left, label_loc.x);
+  EXPECT_EQ(margins.top, box_loc.y);
+  EXPECT_EQ(box_margins.top, label_loc.y);
+  EXPECT_EQ(win_size.width, box_loc.x + box_size.width + margins.right);
+  EXPECT_EQ(box_size.width, label_loc.x + label_size.width + box_margins.right);
+  EXPECT_EQ(win_size.height, box_loc.y + box_size.height + margins.bottom);
+  EXPECT_EQ(box_size.height, label_loc.y + label_size.height + box_margins.bottom);
+}

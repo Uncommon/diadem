@@ -37,6 +37,11 @@ class Native : public EntityDelegate {
 
   virtual void AddChild(Native *child) {}
 
+  // If the object is a superview that contains native objects for child
+  // entities, adjustments need to be made to their locations.
+  virtual Bool IsSuperview() const { return false; }
+  virtual Location GetSubviewAdjustment() const { return Location(); }
+
   virtual const PlatformMetrics& GetPlatformMetrics() const = 0;
   virtual WindowInterface* GetWindowInterface() { return NULL; }
 
