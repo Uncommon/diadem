@@ -539,6 +539,13 @@ Location Cocoa::Box::GetSubviewAdjustment() const {
 }
 
 Bool Cocoa::Control::SetProperty(PropertyName name, const Value &value) {
+  if (strcmp(name, Entity::kPropText) == 0) {
+    ScopedAutoreleasePool pool;
+
+    [(NSControl*)view_ref_ setStringValue:
+        NSStringWithString(value.Coerce<String>())];
+    return true;
+  }
   if (strcmp(name, Entity::kPropEnabled) == 0) {
     ScopedAutoreleasePool pool;
 
