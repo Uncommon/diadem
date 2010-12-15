@@ -216,7 +216,7 @@ static PyMemberDef Entity_members[] = {
 PyTypeObject EntityType = {
     PyObject_HEAD_INIT(NULL)
     0,                        /*ob_size*/
-    "pyadem.entity",          /*tp_name*/
+    "pyadem.Entity",          /*tp_name*/
     sizeof(PyademEntity),     /*tp_basicsize*/
     0,                        /*tp_itemsize*/
     (destructor)Entity_dealloc, /*tp_dealloc*/
@@ -308,7 +308,7 @@ static PyMethodDef Window_methods[] = {
 PyTypeObject WindowType = {
     PyObject_HEAD_INIT(NULL)
     0,                        /*ob_size*/
-    "pyadem.window",          /*tp_name*/
+    "pyadem.Window",          /*tp_name*/
     sizeof(PyademEntity),     /*tp_basicsize*/
     0,                        /*tp_itemsize*/
     (destructor)Window_dealloc,/*tp_dealloc*/
@@ -438,7 +438,18 @@ initpyadem() {
 
   Py_INCREF(&EntityType);
   PyModule_AddObject(
-      module, "entity", reinterpret_cast<PyObject*>(&EntityType));
+      module, "Entity", reinterpret_cast<PyObject*>(&EntityType));
   PyModule_AddObject(
-      module, "window", reinterpret_cast<PyObject*>(&WindowType));
+      module, "Window", reinterpret_cast<PyObject*>(&WindowType));
+
+  PyModule_AddStringConstant(
+      module, "PROP_TEXT", Diadem::Entity::kPropText);
+  PyModule_AddStringConstant(
+      module, "PROP_ENABLED", Diadem::Entity::kPropEnabled);
+  PyModule_AddStringConstant(
+      module, "PROP_VISIBLE", Diadem::kPropVisible);
+  PyModule_AddStringConstant(
+      module, "PROP_IN_LAYOUT", Diadem::kPropInLayout);
+  PyModule_AddStringConstant(
+      module, "PROP_URL", Diadem::kPropURL);
 }

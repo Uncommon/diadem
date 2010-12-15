@@ -16,6 +16,8 @@
 
 #include "Diadem/pyadem.h"
 #include "Diadem/Entity.h"
+#include "Diadem/Layout.h"
+#include "Diadem/Native.h"
 #include "Diadem/Value.h"
 
 class PythonTest : public testing::Test {
@@ -52,7 +54,7 @@ TEST_F(PythonTest, ValueCoersions) {
 
 TEST_F(PythonTest, Window) {
   PyObject *result = PyRun_String(
-      "window = pyadem.window(data=\"<window text='spiny'/>\")\n"
+      "window = pyadem.Window(data=\"<window text='spiny'/>\")\n"
       "did_show = window.ShowModeless()",
       Py_file_input, globals_, locals_);
   PyObject *error = PyErr_Occurred();
@@ -79,7 +81,7 @@ TEST_F(PythonTest, Window) {
 TEST_F(PythonTest, GetSetName) {
   PyObject *locals = PyModule_GetDict(PyImport_AddModule("pyadem"));
   PyObject *window = PyRun_String(
-      "window(data=\"<window name='spiny'/>\")",
+      "Window(data=\"<window name='spiny'/>\")",
       Py_eval_input, globals_, locals);
   PyObject *error = PyErr_Occurred();
 
@@ -118,7 +120,7 @@ TEST_F(PythonTest, GetSetName) {
 
 TEST_F(PythonTest, Properties) {
   PyObject *result = PyRun_String(
-      "window = pyadem.window(data=\"<window text='spiny'/>\")\n"
+      "window = pyadem.Window(data=\"<window text='spiny'/>\")\n"
       "text = window.GetProperty(\"text\")\n"
       "window.SetProperty(\"text\", \"Norman\")",
       Py_file_input, globals_, locals_);
@@ -150,7 +152,7 @@ TEST_F(PythonTest, Properties) {
 
 TEST_F(PythonTest, FindByName) {
   PyObject *result = PyRun_String(
-      "window = pyadem.window(data=\""
+      "window = pyadem.Window(data=\""
         "<window><button name='A'/><button name='B'/></window>\")\n"
       "buttonA = window.FindByName(\"A\")\n"
       "buttonB = window.FindByName(\"B\")\n",
@@ -181,7 +183,7 @@ TEST_F(PythonTest, FindByName) {
 
 TEST_F(PythonTest, ButtonCallback) {
   PyObject *result = PyRun_String(
-      "window = pyadem.window(data=\""
+      "window = pyadem.Window(data=\""
         "<window><button name='A' text='OK'/></window>\")\n"
       "window.context = False\n"
       "def callback(win, button):\n"
@@ -213,7 +215,7 @@ TEST_F(PythonTest, ButtonCallback) {
 
 TEST_F(PythonTest, LoadFromFile) {
   PyObject *result = PyRun_String(
-      "window = pyadem.window(path='test.dem')",
+      "window = pyadem.Window(path='test.dem')",
       Py_file_input, globals_, locals_);
   PyObject *error = PyErr_Occurred();
 
@@ -229,6 +231,35 @@ TEST_F(PythonTest, LoadFromFile) {
 
   ASSERT_FALSE(window == NULL);
   ASSERT_TRUE(PyObject_TypeCheck(window, &WindowType));
+}
+
+TEST_F(PythonTest, PropertyConstants) {
+  PyObject *result = PyRun_String(
+      "text = pyadem.PROP_TEXT\n"
+      "enabled = pyadem.PROP_ENABLED\n"
+      "visible = pyadem.PROP_VISIBLE\n"
+      "in_layout = pyadem.PROP_IN_LAYOUT\n"
+      "url = pyadem.PROP_URL\n",
+      Py_file_input, globals_, locals_);
+  PyObject *error = PyErr_Occurred();
+
+  if (error != NULL) {
+    PyErr_Print();
+    PyErr_Clear();
+    FAIL();
+  }
+  ASSERT_FALSE(result == NULL);
+  PyObject *text = PyDict_GetItemString(locals_, "text");
+  PyObject *enabled = PyDict_GetItemString(locals_, "enabled");
+  PyObject *visible = PyDict_GetItemString(locals_, "visible");
+  PyObject *in_layout = PyDict_GetItemString(locals_, "in_layout");
+  PyObject *url = PyDict_GetItemString(locals_, "url");
+
+  EXPECT_STREQ(Diadem::Entity::kPropText, PyString_AsString(text));
+  EXPECT_STREQ(Diadem::Entity::kPropEnabled, PyString_AsString(enabled));
+  EXPECT_STREQ(Diadem::kPropVisible, PyString_AsString(visible));
+  EXPECT_STREQ(Diadem::kPropInLayout, PyString_AsString(in_layout));
+  EXPECT_STREQ(Diadem::kPropURL, PyString_AsString(url));
 }
 
 #define RUN_INTERACTING_TESTS 0
