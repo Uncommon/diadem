@@ -434,8 +434,8 @@ Bool Cocoa::View::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropLocation) == 0) {
     const Spacing inset = GetInset();
     const Location offset = GetViewOffset();
-    const Location setLoc = value.Coerce<Location>();
-    const Location loc = setLoc + offset + Location(inset.left, inset.top);
+    const Location set_loc = value.Coerce<Location>();
+    const Location loc = set_loc + offset + Location(inset.left, inset.top);
     NSPoint origin = InvertPoint(NSMakePoint(loc.x, loc.y));
 
     [[view_ref_ superview] setNeedsDisplayInRect:[view_ref_ frame]];
@@ -500,13 +500,13 @@ Size Cocoa::View::GetViewSize() const {
 
 void Cocoa::Box::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
-  const NSRect defaultBounds = { { 0, 0 }, { 50, 50 } };
+  const NSRect default_bounds = { { 0, 0 }, { 50, 50 } };
 
-  view_ref_ = [[NSBox alloc] initWithFrame:defaultBounds];
+  view_ref_ = [[NSBox alloc] initWithFrame:default_bounds];
   [(NSBox*)view_ref_ setTitlePosition:NSNoTitle];
   [(NSBox*)view_ref_ setContentViewMargins:NSMakeSize(0, 0)];
   [(NSBox*)view_ref_ sizeToFit];  // adjust to new margins
-  [view_ref_ setFrame:defaultBounds];
+  [view_ref_ setFrame:default_bounds];
   ConfigureView();
 }
 

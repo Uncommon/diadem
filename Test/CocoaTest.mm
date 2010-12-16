@@ -22,7 +22,7 @@
 // This doesn't use WindowTestBase because it's Cocoa-only
 class CocoaTest : public testing::Test {
  public:
-  CocoaTest() : windowObject_(NULL) {}
+  CocoaTest() : window_object_(NULL) {}
 
   testing::AssertionResult ReadWindowData(const char *data);
 
@@ -30,7 +30,7 @@ class CocoaTest : public testing::Test {
     pool_ = [[NSAutoreleasePool alloc] init];
   }
   void TearDown() {
-    delete windowObject_;
+    delete window_object_;
     [pool_ drain];
   }
 
@@ -40,8 +40,8 @@ class CocoaTest : public testing::Test {
   }
 
   NSAutoreleasePool *pool_;
-  Diadem::Window *windowObject_;
-  Diadem::Entity *windowRoot_;
+  Diadem::Window *window_object_;
+  Diadem::Entity *window_root_;
 };
 
 testing::AssertionResult CocoaTest::ReadWindowData(const char *data) {
@@ -51,16 +51,16 @@ testing::AssertionResult CocoaTest::ReadWindowData(const char *data) {
 
   Diadem::LibXMLParser parser(factory);
 
-  windowRoot_ = parser.LoadEntityFromData(data);
-  if (windowRoot_ == NULL)
+  window_root_ = parser.LoadEntityFromData(data);
+  if (window_root_ == NULL)
     return testing::AssertionFailure() << "load failed";
-  if (windowRoot_->GetNative() == NULL)
+  if (window_root_->GetNative() == NULL)
     return testing::AssertionFailure() << "null native object";
-  if (windowRoot_->GetNative()->GetWindowInterface() == NULL)
+  if (window_root_->GetNative()->GetWindowInterface() == NULL)
     return testing::AssertionFailure() << "null window interface";
-  windowObject_ = new Diadem::Window(windowRoot_);
-  if (windowObject_->ShowModeless())
-    windowRoot_->SetProperty(Diadem::kPropLocation, Diadem::Location(20,50));
+  window_object_ = new Diadem::Window(window_root_);
+  if (window_object_->ShowModeless())
+    window_root_->SetProperty(Diadem::kPropLocation, Diadem::Location(20,50));
   return testing::AssertionSuccess();
 }
 
@@ -68,11 +68,11 @@ TEST_F(CocoaTest, Button) {
   ASSERT_TRUE(ReadWindowData(
       "<window text='Button'><button text='Dot'/></window>"));
 
-  ASSERT_EQ(1, windowRoot_->ChildrenCount());
-  ASSERT_FALSE(windowRoot_->ChildAt(0)->GetNative() == NULL);
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+  ASSERT_FALSE(window_root_->ChildAt(0)->GetNative() == NULL);
 
   NSButton *button = (NSButton *)
-      windowRoot_->ChildAt(0)->GetNative()->GetNativeRef();
+      window_root_->ChildAt(0)->GetNative()->GetNativeRef();
 
   ASSERT_FALSE(button == nil);
   ASSERT_TRUE([button isKindOfClass:[NSButton class]]);
@@ -84,11 +84,11 @@ TEST_F(CocoaTest, Label) {
   ASSERT_TRUE(ReadWindowData(
       "<window text='Label'><label text='Kaput'/></window>"));
 
-  ASSERT_EQ(1, windowRoot_->ChildrenCount());
-  ASSERT_FALSE(windowRoot_->ChildAt(0)->GetNative() == NULL);
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+  ASSERT_FALSE(window_root_->ChildAt(0)->GetNative() == NULL);
 
   NSTextField *label = (NSTextField *)
-      windowRoot_->ChildAt(0)->GetNative()->GetNativeRef();
+      window_root_->ChildAt(0)->GetNative()->GetNativeRef();
 
   ASSERT_FALSE(label == nil);
   ASSERT_TRUE([label isKindOfClass:[NSTextField class]]);
@@ -103,14 +103,14 @@ TEST_F(CocoaTest, EditPassword) {
         "<password/>"
       "</window>"));
 
-  ASSERT_EQ(2, windowRoot_->ChildrenCount());
-  ASSERT_FALSE(windowRoot_->ChildAt(0)->GetNative() == NULL);
-  ASSERT_FALSE(windowRoot_->ChildAt(1)->GetNative() == NULL);
+  ASSERT_EQ(2, window_root_->ChildrenCount());
+  ASSERT_FALSE(window_root_->ChildAt(0)->GetNative() == NULL);
+  ASSERT_FALSE(window_root_->ChildAt(1)->GetNative() == NULL);
 
   NSTextField *edit = (NSTextField *)
-      windowRoot_->ChildAt(0)->GetNative()->GetNativeRef();
+      window_root_->ChildAt(0)->GetNative()->GetNativeRef();
   NSSecureTextField *password = (NSSecureTextField *)
-      windowRoot_->ChildAt(1)->GetNative()->GetNativeRef();
+      window_root_->ChildAt(1)->GetNative()->GetNativeRef();
 
   ASSERT_FALSE(edit == nil);
   ASSERT_TRUE([edit isKindOfClass:[NSTextField class]]);
@@ -128,11 +128,11 @@ TEST_F(CocoaTest, Popup) {
       "</popup>"
     "</window>"));
 
-  ASSERT_EQ(1, windowRoot_->ChildrenCount());
-  ASSERT_FALSE(windowRoot_->ChildAt(0)->GetNative() == NULL);
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+  ASSERT_FALSE(window_root_->ChildAt(0)->GetNative() == NULL);
 
   NSPopUpButton *popup = (NSPopUpButton *)
-      windowRoot_->ChildAt(0)->GetNative()->GetNativeRef();
+      window_root_->ChildAt(0)->GetNative()->GetNativeRef();
 
   ASSERT_FALSE(popup == nil);
   ASSERT_TRUE([popup isKindOfClass:[NSPopUpButton class]]);
@@ -151,11 +151,11 @@ TEST_F(CocoaTest, Image) {
         "<image file='image.png'/>"
       "</window>"));
 
-  ASSERT_EQ(1, windowRoot_->ChildrenCount());
-  ASSERT_FALSE(windowRoot_->ChildAt(0)->GetNative() == NULL);
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+  ASSERT_FALSE(window_root_->ChildAt(0)->GetNative() == NULL);
 
   NSImageView *image_view = (NSImageView*)
-      windowRoot_->ChildAt(0)->GetNative()->GetNativeRef();
+      window_root_->ChildAt(0)->GetNative()->GetNativeRef();
 
   ASSERT_FALSE(image_view == nil);
   ASSERT_TRUE([image_view isKindOfClass:[NSImageView class]]);
@@ -179,37 +179,37 @@ TEST_F(CocoaTest, Box) {
         "</box>"
       "</window>"));
 
-  Diadem::Entity* const box = windowRoot_->FindByName("b");
-  Diadem::Entity* const label = windowRoot_->FindByName("h");
+  Diadem::Entity* const box = window_root_->FindByName("b");
+  Diadem::Entity* const label = window_root_->FindByName("h");
   ASSERT_FALSE(box == NULL);
   ASSERT_FALSE(label == NULL);
 
-  NSBox *boxView = (NSBox*)box->GetNative()->GetNativeRef();
-  NSView *labelView = (NSView*)label->GetNative()->GetNativeRef();
+  NSBox *box_view = (NSBox*)box->GetNative()->GetNativeRef();
+  NSView *label_view = (NSView*)label->GetNative()->GetNativeRef();
 
-  EXPECT_EQ([labelView superview], [boxView contentView]);
+  EXPECT_EQ([label_view superview], [box_view contentView]);
 
-  const NSRect labelFrame = [labelView frame];
-  const NSRect boxRect = [[boxView contentView] bounds];
-  const Diadem::Spacing boxMargins =
+  const NSRect label_frame = [label_view frame];
+  const NSRect box_rect = [[box_view contentView] bounds];
+  const Diadem::Spacing box_margins =
       box->GetProperty(Diadem::kPropMargins).Coerce<Diadem::Spacing>();
 
-  EXPECT_EQ(boxMargins.left, labelFrame.origin.x + 1);  // 1 for inset
-  EXPECT_EQ(boxMargins.top,
-      boxRect.size.height - labelFrame.origin.y - labelFrame.size.height);
+  EXPECT_EQ(box_margins.left, label_frame.origin.x + 1);  // 1 for inset
+  EXPECT_EQ(box_margins.top,
+      box_rect.size.height - label_frame.origin.y - label_frame.size.height);
 }
 
 TEST_F(CocoaTest, ButtonCallback) {
   ASSERT_TRUE(ReadWindowData("<window><button/></window>"));
 
-  ASSERT_EQ(1, windowRoot_->ChildrenCount());
-  ASSERT_FALSE(windowRoot_->ChildAt(0)->GetNative() == NULL);
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+  ASSERT_FALSE(window_root_->ChildAt(0)->GetNative() == NULL);
 
   NSButton *button = (NSButton *)
-      windowRoot_->ChildAt(0)->GetNative()->GetNativeRef();
+      window_root_->ChildAt(0)->GetNative()->GetNativeRef();
   bool called = false;
 
-  windowRoot_->SetButtonCallback(ButtonCallback, &called);
+  window_root_->SetButtonCallback(ButtonCallback, &called);
   [button performClick:nil];
   EXPECT_TRUE(called);
 }
@@ -223,10 +223,10 @@ TEST_F(CocoaTest, Enabled) {
         "</popup>"
       "</window>"));
 
-  ASSERT_EQ(2, windowRoot_->ChildrenCount());
+  ASSERT_EQ(2, window_root_->ChildrenCount());
 
-  Diadem::Entity *button = windowRoot_->FindByName("b");
-  Diadem::Entity *popup  = windowRoot_->FindByName("p");
+  Diadem::Entity *button = window_root_->FindByName("b");
+  Diadem::Entity *popup  = window_root_->FindByName("p");
 
   ASSERT_FALSE(button == NULL);
   ASSERT_FALSE(popup == NULL);

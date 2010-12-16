@@ -340,6 +340,9 @@ void LayoutContainer::SetLocation(const Location &loc) {
   const Location offset(loc.x-current.x, loc.y-current.y);
 
   SetLocationImp(loc);
+
+  // If the native object is a superview, then subviews will be moved
+  // automatically. Otherwise, children need to be notified of the change.
   if ((entity_->GetNative() == NULL) || (!entity_->GetNative()->IsSuperview()))
     for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
       Layout *layout_child = entity_->ChildAt(i)->GetLayout();

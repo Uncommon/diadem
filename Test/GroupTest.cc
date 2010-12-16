@@ -209,5 +209,7 @@ TEST_F(GroupTest, testBox) {
   EXPECT_EQ(win_size.width, box_loc.x + box_size.width + margins.right);
   EXPECT_EQ(box_size.width, label_loc.x + label_size.width + box_margins.right);
   EXPECT_EQ(win_size.height, box_loc.y + box_size.height + margins.bottom);
-  EXPECT_EQ(box_size.height, label_loc.y + label_size.height + box_margins.bottom);
+  EXPECT_EQ(
+      box_size.height,
+      label_loc.y + label_size.height + box_margins.bottom);
 }

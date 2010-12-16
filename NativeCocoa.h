@@ -93,13 +93,19 @@ class Cocoa {
    protected:
     NSView *view_ref_;
 
+    // Performs setup needed by all subclasses
     void ConfigureView();
+    // Returns the Diadem layout location of the view.
     Location GetLocation() const;
+    // Returns the size of the view without compensation for inset etc.
     Size GetViewSize() const;
+    // Flips point.y to compensate for inverted coordinates
     NSPoint InvertPoint(NSPoint point) const;
+    // Returns the difference between the view bounds and the layout bounds
     virtual Spacing GetInset() const { return Spacing(); }
   };
 
+  // Group box view
   class Box : public View {
    public:
     Box() {}
@@ -107,8 +113,11 @@ class Cocoa {
     virtual void InitializeProperties(const PropertyMap &properties);
     virtual Value GetProperty(PropertyName name) const;
     virtual Spacing GetInset() const;
+    // Adds children as subviews
     virtual void AddChild(Native *child);
+    // A box is a native superview
     virtual Bool IsSuperview() const { return true; }
+    // Returns an offset to compensate for the box's metrics
     virtual Location GetSubviewAdjustment() const;
 
     typedef BorderedContainer LayoutType;
