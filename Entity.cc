@@ -55,6 +55,18 @@ void Entity::SetNative(Native *native) {
     native->SetEntity(this);
 }
 
+Window* Entity::GetWindow() {
+  if (parent_ != NULL)
+    return parent_->GetWindow();
+  return window_;
+}
+
+const Window* Entity::GetWindow() const {
+  if (parent_ != NULL)
+    return parent_->GetWindow();
+  return window_;
+}
+
 void Entity::FactoryFinalize() {
   for (uint32_t i = 0; i < children_.size(); ++i) {
     if (children_[i]->GetNative() != NULL)

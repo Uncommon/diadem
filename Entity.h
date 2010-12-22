@@ -22,6 +22,7 @@ namespace Diadem {
 class Value;
 class Layout;
 class Native;
+class Window;
 
 // Having this makes it easier to declare lots of const char* const variables
 typedef const char* PropertyName;
@@ -54,6 +55,14 @@ class Entity : public Base {
   Native* GetNative()             { return native_; }
   const Native* GetNative() const { return native_; }
   virtual void AddNative(Native *n);
+
+  // SetWindow should only be called on the root entity
+  void SetWindow(Window *window) {
+    DASSERT(parent_ == NULL);
+    window_ = window;
+  }
+  Window* GetWindow();
+  const Window* GetWindow() const;
 
   virtual Bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
@@ -91,6 +100,7 @@ class Entity : public Base {
   Array<Entity*> children_;
   Layout *layout_;
   Native *native_;
+  Window *window_;
   ButtonCallback button_callback_;
   void *button_data_;
 
