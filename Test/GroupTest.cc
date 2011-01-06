@@ -15,11 +15,13 @@
 #include "Diadem/Test/WindowTestBase.h"
 #include "Diadem/Layout.h"
 
+// Layout tests involving nested containers
 class GroupTest : public WindowTestBase {
  protected:
   void VerifyButtonGrid();
 };
 
+// A text label, with a row of two button beneath it
 TEST_F(GroupTest, testTextAndButtonRow) {
   ReadWindowData(
       "<window text='Group'>"
@@ -144,6 +146,7 @@ TEST_F(GroupTest, testRowOfColumns) {
   VerifyButtonGrid();
 }
 
+// Basic "row in a column" case
 TEST_F(GroupTest, testRowCross) {
   ReadWindowData(
       "<window>"
@@ -178,6 +181,8 @@ TEST_F(GroupTest, testRowCross) {
   EXPECT_EQ(sizeW.height - margins.bottom, locB.y+sizeB.height);
 }
 
+// Box is different from group because the native control is a superview, which
+// requires different handling of coordinates.
 TEST_F(GroupTest, testBox) {
   ReadWindowData(
       "<window text='testBox'>"

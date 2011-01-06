@@ -34,6 +34,7 @@ class PythonTest : public testing::Test {
   PyObject *globals_, *locals_;
 };
 
+// Checks Value to PyObject conversion
 TEST_F(PythonTest, ValueCoersions) {
   const Diadem::Value v(1);
   PyObject *o = v.Coerce<PyObject*>();
@@ -52,6 +53,7 @@ TEST_F(PythonTest, ValueCoersions) {
   Py_DECREF(o);
 }
 
+// Simple window
 TEST_F(PythonTest, Window) {
   PyObject *result = PyRun_String(
       "window = pyadem.Window(data=\"<window text='spiny'/>\")\n"
@@ -78,6 +80,7 @@ TEST_F(PythonTest, Window) {
   EXPECT_TRUE(PyObject_IsTrue(did_show));
 }
 
+// Tests getting and setting an entity's name
 TEST_F(PythonTest, GetSetName) {
   PyObject *locals = PyModule_GetDict(PyImport_AddModule("pyadem"));
   PyObject *window = PyRun_String(
@@ -118,6 +121,7 @@ TEST_F(PythonTest, GetSetName) {
   Py_DECREF(window);
 }
 
+// Tests getting and setting properties
 TEST_F(PythonTest, Properties) {
   PyObject *result = PyRun_String(
       "window = pyadem.Window(data=\"<window text='spiny'/>\")\n"
@@ -150,6 +154,7 @@ TEST_F(PythonTest, Properties) {
       window_entity->GetProperty("text").Coerce<Diadem::String>().Get());
 }
 
+// Tests exposing Entity::FindByName
 TEST_F(PythonTest, FindByName) {
   PyObject *result = PyRun_String(
       "window = pyadem.Window(data=\""
@@ -181,6 +186,7 @@ TEST_F(PythonTest, FindByName) {
   EXPECT_STREQ("B", entityB->GetName());
 }
 
+// Tests the button callback calling a Python function
 TEST_F(PythonTest, ButtonCallback) {
   PyObject *result = PyRun_String(
       "window = pyadem.Window(data=\""
@@ -213,6 +219,7 @@ TEST_F(PythonTest, ButtonCallback) {
   EXPECT_TRUE(PyObject_IsTrue(window->context));
 }
 
+// Loads a window from a file; other tests use raw data
 TEST_F(PythonTest, LoadFromFile) {
   PyObject *result = PyRun_String(
       "window = pyadem.Window(path='test.dem')",
@@ -233,6 +240,7 @@ TEST_F(PythonTest, LoadFromFile) {
   ASSERT_TRUE(PyObject_TypeCheck(window, &WindowType));
 }
 
+// Named property constants in the module
 TEST_F(PythonTest, PropertyConstants) {
   PyObject *result = PyRun_String(
       "text = pyadem.PROP_TEXT\n"
@@ -265,6 +273,7 @@ TEST_F(PythonTest, PropertyConstants) {
 #define RUN_INTERACTING_TESTS 0
 
 #if RUN_INTERACTING_TESTS  // TODO(catmull): automate the button clicking
+// ShowMessage with message and OK button
 TEST_F(PythonTest, MessagePlain) {
   PyObject *result = PyRun_String(
       "button = pyadem.ShowMessage('Something happened!')",
@@ -285,6 +294,7 @@ TEST_F(PythonTest, MessagePlain) {
   EXPECT_STREQ("accept", PyString_AsString(button));
 }
 
+// ShowMessage with OK and Cancel buttons
 TEST_F(PythonTest, MessageCancel) {
   PyObject *result = PyRun_String(
       "button = pyadem.ShowMessage('Click Cancel for me.', cancel=True)",
@@ -305,6 +315,7 @@ TEST_F(PythonTest, MessageCancel) {
   EXPECT_STREQ("cancel", PyString_AsString(button));
 }
 
+// ShowMessage with suppression checkbox visible
 TEST_F(PythonTest, MessageSuppress) {
   PyObject *result = PyRun_String(
       "msg_result = pyadem.ShowMessage('Somebody stop me!', suppress='Stop')",

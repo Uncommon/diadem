@@ -20,12 +20,12 @@ extern "C" int NSApplicationMain(int argc, const char *argv[]);
 extern "C" void NSApplicationLoad();
 
 int InitPython() {
-  static const char *pyadem_module = "pyadem";
+  static const char *pyadem_name = "pyadem";
 
-  PyImport_AppendInittab(const_cast<char*>(pyadem_module), initpyadem);
+  PyImport_AppendInittab(const_cast<char*>(pyadem_name), initpyadem);
   Py_Initialize();
 
-  PyObject *module = PyImport_ImportModule(pyadem_module);
+  PyObject *module = PyImport_ImportModule(pyadem_name);
 
   if (module == NULL)
     return -1;
@@ -40,7 +40,7 @@ int main(int argc, const char* argv[]) {
 
   if ((argc > 1) && (strcmp(argv[1], "-test") == 0)) {
     testing::InitGoogleTest(&argc, const_cast<char**>(argv));
-    NSApplicationLoad();  // needed for python tests
+    NSApplicationLoad();  // needed for Python tests
     result = RUN_ALL_TESTS();
   } else {
     NSApplicationMain(argc, argv);

@@ -64,6 +64,7 @@ testing::AssertionResult CocoaTest::ReadWindowData(const char *data) {
   return testing::AssertionSuccess();
 }
 
+// Verifies button control and title
 TEST_F(CocoaTest, Button) {
   ASSERT_TRUE(ReadWindowData(
       "<window text='Button'><button text='Dot'/></window>"));
@@ -80,6 +81,7 @@ TEST_F(CocoaTest, Button) {
       [[button title] cStringUsingEncoding:NSUTF8StringEncoding]);
 }
 
+// Verifies label (NSTextField) control and title
 TEST_F(CocoaTest, Label) {
   ASSERT_TRUE(ReadWindowData(
       "<window text='Label'><label text='Kaput'/></window>"));
@@ -96,6 +98,7 @@ TEST_F(CocoaTest, Label) {
       [[label stringValue] cStringUsingEncoding:NSUTF8StringEncoding]);
 }
 
+// Verifies edit field and password variation
 TEST_F(CocoaTest, EditPassword) {
   ASSERT_TRUE(ReadWindowData(
       "<window text='Label'>"
@@ -119,6 +122,7 @@ TEST_F(CocoaTest, EditPassword) {
   ASSERT_TRUE([password isKindOfClass:[NSSecureTextField class]]);
 }
 
+// Verifies popup button and menu contents
 TEST_F(CocoaTest, Popup) {
   ASSERT_TRUE(ReadWindowData(
     "<window>"
@@ -145,6 +149,7 @@ TEST_F(CocoaTest, Popup) {
   // TODO: check width
 }
 
+// Verifies image loaded from a file
 TEST_F(CocoaTest, Image) {
   ASSERT_TRUE(ReadWindowData(
       "<window text='Image'>"
@@ -167,10 +172,7 @@ TEST_F(CocoaTest, Image) {
   EXPECT_EQ( 95, image_size.height);
 }
 
-static void ButtonCallback(Diadem::Entity *target, void *data) {
-  *(bool *)data = true;
-}
-
+// Verifies box and its metrics
 TEST_F(CocoaTest, Box) {
   ASSERT_TRUE(ReadWindowData(
       "<window text='testBox'>"
@@ -199,6 +201,11 @@ TEST_F(CocoaTest, Box) {
       box_rect.size.height - label_frame.origin.y - label_frame.size.height);
 }
 
+static void ButtonCallback(Diadem::Entity *target, void *data) {
+  *(bool *)data = true;
+}
+
+// Tests that the button callback works
 TEST_F(CocoaTest, ButtonCallback) {
   ASSERT_TRUE(ReadWindowData("<window><button/></window>"));
 
@@ -214,6 +221,7 @@ TEST_F(CocoaTest, ButtonCallback) {
   EXPECT_TRUE(called);
 }
 
+// Tests enabling and disabling
 TEST_F(CocoaTest, Enabled) {
   ASSERT_TRUE(ReadWindowData(
       "<window text='Enabled'>"
@@ -259,6 +267,7 @@ TEST_F(CocoaTest, Enabled) {
       Diadem::Entity::kPropEnabled).Coerce<Diadem::Bool>());
 }
 
+// Simple case for ShowMessage - message with OK buton
 TEST_F(CocoaTest, MessagePlain) {
   Diadem::MessageData message("Something happened!");
   NSAlert *alert = AlertForMessageData(&message);
@@ -269,6 +278,7 @@ TEST_F(CocoaTest, MessagePlain) {
   EXPECT_STREQ("Something happened!", [[alert messageText] UTF8String]);
 }
 
+// ShowMessage with OK and Cancel buttons
 TEST_F(CocoaTest, MessageCancel) {
   Diadem::MessageData message("Let's go to the zoo.");
 
@@ -284,6 +294,7 @@ TEST_F(CocoaTest, MessageCancel) {
   EXPECT_STREQ("Let's go to the zoo.", [[alert messageText] UTF8String]);
 }
 
+// ShowMessage with suppression checkbox visible
 TEST_F(CocoaTest, MessageSuppress) {
   Diadem::MessageData message("Poke!");
 

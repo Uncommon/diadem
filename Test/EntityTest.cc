@@ -25,6 +25,7 @@ class EntityTest : public testing::Test {
   virtual void TearDown() {}
 };
 
+// FindByName: find self, find child
 TEST(EntityTest, FindByName) {
   Diadem::Entity parent, child1, child2;
 
@@ -40,6 +41,7 @@ TEST(EntityTest, FindByName) {
   parent.RemoveChild(&child2);
 }
 
+// Constructs with a PropertyMap specifying a name
 TEST(EntityTest, ConstructWithName) {
   Diadem::PropertyMap properties;
 
@@ -53,6 +55,7 @@ TEST(EntityTest, ConstructWithName) {
   EXPECT_STREQ("Eustace", entity.GetName());
 }
 
+// Tests parent-child relationships
 TEST(EntityTest, ParentChild) {
   Diadem::PropertyMap properties;
   Diadem::Entity parent, child1, child2;

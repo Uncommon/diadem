@@ -17,9 +17,11 @@
 #include "Diadem/Native.h"
 #include "Diadem/Value.h"
 
+// Layout tests that do not involve nested containers
 class LayoutTest : public WindowTestBase {
 };
 
+// A row where one object has its width set to fill
 TEST_F(LayoutTest, testRowFill) {
   ReadWindowData(
     "<window text='testRowFill' width='30em' direction='row'>"
@@ -54,6 +56,8 @@ TEST_F(LayoutTest, testRowFill) {
       loc2.x);
 }
 
+// Makes sure an edit field set to fill comes out the same as on that is
+// explicitly sized
 TEST_F(LayoutTest, testEditFill) {
   ReadWindowData(
     "<window text='testEditFill'>"
@@ -76,6 +80,7 @@ TEST_F(LayoutTest, testEditFill) {
   EXPECT_EQ(label1L->GetSize().width, label2L->GetSize().width);
 }
 
+// Toggles the "in layout" property of the first object
 TEST_F(LayoutTest, testInLayoutFirst) {
   ReadWindowData(
     "<window direction='row'>"
@@ -122,6 +127,7 @@ TEST_F(LayoutTest, testInLayoutFirst) {
   EXPECT_EQ(margins.left, b_loc.x);
 }
 
+// Toggles the "in layout" property of the middle object
 TEST_F(LayoutTest, testInLayoutMiddle) {
   ReadWindowData(
     "<window direction='row'>"
@@ -181,6 +187,7 @@ TEST_F(LayoutTest, testExplicitSize) {
   EXPECT_EQ(metrics.em_size * 5, size.width);
 }
 
+// Tests the align options
 TEST_F(LayoutTest, testAlignment) {
   ReadWindowData(
     "<window text='Test' direction='column'>"
@@ -224,6 +231,7 @@ TEST_F(LayoutTest, testAlignment) {
       entity->GetLayout()->GetSize().width);
 }
 
+// Simple window with one button
 TEST_F(LayoutTest, testOneButton) {
   ReadWindowData(
     "<window text='Test'><button text='OK'/></window>");
@@ -248,6 +256,7 @@ TEST_F(LayoutTest, testOneButton) {
       loc.y + b_size.height) << "b margin";
 }
 
+// Row of two buttons
 TEST_F(LayoutTest, testTwoButtonRow) {
   ReadWindowData(
     "<window text='Test' direction='row'>"
@@ -283,6 +292,7 @@ TEST_F(LayoutTest, testTwoButtonRow) {
   EXPECT_EQ(w_size.width - margins.right, loc_2.x + size_2.width) << "r margin";
 }
 
+// Column of two buttons
 TEST_F(LayoutTest, testTwoButtonColumn) {
   ReadWindowData(
     "<window title='Test' direction='column'>"
@@ -322,6 +332,7 @@ TEST_F(LayoutTest, testTwoButtonColumn) {
       loc_2.y + size_2.height) << "r margin";
 }
 
+// Row with label and button
 TEST_F(LayoutTest, testLabelButtonRow) {
   ReadWindowData(
     "<window text='Test' direction='row'>"
@@ -350,6 +361,7 @@ TEST_F(LayoutTest, testLabelButtonRow) {
   EXPECT_EQ(margins.top + offset, locL.y) << "Baseline alignment";
 }
 
+// Tests parsing the size options
 TEST_F(LayoutTest, testSizeParse) {
   ReadWindowData(
     "<window title='Test'>"
@@ -367,6 +379,7 @@ TEST_F(LayoutTest, testSizeParse) {
   EXPECT_EQ(Diadem::kSizeFill,    HSizeOption(windowRoot_->ChildAt(2)));
 }
 
+// Horizontal separator should automatically fill width
 TEST_F(LayoutTest, testHSeparator) {
   ReadWindowData(
     "<window text='testHSeparator' direction='row'>"
@@ -387,6 +400,7 @@ TEST_F(LayoutTest, testHSeparator) {
   EXPECT_EQ(sizeL.height, sizeS.height);
 }
 
+// Vertical separator should automatically fill height
 TEST_F(LayoutTest, testVSeparator) {
   ReadWindowData(
     "<window text='S'>"

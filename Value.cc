@@ -18,6 +18,7 @@ namespace Diadem {
 
 Value& Value::operator=(const Value &v) {
   if (this != &v) {
+    delete holder_;
     if (v.holder_ == NULL)
       holder_ = NULL;
     else
