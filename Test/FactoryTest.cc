@@ -39,6 +39,7 @@ class TestEntity : public Diadem::Entity {
 
 #define kEntityClassName "entity"
 
+// Constructs a plain, named entity
 TEST(FactoryTest, ConstructEntity) {
   Diadem::Factory factory;
   Diadem::PropertyMap properties;
@@ -53,6 +54,7 @@ TEST(FactoryTest, ConstructEntity) {
   delete entity;
 }
 
+// Directly exercises FactorySession, normally only called by the Parser
 TEST(FactoryTest, BasicSession) {
   Diadem::Factory factory;
   Diadem::FactorySession session(factory);

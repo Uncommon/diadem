@@ -25,6 +25,7 @@
 #include "Diadem/NativeCocoa.h"
 #include "Diadem/Value.h"
 
+// Wraps an Entity in a Python object.
 static PyademEntity* WrapEntity(Diadem::Entity *entity) {
   PyademEntity *result = PyObject_New(PyademEntity, &EntityType);
 
@@ -34,6 +35,7 @@ static PyademEntity* WrapEntity(Diadem::Entity *entity) {
   return result;
 }
 
+// Diadem button callback that calls through to the Python window's callback
 static void ButtonCallback(Diadem::Entity *button, PyademEntity *self) {
   if ((self->button_callback != NULL) &&
       (PyCallable_Check(self->button_callback))) {
@@ -58,6 +60,7 @@ static void ButtonCallback(Diadem::Entity *button, PyademEntity *self) {
   }
 }
 
+// Returns the path to the named file in the default resources directory.
 // TODO(catmull): This is Mac-specific, and we'll need a Windows equivalent
 static char* GetResourcePath(const char *path) {
   CFStringRef name = CFStringCreateWithCString(
@@ -100,6 +103,14 @@ static char* GetResourcePath(const char *path) {
   return result;
 }
 
+// TODO(catmull): This is platform-specific.
+bool IsAbsolutePath(const char *path) {
+  return path[0] == '/';
+}
+
+// Entity constructor. Either the path or the data parameter may be given.
+// TODO(catmull): This should be moved to the Window class, since Entities
+// can't be constructed directly in Python.
 static int Entity_init(PyademEntity *self, PyObject *args, PyObject *keywords) {
   PyObject *path = NULL, *data = NULL;
   static const char *keys[] = { "path", "data" };
@@ -124,7 +135,7 @@ static int Entity_init(PyademEntity *self, PyObject *args, PyObject *keywords) {
     if ((cpath == NULL) || (cpath[0] == '\0'))
       return -1;
 
-    if (cpath[0] == '/') {
+    if (IsAbsolutePath(cpath)) {
       self->object = parser.LoadEntityFromFile(cpath);
     } else {
       cpath = GetResourcePath(cpath);
@@ -146,6 +157,7 @@ static int Entity_init(PyademEntity *self, PyObject *args, PyObject *keywords) {
   }
 }
 
+// Entity destructor.
 static void Entity_dealloc(PyademEntity *self) {
   if ((self->object != NULL) && (self->object->GetParent() == NULL)) {
     delete self->object;
@@ -154,12 +166,14 @@ static void Entity_dealloc(PyademEntity *self) {
   self->ob_type->tp_free(reinterpret_cast<PyObject*>(self));
 }
 
+// Getter for the 'name' attribute.
 static PyObject* Entity_getName(PyademEntity *self, void *closure) {
   if ((self == NULL) || (self->object == NULL))
     return NULL;
   return PyString_FromString(self->object->GetName());
 }
 
+// Getter for the 'name' attribute.
 static int Entity_setName(PyademEntity *self, PyObject *value, void *closure) {
   if ((self == NULL) || (self->object == NULL))
     return -1;
@@ -439,6 +453,8 @@ static PyMethodDef Pyadem_Methods[] = {
     { NULL },
     };
 
+// Since the name of the module is "pyadem", Python will look for a function
+// named "initpyadem".
 PyMODINIT_FUNC
 initpyadem() {
   EntityType.tp_new = PyType_GenericNew;

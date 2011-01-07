@@ -42,6 +42,10 @@ const PropertyName
     kPropMargins      = "margins",
     kPropBaseline     = "baseline";
 
+// Height or width may be specified as fit, fill or default, or an explicit
+// size. Fit is the smallest size that will fit the object's contents. Fill
+// expands to take up any extra space in the parent container. Default will
+// vary depending on the object type.
 Bool ParseSizeOption(const char *c, SizeOption *size) {
   const char* strings[3] = {
       "default", "fit", "fill" };
@@ -56,6 +60,7 @@ Bool ParseSizeOption(const char *c, SizeOption *size) {
   return false;
 }
 
+// Finds the first letter (a-z) in a string
 const char *FirstLetter(const char *s) {
   const char *l = s;
 
@@ -66,6 +71,7 @@ const char *FirstLetter(const char *s) {
   return l;
 }
 
+// Parses a width value for an explicit amount and unit
 void ParseWidth(const char *value, ExplicitSize *size) {
   DASSERT(size != NULL);
   if (strcmp(value, "indent") == 0) {
@@ -82,6 +88,7 @@ void ParseWidth(const char *value, ExplicitSize *size) {
   }
 }
 
+// Parses a height value for an explicit amount and unit
 void ParseHeight(const char *value, ExplicitSize *size) {
   DASSERT(size != NULL);
   const char *letters = FirstLetter(value);
@@ -93,6 +100,7 @@ void ParseHeight(const char *value, ExplicitSize *size) {
   size->height_ = strtof(value, NULL);
 }
 
+// Reverses an alignment value for RTL layout
 AlignOption ReverseAlignment(AlignOption a) {
   switch (a) {
     case kAlignStart:  return kAlignEnd;
@@ -186,6 +194,8 @@ Value Layout::GetProperty(PropertyName name) const {
 Location Layout::GetViewLocation() const {
   const Native* const native = entity_->GetNative();
 
+  // If the native object is a superview, then it defines the origin for its
+  // subviews, so its location is (0, 0)
   if ((native != NULL) && (native->IsSuperview()))
     return Location();
   if (entity_->GetParent() != NULL) {
@@ -270,7 +280,7 @@ const PlatformMetrics& Layout::GetPlatformMetrics() const {
 
   static PlatformMetrics no_metrics = {};
 
-  DASSERT(false);
+  DASSERT(false);  // Platform metrics must be somewhere in the hierarchy
   return no_metrics;
 }
 
@@ -331,6 +341,8 @@ void LayoutContainer::SetSize(const Size &s) {
   Size new_size;
   long extra;
 
+  // Resizing a container is done in two phases: setting the sizes of the
+  // children, and then setting their locations.
   SetObjectSizes(s, &new_size, &extra);
   ArrangeObjects(new_size, extra);
 }
@@ -376,13 +388,17 @@ uint32_t LayoutContainer::FillChildCount() const {
   return count;
 }
 
+static const uint32_t kMaxLayoutIterations = 3;
+
 void LayoutContainer::SetObjectSizes(
     const Size &s, Size *new_size, long *extra) {
   const Spacing margins = GetMargins();
   const unsigned int fill_count = FillChildCount();
 
-  layout_valid_ = false;
-  for (int i = 0; !layout_valid_ && (i < 3); ++i) {  // limit the recalculations
+  // For some objects, such as wrapped text, changing their size in one
+  // direction will affect their minimum size in the other. When that happens,
+  // the object will call InvalidateLayout, and the loop will be executed again.
+  for (uint32_t i = 0; !layout_valid_ && (i < kMaxLayoutIterations); ++i) {
     layout_valid_ = true;
     if (cached_min_size_ == Size())
       cached_min_size_ = GetMinimumSize();
@@ -421,6 +437,7 @@ void LayoutContainer::SetObjectSizes(
         if ((StreamSizeOption(*child) == kSizeFill) ||
             (StreamDim(max) == kSizeFill)) {
           long item_fill = fill + StreamDim(min);
+
           if (remainder > 0) {
             ++item_fill;
             --remainder;
@@ -465,9 +482,9 @@ void LayoutContainer::ArrangeObjects(const Size &new_size, long extra) {
   long cross_extra;
   Bool first = true;
   const uint32_t end = reverse_row ? UINT32_MAX : entity_->ChildrenCount();
-  const int inc = reverse_row ? -1 : 1;
+  const uint8_t inc = reverse_row ? -1 : 1;
 
-  for (uint32_t i = reverse_row ? entity_->ChildrenCount()-1 : 0;
+  for (uint32_t i = reverse_row ? (entity_->ChildrenCount() - 1) : 0;
        i != end; i += inc) {
     Layout *child = entity_->ChildAt(i)->GetLayout();
 
@@ -493,7 +510,7 @@ void LayoutContainer::ArrangeObjects(const Size &new_size, long extra) {
         break;
       case kAlignCenter:
       case kAlignEnd:
-        cross_extra = CrossDim(new_size)-CrossDim(child_size) -
+        cross_extra = CrossDim(new_size) - CrossDim(child_size) -
             (CrossBefore(margins) + CrossAfter(margins));
         if (child_align == kAlignEnd)
           CrossLoc(loc) += cross_extra;
@@ -516,8 +533,7 @@ void LayoutContainer::AlignBaselines() {
   Layout *best_items[3] = { NULL, NULL, NULL };
   long baselines[3] = { 0, 0, GetSize().height };
   long center_height = 0;
-  AlignOption a;
-  uint32 i;
+  uint32_t i;
   Layout *child = NULL;
 
   for (i = 0; i < entity_->ChildrenCount(); ++i) {
@@ -554,7 +570,8 @@ void LayoutContainer::AlignBaselines() {
     if ((child == NULL) || !child->IsInLayout())
       continue;
 
-    a = child->GetAlignment();
+    const AlignOption a = child->GetAlignment();
+
     if (child == best_items[a])
       continue;
 
@@ -579,10 +596,9 @@ Size LayoutContainer::CalculateMinimumSize() const {
   if (entity_->ChildrenCount() != 0) {
     const Spacing margins = GetMargins();
     long prev_padding = 0;
-    const Layout* const first_child =
-        entity_->ChildAt(0)->GetLayout();
+    const Layout* const first_child = entity_->ChildAt(0)->GetLayout();
 
-    const long first_padding = StreamBefore(first_child->GetPadding());
+    const int32_t first_padding = StreamBefore(first_child->GetPadding());
 
     // TODO(catmull): is this really useful? min_size_ should be empty
     if (first_padding > 0) {
@@ -591,8 +607,7 @@ Size LayoutContainer::CalculateMinimumSize() const {
     }
 
     for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
-      const Layout* const child =
-          entity_->ChildAt(i)->GetLayout();
+      const Layout* const child = entity_->ChildAt(i)->GetLayout();
 
       if ((child == NULL) || !child->IsInLayout())
         continue;
@@ -658,7 +673,7 @@ void LayoutContainer::ResizeToMinimum() {
   cached_min_size_ = Size();
   layout_valid_ = false;
 
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < kMaxLayoutIterations; ++i) {
     const Size min = GetMinimumSize();
 
     if (min == GetSize())

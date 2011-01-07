@@ -15,6 +15,7 @@
 #include "XMLTest.h"
 #include "Diadem/Factory.h"
 
+// Loads a single entity from XML
 void XMLTest::SimpleTest() {
   Diadem::Factory factory;
 
@@ -29,6 +30,7 @@ void XMLTest::SimpleTest() {
   delete parser;
 }
 
+// Loads nested entities
 void XMLTest::NestedTest() {
   Diadem::Factory factory;
 
