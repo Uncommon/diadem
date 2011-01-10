@@ -46,7 +46,7 @@ const PropertyName
 // size. Fit is the smallest size that will fit the object's contents. Fill
 // expands to take up any extra space in the parent container. Default will
 // vary depending on the object type.
-Bool ParseSizeOption(const char *c, SizeOption *size) {
+static Bool ParseSizeOption(const char *c, SizeOption *size) {
   const char* strings[3] = {
       "default", "fit", "fill" };
   const SizeOption options[3] = { kSizeDefault, kSizeFit, kSizeFill };
@@ -61,7 +61,7 @@ Bool ParseSizeOption(const char *c, SizeOption *size) {
 }
 
 // Finds the first letter (a-z) in a string
-const char *FirstLetter(const char *s) {
+static const char *FirstLetter(const char *s) {
   const char *l = s;
 
   for (; !isalpha(*l); ++l) {
@@ -72,7 +72,7 @@ const char *FirstLetter(const char *s) {
 }
 
 // Parses a width value for an explicit amount and unit
-void ParseWidth(const char *value, ExplicitSize *size) {
+static void ParseWidth(const char *value, ExplicitSize *size) {
   DASSERT(size != NULL);
   if (strcmp(value, "indent") == 0) {
     size->width_ = 1;
@@ -89,7 +89,7 @@ void ParseWidth(const char *value, ExplicitSize *size) {
 }
 
 // Parses a height value for an explicit amount and unit
-void ParseHeight(const char *value, ExplicitSize *size) {
+static void ParseHeight(const char *value, ExplicitSize *size) {
   DASSERT(size != NULL);
   const char *letters = FirstLetter(value);
 
@@ -101,7 +101,7 @@ void ParseHeight(const char *value, ExplicitSize *size) {
 }
 
 // Reverses an alignment value for RTL layout
-AlignOption ReverseAlignment(AlignOption a) {
+static AlignOption ReverseAlignment(AlignOption a) {
   switch (a) {
     case kAlignStart:  return kAlignEnd;
     case kAlignCenter: return kAlignCenter;
@@ -280,7 +280,7 @@ const PlatformMetrics& Layout::GetPlatformMetrics() const {
 
   static PlatformMetrics no_metrics = {};
 
-  DASSERT(false);  // Platform metrics must be somewhere in the hierarchy
+  DASSERT(false);  // Platform metrics must be somewhere in the hierarchy.
   return no_metrics;
 }
 
