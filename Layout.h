@@ -24,16 +24,16 @@ namespace Diadem {
 class LayoutContainer;
 
 enum SizeOption {
-  kSizeFill = -1,
-  kSizeDefault,
-  kSizeFit,
-  kSizeExplicit
+  kSizeFill = -1,   // Fill any extra space in the container.
+  kSizeDefault,     // Depends on the type, usually fit or fill.
+  kSizeFit,         // Just big enough to fit its contents.
+  kSizeExplicit,    // Given in pixels or platform-dependent units.
 };
 
 enum AlignOption {
-  kAlignStart,
+  kAlignStart,    // Top for rows, left for columns.
   kAlignCenter,
-  kAlignEnd
+  kAlignEnd       // Bottom for rows, right for columns.
 };
 
 extern const PropertyName
@@ -55,6 +55,8 @@ class Layout : public EntityDelegate {
 
   void InitializeProperties(const PropertyMap &properties);
 
+  // Notification that a child has been added, in case layout adjustments
+  // need to be made.
   virtual void ChildAdded(Entity *child) {}
 
   // These are convenience methods to get the layout object for the parent
@@ -70,6 +72,7 @@ class Layout : public EntityDelegate {
   // Layout is done repeatedly until nobody calls InvalidateLayout.
   virtual void InvalidateLayout();
 
+  // Returns the layout direction of the object, or the parent container.
   virtual LayoutDirection GetDirection() const;
 
   virtual void SetSize(const Size &size)
@@ -86,10 +89,10 @@ class Layout : public EntityDelegate {
   // GetLocation() if the object is inside a Group.
   virtual Location GetViewLocation() const;
 
-  // Padding is the minimum distance around an object
+  // Padding is the minimum distance around an object.
   virtual Spacing GetPadding() const
     { return entity_->GetNativeProperty(kPropPadding).Coerce<Spacing>(); }
-  // Baseline is the distance from the top to the baseline of the text
+  // Baseline is the distance from the top to the baseline of the text.
   virtual long GetBaseline() const
     { return entity_->GetProperty(kPropBaseline).Coerce<int32_t>(); }
 
@@ -102,7 +105,8 @@ class Layout : public EntityDelegate {
   virtual void ResizeToMinimum()
     { SetSize(GetMinimumSize()); }
 
-  // Visibility is simply whether the object is displayed
+  // Visibility is simply whether the object is displayed, though it still
+  // may take up space in the layout.
   void SetVisible(Bool visible)
     { entity_->SetNativeProperty(kPropVisible, visible); }
   Bool IsVisible() const
@@ -113,6 +117,8 @@ class Layout : public EntityDelegate {
   void SetInLayout(Bool in_layout);
   Bool IsInLayout() const { return in_layout_; }
 
+  // Notification that the parent's location has changed, so this child should
+  // adjust itself accordingly.
   virtual void ParentLocationChanged(const Location &offset);
 
   SizeOption GetHSizeOption() const { return h_size_; }
@@ -128,7 +134,10 @@ class Layout : public EntityDelegate {
   ExplicitSize explicit_size_;
   AlignOption align_;
 
+  // For each dimension, returns the greater of the given size and any
+  // explicit size specified in the object.
   Size EnforceExplicitSize(const Size &size) const;
+  // Returns the smallest size allowed by the object.
   virtual Size CalculateMinimumSize() const;
 };
 
@@ -167,12 +176,18 @@ class LayoutContainer : public Layout {
 
   virtual LayoutDirection GetDirection() const { return direction_; }
 
+  // Sets the object's size and recalculates the layout of its children.
   virtual void SetSize(const Size &size);
+  // Moves the object and its children to the given location.
   virtual void SetLocation(const Location &loc);
   virtual void ResizeToMinimum();
   virtual Size CalculateMinimumSize() const;
+  // Returns the space between this object's edges and the edges of any
+  // children. Margins and padding will overlap.
   virtual Spacing GetMargins() const;
 
+  // Signals the layout code to continue with another iteration because
+  // something affecting layout has changed.
   virtual void InvalidateLayout();
 
  protected:
@@ -186,15 +201,21 @@ class LayoutContainer : public Layout {
   void SetObjectSizes(const Size &s, Size *new_size, long *extra);
   void ArrangeObjects(const Size &new_size, long extra);
 
+  // Pass size changes to the native implementation.
   virtual void SetSizeImp(const Size &size);
+  // Pass location changes to the native implementation.
   virtual void SetLocationImp(const Location &loc);
+  // Pass location changes to the children.
   virtual void ParentLocationChanged(const Location &offset);
 
-  // Extra space available to child objects that may want to expand to fill it
+  // Returns the extra space available to child objects that may want to expand
+  // to fill it.
   virtual long ExtraSpace(long new_size)
     { return new_size - StreamDim(CalculateMinimumSize()); }
 
+  // Adjusts children vertically so their baselines line up.
   void AlignBaselines();
+  // Returns the number of children set to fill in the layout direction.
   uint32_t FillChildCount() const;
 
   // Return true if the application is running in an RTL language, indicating
@@ -257,15 +278,19 @@ class BorderedContainer : public LayoutContainer {
 
 // Not to be confused with group boxes that have visible borders. A Group is
 // simply a layout tool. Normally its layout direction will be the opposite
-// (row vs column) of its parent.
+// (row vs column) of its parent. A group's padding is determined by how much
+// the children's padding extends past the group's borders.
 class Group : public LayoutContainer {
  public:
   Group() {}
 
+  // Padding may need to be recalculated when children are added.
   virtual void ChildAdded(Entity *child);
 
   Spacing GetPadding() const { return min_padding_; }
 
+  // When the group's size changes, the children may move, which could change
+  // the group's padding.
   virtual void SetSize(const Size &size);
   virtual Size GetSize() const { return size_; }
   virtual Location GetLocation() const { return location_; }

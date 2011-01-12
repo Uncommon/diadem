@@ -29,6 +29,8 @@ class Factory : public Base {
   typedef Layout* (*CreateLayoutFunction)();
   typedef Native* (*CreateNativeFunction)();
 
+  // For every class name there is a set of creation functions. The layout and
+  // native creators may be NULL.
   struct CreatorFunctions {
     CreateEntityFunction entity_creator;
     CreateLayoutFunction layout_creator;
@@ -66,6 +68,7 @@ class Factory : public Base {
     registry_.Insert(String(class_name), functions);
   }
 
+  // Registers a class name with no layout or native helper.
   template <class T>
   void Register(const char *class_name)
     { RegisterCreator(class_name, &Creator<T, Entity>::Create, NULL, NULL); }
@@ -80,6 +83,9 @@ class Factory : public Base {
         &Creator<T, Native>::Create);
   }
 
+  // Looks up the given class name and creates a new Entity with the
+  // corresponding creator functions, initialized with the given properties.
+  // Returns NULL if the name is not found.
   Entity* CreateEntity(
       const char *class_name, const PropertyMap &properties) const;
 
@@ -87,6 +93,7 @@ class Factory : public Base {
     return registry_.Exists(class_name);
   }
 
+  // Registers all standard, platform-independent classes.
   void RegisterBasicClasses();
 
  protected:

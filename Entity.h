@@ -24,20 +24,23 @@ class Layout;
 class Native;
 class Window;
 
-// Having this makes it easier to declare lots of const char* const variables
+// Having this makes it easier to declare lots of const char* const variables.
 typedef const char* PropertyName;
 typedef Map<String, Value> PropertyMap;
 
-// Basic object type: has a unique name, created from a resource
+// Basic object type: has a unique name, created from a resource.
 class Entity : public Base {
  public:
   Entity();
   virtual ~Entity();  // all children are deleted
 
-  // These methods are called by the factory
+  // Initializes with the properties given in the resource file.
   void InitializeProperties(const PropertyMap &properties);
+  // Notification that the Factory has finished constructing the hierarchy.
+  // Subclasses may override Finalize().
   void FactoryFinalize();
 
+  // Entities form a tree with parent-child relationships.
   Entity* GetParent() { return parent_; }
   const Entity* GetParent() const { return parent_; }
   uint32_t ChildrenCount() const { return children_.size(); }
@@ -45,18 +48,22 @@ class Entity : public Base {
   const Entity* ChildAt(uint32_t index) const { return children_[index]; }
   void AddChild(Entity *child);
   void RemoveChild(Entity *child);
+
+  // Finds and entity by name, starting from this point in the hierarchy.
   Entity* FindByName(const char *name);
 
+  /// Gets/sets the Layout helper object which handles all dialog layout.
   void SetLayout(Layout *layout);
   Layout* GetLayout()             { return layout_; }
   const Layout* GetLayout() const { return layout_; }
 
+  // Gets/sets the Native helper object, containing the platform implementation.
   void SetNative(Native *native);
   Native* GetNative()             { return native_; }
   const Native* GetNative() const { return native_; }
   virtual void AddNative(Native *n);
 
-  // SetWindow should only be called on the root entity
+  // SetWindow should only be called on the root entity.
   void SetWindow(Window *window) {
     DASSERT(parent_ == NULL);
     window_ = window;
@@ -64,34 +71,43 @@ class Entity : public Base {
   Window* GetWindow();
   const Window* GetWindow() const;
 
+  // Gets/sets a named property, which may be delegated to a helper.
   virtual Bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
 
+  // Shortcuts for when the caller knows Layout will handle the property.
   virtual Bool SetLayoutProperty(PropertyName name, const Value &value);
   virtual Value GetLayoutProperty(PropertyName name) const;
 
+  // Shortcuts for when the caller knows Native will handle the property.
   virtual Bool SetNativeProperty(PropertyName name, const Value &value);
   virtual Value GetNativeProperty(PropertyName name) const;
 
+  // Every Entity can have a name, which should be unique within the hierarchy
+  // if it is not empty.
   void SetName(const char *name)
     { name_ = name; }
   const char* GetName() const
     { return name_; }
 
+  // Shortcuts to setting/getting kPropText
   void SetText(const char *text);
   String GetText() const;
 
+  // Notification that the control for the given entity was clicked. The
+  // message is passed up the hierarchy until an entity has a button callback.
   virtual void Clicked(Entity *target);
   void Clicked() { Clicked(this); }
 
   typedef void (*ButtonCallback)(Entity *target, void *data);
 
+  // Sets the function to be called when a control is clicked.
   void SetButtonCallback(ButtonCallback callback, void *data = NULL) {
     button_callback_ = callback;
     button_data_ = data;
   }
 
-  // Text is included here because it's so common
+  // Text is included here because it's so common.
   static const PropertyName kPropName, kPropText, kPropEnabled;
 
  protected:
@@ -104,9 +120,14 @@ class Entity : public Base {
   ButtonCallback button_callback_;
   void *button_data_;
 
+  // Called by FactoryFinalize() once the Native and Layout helpers have also
+  // been finalized.
   virtual void Finalize() {}
 
   void SetParent(Entity *parent) { parent_ = parent; }
+
+  // Called by AddChild and RemoveChild in case subclasses need to take
+  // special action
   virtual void ChildAdded(Entity *child) {}
   virtual void ChildRemoved(Entity *child) {}
 
@@ -116,7 +137,9 @@ class Entity : public Base {
   void operator=(const Entity*);
 };
 
-// Superclass for Layout and Native
+// Superclass for Layout and Native. In a previous incarnation, these features
+// were all in one class, but some objects are not in the layout (like
+// menu items), and some have no native controls (like groups).
 class EntityDelegate : public Base {
  public:
   EntityDelegate() : entity_(NULL) {}
@@ -137,12 +160,12 @@ class EntityDelegate : public Base {
   Entity *entity_;
 
  private:
-  // Disallow copy and assign
+  // Disallow copy and assign.
   EntityDelegate(const EntityDelegate&);
   void operator=(const EntityDelegate*);
 };
 
-// A connection between two entity values
+// A connection between two entity values.
 class Binding : public Entity {
  public:
   Binding() {}
