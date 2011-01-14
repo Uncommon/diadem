@@ -39,6 +39,7 @@ enum AlignOption {
 extern const PropertyName
     kPropSize, kPropMinimumSize, kPropMaxWidth, kPropMaxHeight,
     kPropWidthOption, kPropHeightOption, kPropDirection,
+    kPropWidthName, kPropHeightName,
     kPropLocation, kPropAlign, kPropVisible, kPropInLayout,
     kPropPadding, kPropMargins, kPropBaseline;
 
@@ -126,10 +127,20 @@ class Layout : public EntityDelegate {
   Bool in_layout_;
   SizeOption h_size_, v_size_;
   ExplicitSize explicit_size_;
+  String width_name_, height_name_;
   AlignOption align_;
 
   Size EnforceExplicitSize(const Size &size) const;
   virtual Size CalculateMinimumSize() const;
+
+  enum Dimension {
+    kDimensionWidth,
+    kDimensionHeight
+  };
+
+  uint32_t FindWidthForName() const;
+  uint32_t FindHeightForName() const;
+  uint32_t FindDimensionForName(Dimension dimension, const String &name) const;
 };
 
 // Size, location and padding are stored in the object. Other Layout

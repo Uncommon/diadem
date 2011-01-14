@@ -420,3 +420,59 @@ TEST_F(LayoutTest, testVSeparator) {
   EXPECT_GT(sizeS.height, 0);
   EXPECT_EQ(sizeL.width, sizeS.width);
 }
+
+TEST_F(LayoutTest, testNamedWidth1) {
+  ReadWindowData(
+      "<window text='testNamedWidth'>"
+        "<label text='AAAAAA'/>"
+        "<label text='AAAAA' widthName='follow me'/>"
+        "<label text='AAAA' widthName='follow me'/>"
+        "<label text='AAA' widthName='follow me'/>"
+      "</window>");
+  ASSERT_EQ(4, windowRoot_->ChildrenCount());
+
+  Diadem::Entity* const label1 = windowRoot_->ChildAt(0);
+  Diadem::Entity* const label2 = windowRoot_->ChildAt(1);
+  Diadem::Entity* const label3 = windowRoot_->ChildAt(2);
+  Diadem::Entity* const label4 = windowRoot_->ChildAt(3);
+  const Diadem::Size size1 =
+      label1->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
+  const Diadem::Size size2 =
+      label2->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
+  const Diadem::Size size3 =
+      label3->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
+  const Diadem::Size size4 =
+      label4->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
+
+  EXPECT_GT(size1.width, size2.width);
+  EXPECT_EQ(size2.width, size3.width);
+  EXPECT_EQ(size2.width, size4.width);
+}
+
+TEST_F(LayoutTest, testNamedWidth2) {
+  ReadWindowData(
+      "<window text='testNamedWidth'>"
+        "<label text='AAAAAA'/>"
+        "<label text='AAA' widthName='follow me'/>"
+        "<label text='AAAA' widthName='follow me'/>"
+        "<label text='AAAAA' widthName='follow me'/>"
+      "</window>");
+  ASSERT_EQ(4, windowRoot_->ChildrenCount());
+
+  Diadem::Entity* const label1 = windowRoot_->ChildAt(0);
+  Diadem::Entity* const label2 = windowRoot_->ChildAt(1);
+  Diadem::Entity* const label3 = windowRoot_->ChildAt(2);
+  Diadem::Entity* const label4 = windowRoot_->ChildAt(3);
+  const Diadem::Size size1 =
+      label1->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
+  const Diadem::Size size2 =
+      label2->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
+  const Diadem::Size size3 =
+      label3->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
+  const Diadem::Size size4 =
+      label4->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
+
+  EXPECT_GT(size1.width, size4.width);
+  EXPECT_EQ(size4.width, size2.width);
+  EXPECT_EQ(size4.width, size3.width);
+}

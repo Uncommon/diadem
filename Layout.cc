@@ -33,6 +33,8 @@ const PropertyName
     kPropHeightOption = "height",
     kPropMaxWidth     = "maxWidth",
     kPropMaxHeight    = "maxHeight",
+    kPropWidthName    = "widthName",
+    kPropHeightName   = "heightName",
     kPropAlign        = "align",
     kPropVisible      = "visible",
     kPropInLayout     = "inLayout",
@@ -178,6 +180,12 @@ Bool Layout::SetProperty(PropertyName name, const Value &value) {
       align_ = kAlignEnd;
     return true;
   }
+  if (strcmp(name, kPropWidthName) == 0) {
+    width_name_ = value.Coerce<String>();
+  }
+  if (strcmp(name, kPropHeightName) == 0) {
+    height_name_ = value.Coerce<String>();
+  }
   return false;
 }
 
@@ -222,13 +230,12 @@ Size Layout::CalculateMinimumSize() const {
 }
 
 Size Layout::EnforceExplicitSize(const Size &size) const {
-  if ((h_size_ != kSizeExplicit) && (v_size_ != kSizeExplicit))
-    return size;
-
   Size result = size;
   const PlatformMetrics &metrics = GetPlatformMetrics();
 
-  if (h_size_ == kSizeExplicit) {
+  if (!width_name_.IsEmpty()) {
+    result.width = FindWidthForName();
+  } else if (h_size_ == kSizeExplicit) {
     uint32_t h_multiplier = 1;
 
     switch (explicit_size_.width_units_) {
@@ -244,7 +251,9 @@ Size Layout::EnforceExplicitSize(const Size &size) const {
     result.width =
         std::max<long>(size.width, explicit_size_.width_ * h_multiplier);
   }
-  if (v_size_ == kSizeExplicit) {
+  if (!height_name_.IsEmpty()) {
+    result.height = FindHeightForName();
+  } else if (v_size_ == kSizeExplicit) {
     uint32_t v_multiplier = 1;
 
     switch (explicit_size_.width_units_) {
@@ -263,6 +272,50 @@ Size Layout::EnforceExplicitSize(const Size &size) const {
         std::max<long>(size.height, explicit_size_.height_ * v_multiplier);
   }
   return result;
+}
+
+uint32_t Layout::FindWidthForName() const {
+  const Entity *root = entity_;
+
+  for (; root->GetParent() != NULL; root = root->GetParent()) {
+    // Non-layout entities should only be leaf nodes in the hierarchy
+    DASSERT(root->GetLayout() != NULL);
+  }
+  return root->GetLayout()->FindDimensionForName(
+      kDimensionWidth, width_name_);
+}
+
+uint32_t Layout::FindHeightForName() const {
+  const Entity *root = entity_;
+
+  for (; root->GetParent() != NULL; root = root->GetParent()) {
+    // Non-layout entities should only be leaf nodes in the hierarchy
+    DASSERT(root->GetLayout() != NULL);
+  }
+  return root->GetLayout()->FindDimensionForName(
+      kDimensionHeight, width_name_);
+}
+
+uint32_t Layout::FindDimensionForName(
+    Dimension dimension, const String &name) const {
+  if (dimension == kDimensionWidth) {
+    if (name == width_name_)
+      return CalculateMinimumSize().width;
+  } else {  // kDimensionHeight
+    if (name == height_name_)
+      return CalculateMinimumSize().height;
+  }
+
+  uint32_t max = 0;
+
+  for (size_t i = 0; i < entity_->ChildrenCount(); ++i) {
+    const Layout *layout = entity_->ChildAt(i)->GetLayout();
+
+    if (layout == NULL)
+      continue;
+    max = std::max(max, layout->FindDimensionForName(dimension, name));
+  }
+  return max;
 }
 
 void Layout::SetInLayout(Bool in_layout) {
