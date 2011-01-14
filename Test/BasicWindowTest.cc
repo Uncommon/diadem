@@ -105,3 +105,41 @@ TEST_F(BasicWindowTest, TypeNames) {
   EXPECT_STREQ("edit", edit->GetTypeName());
   EXPECT_STREQ("password", password->GetTypeName());
 }
+
+// Test entity paths
+TEST_F(BasicWindowTest, Paths) {
+  ReadWindowData(
+      "<window text='Paths'>"
+        "<label text='a'/>"
+        "<group name='g'>"
+          "<label text='b'/>"
+        "</group>"
+        "<group>"
+          "<label text='c'/>"
+        "</group>"
+        "<label text='d'/>"
+      "</window>");
+  ASSERT_EQ(4, windowRoot_->ChildrenCount());
+
+  Diadem::Entity* const labelA = windowRoot_->ChildAt(0);
+  Diadem::Entity* const group1 = windowRoot_->ChildAt(1);
+  Diadem::Entity* const labelB = group1->ChildAt(0);
+  Diadem::Entity* const group2 = windowRoot_->ChildAt(2);
+  Diadem::Entity* const labelC = group2->ChildAt(0);
+  Diadem::Entity* const labelD = windowRoot_->ChildAt(3);
+
+  EXPECT_EQ(1, windowRoot_->ChildIndexByType(labelA));
+  EXPECT_EQ(1, group1->ChildIndexByType(labelB));
+  EXPECT_EQ(1, group2->ChildIndexByType(labelC));
+  EXPECT_EQ(2, windowRoot_->ChildIndexByType(labelD));
+  EXPECT_EQ(1, windowRoot_->ChildIndexByType(group1));
+  EXPECT_EQ(2, windowRoot_->ChildIndexByType(group2));
+
+  EXPECT_STREQ("/window", windowRoot_->GetPath());
+  EXPECT_STREQ("/window/label1", labelA->GetPath());
+  EXPECT_STREQ("\"g\"", group1->GetPath());
+  EXPECT_STREQ("\"g\"/label1", labelB->GetPath());
+  EXPECT_STREQ("/window/group2", group2->GetPath());
+  EXPECT_STREQ("/window/group2/label1", labelC->GetPath());
+  EXPECT_STREQ("/window/label2", labelD->GetPath());
+}

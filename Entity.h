@@ -47,6 +47,17 @@ class Entity : public Base {
   void RemoveChild(Entity *child);
   Entity* FindByName(const char *name);
 
+  // The purpose of a path is to have a unique string for an entity even when
+  // the name is not specified. If it does have a name, the path is the name
+  // in quotes. If it is the root entity, the path is /t where t is the type
+  // (eg, /window). Otherwise, it's p/ti, where p is the parent path and i is
+  // the 1-based index of the entity within its parent, by type.
+  // Example: the second label in a window would be /window/label2
+  String GetPath() const;
+  // Returns the index of the child, counting only children with the same type
+  // name.
+  uint32_t ChildIndexByType(const Entity *child) const;
+
   // Returns the type name that would be used for the entity in a resource file.
   // Delegates to the Native or Layout object.
   String GetTypeName() const;

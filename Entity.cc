@@ -59,6 +59,45 @@ String Entity::GetTypeName() const {
   return String();
 }
 
+const uint32_t kMaxPathLength = 256;
+
+String Entity::GetPath() const {
+  char path[kMaxPathLength];
+
+  if (name_.IsEmpty()) {
+    const String my_name = GetTypeName();
+    
+    if (GetParent() == NULL) {
+      snprintf(path, kMaxPathLength, "/%s", my_name.Get());
+    } else {
+      const String parent_path = (GetParent() == NULL) ?
+          String() : GetParent()->GetPath();
+
+      snprintf(
+          path, kMaxPathLength, "%s/%s%d",
+          parent_path.Get(), my_name.Get(),
+          GetParent()->ChildIndexByType(this));
+    }
+  } else {
+    snprintf(path, kMaxPathLength, "\"%s\"", name_.Get());
+  }
+  return String(path);
+}
+
+uint32_t Entity::ChildIndexByType(const Entity *child) const {
+  DASSERT(child != NULL);
+  const String child_type = child->GetTypeName();
+  uint32 count = 0;
+
+  for (uint32_t i = 0; i < ChildrenCount(); ++i) {
+    if (ChildAt(i) == child)
+      return count + 1;
+    if (ChildAt(i)->GetTypeName() == child_type)
+      ++count;
+  }
+  return 0;
+}
+
 void Entity::SetLayout(Layout *layout) {
   layout_ = layout;
   if (layout != NULL)
