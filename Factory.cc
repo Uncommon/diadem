@@ -31,12 +31,12 @@ namespace Diadem {
 
 void Factory::RegisterBasicClasses() {
   RegisterCreator(
-      "group",
+      kTypeNameGroup,
       &Creator<Entity, Entity>::Create,
       &Creator<Group, Layout>::Create,
       NULL);
   RegisterCreator(
-      "spacer",
+      kTypeNameSpacer,
       &Creator<Entity, Entity>::Create,
       &Creator<Spacer, Layout>::Create,
       NULL);

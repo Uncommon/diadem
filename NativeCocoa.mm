@@ -181,19 +181,19 @@ PlatformMetrics Cocoa::NativeCocoa::metrics_ = {
 
 void Cocoa::SetUpFactory(Factory *factory) {
   DASSERT(factory != NULL);
-  factory->RegisterNative<Label>("label");
-  factory->RegisterNative<Link>("link");
-  factory->RegisterNative<Window>("window");
-  factory->RegisterNative<Box>("box");
-  factory->RegisterNative<Button>("button");
-  factory->RegisterNative<Checkbox>("check");
-  factory->RegisterNative<EditField>("edit");
-  factory->RegisterNative<PasswordField>("password");
-  factory->RegisterNative<PathBox>("path");
-  factory->RegisterNative<Separator>("separator");
-  factory->RegisterNative<Image>("image");
-  factory->RegisterNative<Popup>("popup");
-  factory->RegisterNative<PopupItem>("item");
+  factory->RegisterNative<Label>(kTypeNameLabel);
+  factory->RegisterNative<Link>(kTypeNameLink);
+  factory->RegisterNative<Window>(kTypeNameWindow);
+  factory->RegisterNative<Box>(kTypeNameBox);
+  factory->RegisterNative<Button>(kTypeNameButton);
+  factory->RegisterNative<Checkbox>(kTypeNameCheck);
+  factory->RegisterNative<EditField>(kTypeNameEdit);
+  factory->RegisterNative<PasswordField>(kTypeNamePassword);
+  factory->RegisterNative<PathBox>(kTypeNamePath);
+  factory->RegisterNative<Separator>(kTypeNameSeparator);
+  factory->RegisterNative<Image>(kTypeNameImage);
+  factory->RegisterNative<Popup>(kTypeNamePopup);
+  factory->RegisterNative<PopupItem>(kTypeNameItem);
 }
 
 String Cocoa::ChooseFolder(const String &initial_path) {

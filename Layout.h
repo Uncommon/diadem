@@ -43,6 +43,8 @@ extern const PropertyName
     kPropLocation, kPropAlign, kPropVisible, kPropInLayout,
     kPropPadding, kPropMargins, kPropBaseline;
 
+extern const TypeName kTypeNameGroup, kTypeNameSpacer;
+
 // A layout object manages an Entity's place in the dialog layout.
 class Layout : public EntityDelegate {
  public:
@@ -138,8 +140,17 @@ class Layout : public EntityDelegate {
     kDimensionHeight
   };
 
+  // Width and height names:
+  // When an object has its width or height name set, it will have the same
+  // width/height as other objects with the same width/height name. The largest
+  // object determines the size of the others.
+
+  // Find the width to be used for the object's width name.
   uint32_t FindWidthForName() const;
+  // Find the height to be used for the object's height name.
   uint32_t FindHeightForName() const;
+  // Called on the root layout object. Recursively finds the largest dimension
+  // (width or height) of an object with the given width/height name.
   uint32_t FindDimensionForName(Dimension dimension, const String &name) const;
 };
 
@@ -273,6 +284,8 @@ class Group : public LayoutContainer {
  public:
   Group() {}
 
+  virtual String GetTypeName() const { return kTypeNameGroup; }
+
   virtual void ChildAdded(Entity *child);
 
   Spacing GetPadding() const { return min_padding_; }
@@ -305,6 +318,8 @@ class Group : public LayoutContainer {
 class Spacer : public SelfMeasured {
  public:
   Spacer() { padding_ = Spacing(-1, -1, -1, -1); }
+
+  virtual String GetTypeName() const { return kTypeNameSpacer; }
 
  protected:
   virtual Size CalculateMinimumSize() const;

@@ -80,3 +80,28 @@ TEST_F(BasicWindowTest, PasswordField) {
       "gopher",
       edit->GetProperty(Entity::kPropText).Coerce<String>());
 }
+
+// Tests entity type names
+TEST_F(BasicWindowTest, TypeNames) {
+  ReadWindowData(
+      "<window text='TypeNames'>"
+        "<button text='Button'/>"
+        "<group><edit/><password/></group>"
+      "</window>");
+  ASSERT_EQ(2, windowRoot_->ChildrenCount());
+
+  EXPECT_STREQ("window", windowRoot_->GetTypeName());
+
+  Diadem::Entity* const button   = windowRoot_->ChildAt(0);
+  Diadem::Entity* const group    = windowRoot_->ChildAt(1);
+
+  ASSERT_EQ(2, group->ChildrenCount());
+
+  Diadem::Entity* const edit     = group->ChildAt(0);
+  Diadem::Entity* const password = group->ChildAt(1);
+
+  EXPECT_STREQ("button", button->GetTypeName());
+  EXPECT_STREQ("group", group->GetTypeName());
+  EXPECT_STREQ("edit", edit->GetTypeName());
+  EXPECT_STREQ("password", password->GetTypeName());
+}

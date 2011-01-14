@@ -24,6 +24,13 @@ namespace Diadem {
 extern PropertyName
     kPropButtonType, kPropFile, kPropTextAlign, kPropUISize, kPropURL;
 
+extern TypeName
+    kTypeNameWindow, kTypeNameBox, kTypeNameButton, kTypeNameCheck,
+    kTypeNameLabel, kTypeNameLink, kTypeNameEdit, kTypeNamePassword,
+    kTypeNamePath, kTypeNameSeparator, kTypeNameImage, kTypeNamePopup,
+    kTypeNameItem, kTypeNameCombo, kTypeNameDate, kTypeNameList,
+    kTypeNameTabs, kTypeNameTab;
+
 class WindowInterface;
 
 // Wrapper for a platform-specific implementation for an Entity

@@ -24,6 +24,26 @@ PropertyName
     kPropUISize     = "uisize",
     kPropURL        = "url";
 
+TypeName
+    kTypeNameWindow     = "window",
+    kTypeNameBox        = "box",
+    kTypeNameButton     = "button",
+    kTypeNameCheck      = "check",
+    kTypeNameLabel      = "label",
+    kTypeNameLink       = "link",
+    kTypeNameEdit       = "edit",
+    kTypeNamePassword   = "password",
+    kTypeNamePath       = "path",
+    kTypeNameSeparator  = "separator",
+    kTypeNameImage      = "image",
+    kTypeNamePopup      = "popup",
+    kTypeNameItem       = "item",
+    kTypeNameCombo      = "combo",
+    kTypeNameDate       = "date",
+    kTypeNameList       = "list",
+    kTypeNameTabs       = "tabs",
+    kTypeNameTab        = "tab";
+
 Location Native::GetViewOffset() const {
   Location view_location;
 

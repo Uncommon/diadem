@@ -56,6 +56,8 @@ class Cocoa {
     virtual void InitializeProperties(const PropertyMap &properties);
     WindowInterface* GetWindowInterface() { return this; }
 
+    virtual String GetTypeName() const { return kTypeNameWindow; }
+
     virtual Bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
     virtual void AddChild(Native *child);
@@ -111,6 +113,7 @@ class Cocoa {
     Box() {}
 
     virtual void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameBox; }
     virtual Value GetProperty(PropertyName name) const;
     virtual Spacing GetInset() const;
     // Adds children as subviews
@@ -139,6 +142,8 @@ class Cocoa {
 
     virtual void InitializeProperties(const PropertyMap &properties);
 
+    virtual String GetTypeName() const { return kTypeNameButton; }
+
     virtual Bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
 
@@ -154,6 +159,8 @@ class Cocoa {
 
     virtual void InitializeProperties(const PropertyMap &properties);
 
+    virtual String GetTypeName() const { return kTypeNameCheck; }
+
    protected:
     Spacing GetInset() const { return Spacing(2, 2, 2, 0); }
   };
@@ -163,6 +170,7 @@ class Cocoa {
     Label() {}
 
     virtual void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameLabel; }
     virtual Value GetProperty(PropertyName name) const;
     virtual Bool SetProperty(PropertyName name, const Value &value);
 
@@ -174,6 +182,7 @@ class Cocoa {
     Link() {}
 
     void InitializeProperties(const PropertyMap &properties);
+    String GetTypeName() const { return kTypeNameLink; }
     Bool SetProperty(PropertyName name, const Value &value);
 
     void SetURL(const String &url);
@@ -184,6 +193,7 @@ class Cocoa {
     EditField() {}
 
     void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameEdit; }
     Value GetProperty(PropertyName name) const;
     Bool SetProperty(PropertyName name, const Value &value);
 
@@ -195,6 +205,8 @@ class Cocoa {
    public:
     PasswordField() {}
 
+    virtual String GetTypeName() const { return kTypeNamePassword; }
+
    protected:
     virtual Class GetTextFieldClass();
   };
@@ -204,6 +216,7 @@ class Cocoa {
     PathBox() {}
 
     void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNamePath; }
     Value GetProperty(PropertyName name) const;
     Bool SetProperty(PropertyName name, const Value &value);
   };
@@ -213,6 +226,7 @@ class Cocoa {
     Separator() {}
 
     virtual void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameSeparator; }
     virtual void Finalize();
     virtual Value GetProperty(PropertyName name) const;
   };
@@ -222,6 +236,7 @@ class Cocoa {
     Image() {}
 
     virtual void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameImage; }
     virtual Value GetProperty(PropertyName name) const;
   };
 
@@ -230,6 +245,7 @@ class Cocoa {
     Popup() {}
 
     void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNamePopup; }
     void AddChild(Native *child);
     Value GetProperty(PropertyName name) const;
 
@@ -241,6 +257,7 @@ class Cocoa {
     PopupItem() : item_(NULL) {}
 
     void InitializeProperties(const PropertyMap &properties);
+    String GetTypeName() const { return kTypeNameItem; }
     void* GetNativeRef() { return item_; }
     Bool SetProperty(PropertyName name, const Value &value);
     Value GetProperty(PropertyName name) const;

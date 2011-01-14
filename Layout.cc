@@ -44,6 +44,10 @@ const PropertyName
     kPropMargins      = "margins",
     kPropBaseline     = "baseline";
 
+const TypeName
+    kTypeNameGroup  = "group",
+    kTypeNameSpacer = "spacer";
+
 // Height or width may be specified as fit, fill or default, or an explicit
 // size. Fit is the smallest size that will fit the object's contents. Fill
 // expands to take up any extra space in the parent container. Default will

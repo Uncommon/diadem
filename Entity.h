@@ -25,6 +25,7 @@ class Native;
 
 // Having this makes it easier to declare lots of const char* const variables
 typedef const char* PropertyName;
+typedef const char* TypeName;
 typedef Map<String, Value> PropertyMap;
 
 // Basic object type: has a unique name, created from a resource
@@ -45,6 +46,10 @@ class Entity : public Base {
   void AddChild(Entity *child);
   void RemoveChild(Entity *child);
   Entity* FindByName(const char *name);
+
+  // Returns the type name that would be used for the entity in a resource file.
+  // Delegates to the Native or Layout object.
+  String GetTypeName() const;
 
   void SetLayout(Layout *layout);
   Layout* GetLayout()             { return layout_; }
@@ -117,6 +122,8 @@ class EntityDelegate : public Base {
   void SetEntity(Entity *entity) { entity_ = entity; }
   Entity* GetEntity()             { return entity_; }
   const Entity* GetEntity() const { return entity_; }
+
+  virtual String GetTypeName() const { return String(); }
 
   virtual void InitializeProperties(const PropertyMap &properties) {}
 

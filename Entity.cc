@@ -43,6 +43,22 @@ void Entity::InitializeProperties(const PropertyMap &properties) {
     SetProperty(keys[i], properties[keys[i]]);
 }
 
+String Entity::GetTypeName() const {
+  if (native_ != NULL) {
+    const String native_type = native_->GetTypeName();
+
+    if (!native_type.IsEmpty())
+      return native_type;
+  }
+  if (layout_ != NULL) {
+    const String layout_type = layout_->GetTypeName();
+
+    if (!layout_type.IsEmpty())
+      return layout_type;
+  }
+  return String();
+}
+
 void Entity::SetLayout(Layout *layout) {
   layout_ = layout;
   if (layout != NULL)
