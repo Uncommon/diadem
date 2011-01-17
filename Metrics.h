@@ -19,6 +19,9 @@
 
 namespace Diadem {
 
+// A set of pixel values for top, left, bottom, and right. This is used for
+// measurements on the inside of a frame (such as margins) or the outside
+// (such as padding).
 struct Spacing {
   long top, left, bottom, right;
 
@@ -44,6 +47,7 @@ struct Spacing {
   }
 };
 
+// The size of a layout object, in pixels.
 struct Size {
   long width, height;
 
@@ -60,6 +64,7 @@ struct Size {
     { return Size(width - (s.left + s.right), height - (s.top + s.bottom)); }
 };
 
+// The location of a layout object relative to its parent.
 struct Location {
   long x, y;
 
@@ -89,8 +94,14 @@ struct Location {
     { return Location(-x, -y); }
 };
 
+// A set of platform-specific measurements.
 struct PlatformMetrics {
-  uint32_t em_size, line_height, indent_size;
+  uint32_t
+      em_size,      // The size of an em in the standard dialog font. An em is
+                    // the distance from the top of a capital letter to the
+                    // bottom of a lower-case descender.
+      line_height,  // The height of a line in the standard dialog font.
+      indent_size;  // Standard horizontal indent distance for controls.
   Spacing radio_group_padding;
 };
 
@@ -101,6 +112,8 @@ enum Unit {
   kUnitIndent,
 };
 
+// Contains a size (width and height) specified in one of the standard
+// platform-dependent units.
 class ExplicitSize {
  public:
   float width_, height_;

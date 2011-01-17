@@ -23,7 +23,10 @@ namespace Diadem {
 class Window {
  public:
   Window() { root_ = NULL; }
-  explicit Window(Entity *root)  : root_(root) { DASSERT(IsValid()); }
+  explicit Window(Entity *root) : root_(root) {
+    DASSERT(IsValid());
+    root->SetWindow(this);
+  }
   ~Window() { delete root_; }
 
   Entity* GetRoot() { return root_; }

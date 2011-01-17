@@ -26,7 +26,7 @@ class EntityTest : public testing::Test {
   virtual void TearDown() {}
 };
 
-// FindByName: find self, find child
+// Tests FindByName, which should match the entity itself or a child
 TEST(EntityTest, FindByName) {
   Diadem::Entity parent, child1, child2;
 

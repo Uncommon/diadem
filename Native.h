@@ -46,6 +46,8 @@ class Native : public EntityDelegate {
   // The actual handle to the native window, control, etc.
   virtual void* GetNativeRef() { return NULL; }
 
+  // Notification that a child has been added. Useful for subviews and menu
+  // items where OS-specific action needs to be taken.
   virtual void AddChild(Native *child) {}
 
   // If the object is a superview that contains native objects for child
@@ -90,10 +92,18 @@ class WindowInterface {
  public:
   virtual ~WindowInterface() {}
 
+  // All of the following return true on success, and false if there is any
+  // error.
+
+  // Shows the window for use as a modeless dialog.
   virtual Bool ShowModeless() = 0;
+  // Hides a modeless window.
   virtual Bool Close() = 0;
+  // Shows the window and starts a blocking modal event loop.
   virtual Bool ShowModal(void *parent) = 0;
+  // Ends a modal event loop. Returns false if the window is not modal.
   virtual Bool EndModal() = 0;
+  // Sets the user focus to the given entity's control.
   virtual Bool SetFocus(Entity *new_focus) = 0;
 };
 

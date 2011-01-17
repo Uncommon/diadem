@@ -15,13 +15,13 @@
 #include "Diadem/Test/WindowTestBase.h"
 #include "Diadem/LabelGroup.h"
 
-// Layout tests involving nested containers
+// Layout tests involving nested containers.
 class GroupTest : public WindowTestBase {
  protected:
   void VerifyButtonGrid();
 };
 
-// A text label, with a row of two button beneath it
+// A text label, with a row of two button beneath it.
 TEST_F(GroupTest, testTextAndButtonRow) {
   ReadWindowData(
       "<window text='Group'>"
@@ -73,7 +73,7 @@ TEST_F(GroupTest, testTextAndButtonRow) {
   EXPECT_EQ(loc1.y, loc2.y);
 }
 
-// A grid should look the same whether you do it rows first or columns first
+// A grid should look the same whether you do it rows first or columns first.
 void GroupTest::VerifyButtonGrid() {
   Diadem::Layout* buttons[4];
   char name[2] = { '\0', '\0' };
@@ -109,6 +109,7 @@ void GroupTest::VerifyButtonGrid() {
   EXPECT_EQ(sizeW.height - margins.bottom, locs[3].y+sizes[3].height);
 }
 
+// A 2x2 grid of buttons as a column of two rows.
 TEST_F(GroupTest, testColumnOfRows)
 {
   ReadWindowData(
@@ -128,6 +129,7 @@ TEST_F(GroupTest, testColumnOfRows)
   VerifyButtonGrid();
 }
 
+// A 2x2 grid of buttons as a row of two columns.
 TEST_F(GroupTest, testRowOfColumns) {
   ReadWindowData(
       "<window>"
@@ -146,7 +148,7 @@ TEST_F(GroupTest, testRowOfColumns) {
   VerifyButtonGrid();
 }
 
-// Basic "row in a column" case
+// Basic "row in a column" case.
 TEST_F(GroupTest, testRowCross) {
   ReadWindowData(
       "<window>"

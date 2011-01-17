@@ -19,7 +19,7 @@
 using Diadem::Entity;
 using Diadem::String;
 
-// Simple tests of window creation and control attributes
+// Simple tests of window creation and control attributes.
 class BasicWindowTest : public WindowTestBase {
 };
 
@@ -43,7 +43,7 @@ TEST_F(BasicWindowTest, SimpleWindow) {
       button->GetProperty(Diadem::kPropText).Coerce<String>());
 }
 
-// Change the contents of an edit field
+// Change the contents of an edit field.
 TEST_F(BasicWindowTest, EditField) {
   ReadWindowData(
       "<window text='EditField'>"
@@ -62,7 +62,7 @@ TEST_F(BasicWindowTest, EditField) {
       edit->GetProperty(Diadem::kPropText).Coerce<String>());
 }
 
-// Change the contents of a password field
+// Change the contents of a password field.
 TEST_F(BasicWindowTest, PasswordField) {
   ReadWindowData(
       "<window text='PasswordField'>"

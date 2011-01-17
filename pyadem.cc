@@ -46,8 +46,16 @@ static void ButtonCallback(Diadem::Entity *button, PyademEntity *self) {
     Py_DECREF(args);
     Py_DECREF(button_object);
     if (PyErr_Occurred()) {
-      PyErr_Print();
-      PyErr_Clear();
+      // If an exception occurred for a modal window, then end the modal loop
+      // and propagate the exception to the ShowModal caller
+      Diadem::Window *window = button->GetWindow();
+
+      if (!window->EndModal()) {
+        // If the window is not modal, then there is no Python caller to handle
+        // the exception, so just log it
+        PyErr_Print();
+        PyErr_Clear();
+      }
     }
   }
 }
@@ -301,7 +309,13 @@ static PyObject* Window_close(PyademWindow *self) {
 static PyObject* Window_showModal(PyademWindow *self) {
   if ((self == NULL) || (self->window == NULL))
     return NULL;
-  return PyBool_FromLong(self->window->ShowModal(NULL));
+
+  Diadem::Bool result = self->window->ShowModal(NULL);
+
+  if (PyErr_Occurred())
+    return NULL;
+  else
+    return PyBool_FromLong(result);
 }
 
 static PyObject* Window_endModal(PyademWindow *self) {
