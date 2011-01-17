@@ -768,7 +768,20 @@ Bool Cocoa::Label::SetProperty(const PropertyName name, const Value &value) {
     } else {
       return Control::SetProperty(name, value);
     }
+  }
+  if (strcmp(name,kPropTextAlign) == 0) {
+    if (value.IsValueType<String>()) {
+      String s = value.Coerce<String>();
+      NSTextAlignment alignment = NSNaturalTextAlignment;
 
+      if (s == "left")
+        alignment = NSLeftTextAlignment;
+      else if (s == "center")
+        alignment = NSCenterTextAlignment;
+      else if (s == "right")
+        alignment = NSRightTextAlignment;
+      [(NSControl*)view_ref_ setAlignment:alignment];
+    }
   }
   return Control::SetProperty(name, value);
 }

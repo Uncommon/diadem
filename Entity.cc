@@ -36,7 +36,9 @@ Entity::~Entity() {
   delete native_;
 }
 
-void Entity::InitializeProperties(const PropertyMap &properties) {
+void Entity::InitializeProperties(
+    const PropertyMap &properties,
+    const Factory &factory) {
   const Array<String> keys = properties.AllKeys();
 
   for (size_t i = 0; i < keys.size(); ++i)
@@ -123,14 +125,23 @@ void Entity::FactoryFinalize() {
   Finalize();
 }
 
+void Entity::AddNativeChild(Entity *child) {
+  if (child->GetNative() == NULL) {
+    for (uint32_t i = 0; i < child->ChildrenCount(); ++i) {
+      AddNativeChild(child->ChildAt(i));
+    }
+  } else {
+    AddNative(child->GetNative());
+  }
+}
+
 void Entity::AddChild(Entity *child) {
   DASSERT(child != NULL);
   if (child != NULL) {
     children_.push_back(child);
     child->SetParent(this);
     ChildAdded(child);
-    if (child->GetNative() != NULL)
-      AddNative(child->GetNative());
+    AddNativeChild(child);
     if (layout_ != NULL)
       layout_->ChildAdded(child);
   }

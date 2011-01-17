@@ -19,9 +19,10 @@
 
 namespace Diadem {
 
-class Value;
+class Factory;
 class Layout;
 class Native;
+class Value;
 
 // Having this makes it easier to declare lots of const char* const variables
 typedef const char* PropertyName;
@@ -35,7 +36,9 @@ class Entity : public Base {
   virtual ~Entity();  // all children are deleted
 
   // These methods are called by the factory
-  void InitializeProperties(const PropertyMap &properties);
+  virtual void InitializeProperties(
+      const PropertyMap &properties,
+      const Factory &factory);
   void FactoryFinalize();
 
   Entity* GetParent() { return parent_; }
@@ -43,7 +46,7 @@ class Entity : public Base {
   uint32_t ChildrenCount() const { return children_.size(); }
   Entity* ChildAt(uint32_t index) { return children_[index]; }
   const Entity* ChildAt(uint32_t index) const { return children_[index]; }
-  void AddChild(Entity *child);
+  virtual void AddChild(Entity *child);
   void RemoveChild(Entity *child);
   Entity* FindByName(const char *name);
 
@@ -115,6 +118,9 @@ class Entity : public Base {
   void SetParent(Entity *parent) { parent_ = parent; }
   virtual void ChildAdded(Entity *child) {}
   virtual void ChildRemoved(Entity *child) {}
+
+  // Add a new child recursively in case it has children
+  void AddNativeChild(Entity *child);
 
  private:
   // Disallow copy and assign

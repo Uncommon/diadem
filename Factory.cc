@@ -13,6 +13,7 @@
 // the License.
 
 #include "Diadem/Factory.h"
+#include "Diadem/LabelGroup.h"
 #include "Diadem/Layout.h"
 #include "Diadem/Native.h"
 #include "Diadem/Value.h"
@@ -40,6 +41,10 @@ void Factory::RegisterBasicClasses() {
       &Creator<Entity, Entity>::Create,
       &Creator<Spacer, Layout>::Create,
       NULL);
+  RegisterCreator(
+      kTypeNameLabelGroup,
+      &Creator<LabelGroup, Entity>::Create,
+      NULL, NULL);
 }
 
 Entity* Factory::CreateEntity(
@@ -68,7 +73,7 @@ Entity* Factory::CreateEntity(
       entity->SetNative(native);
     }
   }
-  entity->InitializeProperties(properties);
+  entity->InitializeProperties(properties, *this);
   return entity;
 }
 

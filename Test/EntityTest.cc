@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 
 #include "Diadem/Entity.h"
+#include "Diadem/Factory.h"
 #include "Diadem/Value.h"
 #include "Diadem/Wrappers.h"
 
@@ -48,7 +49,7 @@ TEST(EntityTest, ConstructWithName) {
   properties.Insert(Diadem::Entity::kPropName, "Courage");
 
   Diadem::Entity entity;
-  entity.InitializeProperties(properties);
+  entity.InitializeProperties(properties, Diadem::Factory());
 
   EXPECT_STREQ("Courage", entity.GetName());
   entity.SetProperty(Diadem::Entity::kPropName, Diadem::Value("Eustace"));
@@ -58,11 +59,12 @@ TEST(EntityTest, ConstructWithName) {
 // Tests parent-child relationships
 TEST(EntityTest, ParentChild) {
   Diadem::PropertyMap properties;
+  Diadem::Factory f;
   Diadem::Entity parent, child1, child2;
 
-  parent.InitializeProperties(properties);
-  child1.InitializeProperties(properties);
-  child2.InitializeProperties(properties);
+  parent.InitializeProperties(properties, f);
+  child1.InitializeProperties(properties, f);
+  child2.InitializeProperties(properties, f);
 
   EXPECT_EQ(0, parent.ChildrenCount());
   EXPECT_EQ((Diadem::Entity*)NULL, child1.GetParent());

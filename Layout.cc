@@ -352,7 +352,7 @@ Bool LayoutContainer::SetProperty(const char *name, const Value &value) {
         direction_ = kLayoutColumn;
       return true;
     } else {
-      direction_ = value.Coerce<LayoutDirection>();
+      direction_ = (LayoutDirection)value.Coerce<int32_t>();
       return true;
     }
   }

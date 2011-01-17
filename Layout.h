@@ -116,6 +116,11 @@ class Layout : public EntityDelegate {
   void SetInLayout(Bool in_layout);
   Bool IsInLayout() const { return in_layout_; }
 
+  const String& GetWidthName() const  { return width_name_; }
+  const String& GetHeightName() const { return height_name_; }
+  void SetWidthName(const String &name)  { width_name_ = name; }
+  void SetHeightName(const String &name) { height_name_ = name; }
+
   virtual void ParentLocationChanged(const Location &offset);
 
   SizeOption GetHSizeOption() const { return h_size_; }

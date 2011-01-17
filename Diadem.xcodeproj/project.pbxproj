@@ -34,6 +34,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		89DDD75912CD2F77007FCD6D /* LabelGroup.cc in Sources */ = {isa = PBXBuildFile; fileRef = 89DDD75812CD2F77007FCD6D /* LabelGroup.cc */; };
+		89DDD75A12CD2F77007FCD6D /* LabelGroup.cc in Sources */ = {isa = PBXBuildFile; fileRef = 89DDD75812CD2F77007FCD6D /* LabelGroup.cc */; };
 		DD6801D81277426300CB9EF5 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.cc */; };
 		DD6801D91277426300CB9EF5 /* Entity.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806D5911F12B73005E4C56 /* Entity.cc */; };
 		DD6801DA1277426300CB9EF5 /* Value.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806D5E11F12B73005E4C56 /* Value.cc */; };
@@ -147,6 +149,8 @@
 
 /* Begin PBXFileReference section */
 		08FB7796FE84155DC02AAC07 /* main.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
+		89DDD75812CD2F77007FCD6D /* LabelGroup.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LabelGroup.cc; sourceTree = "<group>"; };
+		89DDD75F12CD2F91007FCD6D /* LabelGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelGroup.h; sourceTree = "<group>"; };
 		DD18340B124A542100FF34FB /* NativeCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeCocoa.h; sourceTree = "<group>"; };
 		DD18340D124A54B400FF34FB /* NativeCocoa.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NativeCocoa.mm; sourceTree = "<group>"; };
 		DD18348D124C2AD900FF34FB /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -241,6 +245,8 @@
 				DD806D5A11F12B73005E4C56 /* Entity.h */,
 				DD806E8611F91565005E4C56 /* Factory.cc */,
 				DD806D5B11F12B73005E4C56 /* Factory.h */,
+				89DDD75812CD2F77007FCD6D /* LabelGroup.cc */,
+				89DDD75F12CD2F91007FCD6D /* LabelGroup.h */,
 				DD806E2C11F7C7D6005E4C56 /* Layout.cc */,
 				DD806D5C11F12B73005E4C56 /* Layout.h */,
 				DDC32ABC120B64310098E044 /* LibXMLParser.cc */,
@@ -375,7 +381,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "Diadem" */;
 			compatibilityVersion = "Xcode 3.1";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -525,6 +530,7 @@
 				DD6803F2127763AD00CB9EF5 /* XMLTest.cc in Sources */,
 				DDF2C4B012777B67008DBFDB /* CocoaTest.mm in Sources */,
 				DDF2C668127898F8008DBFDB /* DiademDocument.mm in Sources */,
+				89DDD75912CD2F77007FCD6D /* LabelGroup.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -539,6 +545,7 @@
 				DDC1C10E128B52B000D63161 /* Native.cc in Sources */,
 				DDC1C10F128B52B200D63161 /* NativeCocoa.mm in Sources */,
 				DDC1C110128B52B700D63161 /* Value.cc in Sources */,
+				89DDD75A12CD2F77007FCD6D /* LabelGroup.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

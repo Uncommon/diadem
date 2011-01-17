@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include "Diadem/LabelGroup.h"
 #include "Diadem/Layout.h"
 #include "Diadem/LibXMLParser.h"
 #include "Diadem/NativeCocoa.h"
@@ -308,4 +309,31 @@ TEST_F(CocoaTest, MessageSuppress) {
   EXPECT_STREQ(
       "Stop it",
       [[[alert suppressionButton] title] UTF8String]);
+}
+
+// Makes sure a labelgroup's children are added to the window's content view.
+TEST_F(CocoaTest, testColumnLabelGroupSimple) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='testColumnLabelGroupSimple'>"
+        "<labelgroup text='Exit:'>"
+          "<label text='Stage left'/>"
+        "</labelgroup>"
+      "</window>"));
+
+  Diadem::LabelGroup *labelgroup =
+      dynamic_cast<Diadem::LabelGroup*>(window_root_->ChildAt(0));
+  ASSERT_FALSE(labelgroup == NULL);
+
+  Diadem::Entity *group_label = labelgroup->GetLabel();
+  NSView *label_view = (NSView*)group_label->GetNative()->GetNativeRef();
+  NSWindow *native_window =
+      (NSWindow*)window_root_->GetNative()->GetNativeRef();
+
+  EXPECT_EQ(native_window, [label_view window]);
+  EXPECT_EQ(NSRightTextAlignment, [(NSTextField*)label_view alignment]);
+
+  Diadem::Entity *content_label = labelgroup->GetContent()->ChildAt(0);
+
+  label_view = (NSView*)content_label->GetNative()->GetNativeRef();
+  EXPECT_EQ(native_window, [label_view window]);
 }

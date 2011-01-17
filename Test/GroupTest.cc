@@ -13,7 +13,7 @@
 // the License.
 
 #include "Diadem/Test/WindowTestBase.h"
-#include "Diadem/Layout.h"
+#include "Diadem/LabelGroup.h"
 
 // Layout tests involving nested containers
 class GroupTest : public WindowTestBase {
@@ -217,4 +217,104 @@ TEST_F(GroupTest, testBox) {
   EXPECT_EQ(
       box_size.height,
       label_loc.y + label_size.height + box_margins.bottom);
+}
+
+// Simple case for column label group
+TEST_F(GroupTest, testColumnLabelGroupSimple) {
+  ReadWindowData(
+      "<window text='testColumnLabelGroupSimple'>"
+        "<labelgroup text='Exit:'>"
+          "<label text='Stage left'/>"
+        "</labelgroup>"
+      "</window>");
+  ASSERT_EQ(1, windowRoot_->ChildrenCount());
+
+  Diadem::LabelGroup *label_group =
+      dynamic_cast<Diadem::LabelGroup*>(windowRoot_->ChildAt(0));
+  ASSERT_FALSE(label_group == NULL);
+  Diadem::ColumnLabelLayout *layout =
+      dynamic_cast<Diadem::ColumnLabelLayout*>(label_group->GetLayout());
+  Diadem::Entity *label = label_group->GetLabel();
+  Diadem::Entity *content = label_group->GetContent();
+  ASSERT_FALSE(layout == NULL);
+  ASSERT_FALSE(label == NULL);
+  ASSERT_FALSE(content == NULL);
+
+  EXPECT_STREQ(Diadem::kTypeNameLabel, label->GetTypeName());
+  EXPECT_STREQ(
+      "Exit:",
+      label->GetProperty(
+          Diadem::Entity::kPropText).Coerce<Diadem::String>().Get());
+  ASSERT_EQ(1, content->ChildrenCount());
+
+  Diadem::Entity *content_label = content->ChildAt(0);
+
+  EXPECT_STREQ(
+      "Stage left",
+      content_label->GetProperty(
+          Diadem::Entity::kPropText).Coerce<Diadem::String>().Get());
+
+  const Diadem::Spacing margins = GetWindowMargins();
+  const Diadem::Layout *label_L = label->GetLayout();
+  const Diadem::Layout *content_label_L = content_label->GetLayout();
+  ASSERT_FALSE(label_L == NULL);
+  ASSERT_FALSE(content_label_L == NULL);
+
+  const Diadem::Location label_loc = label_L->GetViewLocation();
+  const Diadem::Location content_label_loc = content_label_L->GetViewLocation();
+  const Diadem::Size label_size = label_L->GetSize();
+  const Diadem::Size content_label_size = content_label_L->GetSize();
+  const Diadem::Spacing padding = label_L->GetPadding();
+
+  EXPECT_EQ(margins.left, label_loc.x);
+  EXPECT_EQ(margins.top, label_loc.y);
+  EXPECT_EQ(margins.top, content_label_loc.y);
+  EXPECT_EQ(
+      label_loc.x + label_size.width + padding.right,
+      content_label_loc.x);
+}
+
+// Tests two adjacent labelgroups
+TEST_F(GroupTest, testColumnLabelGroupDouble) {
+  ReadWindowData(
+      "<window text='testColumnLabelGroupDouble'>"
+        "<labelgroup text='AA' type='column'>"
+          "<label text='One'/>"
+        "</labelgroup>"
+        "<labelgroup text='AAAA' type='column'>"
+          "<label text='Two'/>"
+        "</labelgroup>"
+      "</window>");
+  ASSERT_EQ(2, windowRoot_->ChildrenCount());
+
+  Diadem::LabelGroup *lg1 =
+      dynamic_cast<Diadem::LabelGroup*>(windowRoot_->ChildAt(0));
+  Diadem::LabelGroup *lg2 =
+      dynamic_cast<Diadem::LabelGroup*>(windowRoot_->ChildAt(1));
+  ASSERT_FALSE(lg1 == NULL);
+  ASSERT_FALSE(lg2 == NULL);
+
+  Diadem::Entity *label1 = lg1->GetLabel();
+  Diadem::Entity *label2 = lg2->GetLabel();
+  ASSERT_FALSE(label1 == NULL);
+  ASSERT_FALSE(label2 == NULL);
+
+  EXPECT_STREQ("AA",
+      label1->GetProperty(
+          Diadem::Entity::kPropText).Coerce<Diadem::String>().Get());
+  EXPECT_STREQ("AAAA",
+      label2->GetProperty(
+          Diadem::Entity::kPropText).Coerce<Diadem::String>().Get());
+
+  EXPECT_STREQ(
+      label1->GetLayout()->GetWidthName().Get(),
+      label2->GetLayout()->GetWidthName().Get());
+  EXPECT_LT(0, strlen(label1->GetLayout()->GetWidthName().Get()));
+
+  const Diadem::Size l1_size =
+      label1->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
+  const Diadem::Size l2_size =
+      label1->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
+
+  EXPECT_EQ(l1_size.width, l2_size.width);
 }
