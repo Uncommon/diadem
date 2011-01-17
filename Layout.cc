@@ -48,6 +48,15 @@ const TypeName
     kTypeNameGroup  = "group",
     kTypeNameSpacer = "spacer";
 
+const StringConstant
+    kAlignNameStart  = "start",
+    kAlignNameCenter = "center",
+    kAlignNameEnd    = "end";
+
+const StringConstant
+    kDirectionNameRow    = "row",
+    kDirectionNameColumn = "column";
+
 // Height or width may be specified as fit, fill or default, or an explicit
 // size. Fit is the smallest size that will fit the object's contents. Fill
 // expands to take up any extra space in the parent container. Default will
@@ -176,11 +185,11 @@ Bool Layout::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropAlign) == 0) {
     const String align_string = value.Coerce<String>();
 
-    if (align_string == "start")
+    if (align_string == kAlignNameStart)
       align_ = kAlignStart;
-    else if (align_string == "center")
+    else if (align_string == kAlignNameCenter)
       align_ = kAlignCenter;
-    else if (align_string == "end")
+    else if (align_string == kAlignNameEnd)
       align_ = kAlignEnd;
     return true;
   }
@@ -346,9 +355,9 @@ Bool LayoutContainer::SetProperty(const char *name, const Value &value) {
     if (value.IsValueType<String>()) {
       const String direction_string = value.Coerce<String>();
 
-      if (direction_string == "row")
+      if (direction_string == kDirectionNameRow)
         direction_ = kLayoutRow;
-      else if (direction_string == "column")
+      else if (direction_string == kDirectionNameColumn)
         direction_ = kLayoutColumn;
       return true;
     } else {

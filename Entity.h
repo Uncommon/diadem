@@ -25,9 +25,12 @@ class Native;
 class Value;
 
 // Having this makes it easier to declare lots of const char* const variables
-typedef const char* PropertyName;
-typedef const char* TypeName;
+typedef const char* StringConstant;
+typedef StringConstant PropertyName;
+typedef StringConstant TypeName;
 typedef Map<String, Value> PropertyMap;
+
+extern const PropertyName kPropName, kPropText, kPropEnabled;
 
 // Basic object type: has a unique name, created from a resource
 class Entity : public Base {
@@ -100,9 +103,6 @@ class Entity : public Base {
     button_callback_ = callback;
     button_data_ = data;
   }
-
-  // Text is included here because it's so common
-  static const PropertyName kPropName, kPropText, kPropEnabled;
 
  protected:
   String name_;

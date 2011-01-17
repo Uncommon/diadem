@@ -46,13 +46,13 @@ TEST(EntityTest, FindByName) {
 TEST(EntityTest, ConstructWithName) {
   Diadem::PropertyMap properties;
 
-  properties.Insert(Diadem::Entity::kPropName, "Courage");
+  properties.Insert(Diadem::kPropName, "Courage");
 
   Diadem::Entity entity;
   entity.InitializeProperties(properties, Diadem::Factory());
 
   EXPECT_STREQ("Courage", entity.GetName());
-  entity.SetProperty(Diadem::Entity::kPropName, Diadem::Value("Eustace"));
+  entity.SetProperty(Diadem::kPropName, Diadem::Value("Eustace"));
   EXPECT_STREQ("Eustace", entity.GetName());
 }
 

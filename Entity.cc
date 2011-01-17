@@ -20,9 +20,9 @@
 namespace Diadem {
 
 const PropertyName
-    Entity::kPropName = "name",
-    Entity::kPropText = "text",
-    Entity::kPropEnabled = "enabled";
+    kPropName = "name",
+    kPropText = "text",
+    kPropEnabled = "enabled";
 
 Entity::Entity()
     : parent_(NULL), layout_(NULL), native_(NULL),

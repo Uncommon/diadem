@@ -289,8 +289,8 @@ void Cocoa::Window::InitializeProperties(const PropertyMap &properties) {
                   backing:NSBackingStoreBuffered
                     defer:NO];
   [window_ref_ setContentMinSize:NSMakeSize(10, 10)];
-  if ((window_ref_ != nil) && properties.Exists(Entity::kPropText)) {
-    const String title_string = properties[Entity::kPropText].Coerce<String>();
+  if ((window_ref_ != nil) && properties.Exists(kPropText)) {
+    const String title_string = properties[kPropText].Coerce<String>();
 
     [window_ref_ setTitle:NSStringWithString(title_string)];
   }
@@ -308,7 +308,7 @@ Bool Cocoa::Window::SetProperty(PropertyName name, const Value &value) {
 
   if (window_ref_ == nil)
     return false;
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     [window_ref_ setTitle:NSStringWithString(value.Coerce<String>())];
     return true;
   }
@@ -334,7 +334,7 @@ Value Cocoa::Window::GetProperty(PropertyName name) const {
 
   if (window_ref_ == nil)
     return false;
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     NSString *title = [window_ref_ title];
 
     return String([title UTF8String]);
@@ -539,14 +539,14 @@ Location Cocoa::Box::GetSubviewAdjustment() const {
 }
 
 Bool Cocoa::Control::SetProperty(PropertyName name, const Value &value) {
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     ScopedAutoreleasePool pool;
 
     [(NSControl*)view_ref_ setStringValue:
         NSStringWithString(value.Coerce<String>())];
     return true;
   }
-  if (strcmp(name, Entity::kPropEnabled) == 0) {
+  if (strcmp(name, kPropEnabled) == 0) {
     ScopedAutoreleasePool pool;
 
     [(NSControl*)view_ref_ setEnabled:value.Coerce<Bool>()];
@@ -570,12 +570,12 @@ Value Cocoa::Control::GetProperty(PropertyName name) const {
 
     return Size(cell_size.width, cell_size.height) + GetInset();
   }
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     NSString *text = [(NSControl*)view_ref_ stringValue];
 
     return String([text UTF8String]);
   }
-  if (strcmp(name, Entity::kPropEnabled) == 0) {
+  if (strcmp(name, kPropEnabled) == 0) {
     return (Bool)[(NSControl*)view_ref_ isEnabled];
   }
   return View::GetProperty(name);
@@ -590,13 +590,13 @@ void Cocoa::Button::InitializeProperties(const PropertyMap &properties) {
   [button setButtonType:NSMomentaryPushInButton];
   [button setImagePosition:NSNoImage];
   [button setBordered:YES];
-  if (properties.Exists(Entity::kPropText))
+  if (properties.Exists(kPropText))
     [button setTitle:
-        NSStringWithString(properties[Entity::kPropText].Coerce<String>())];
+        NSStringWithString(properties[kPropText].Coerce<String>())];
   if (properties.Exists(kPropUISize)) {
     const String ui_size = properties[kPropUISize].Coerce<String>();
 
-    if (ui_size == "small") {
+    if (ui_size == kUISizeSmall) {
       [[button cell] setControlSize:NSSmallControlSize];
       [[button cell] setFont:
           [NSFont systemFontOfSize:
@@ -653,7 +653,7 @@ Value Cocoa::Button::GetProperty(PropertyName name) const {
     else
       return Spacing(12, 12, 12, 12);
   }
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     NSString *text = [(NSButton*)view_ref_ title];
 
     return String([text cStringUsingEncoding:NSUTF8StringEncoding]);
@@ -681,9 +681,9 @@ void Cocoa::Checkbox::InitializeProperties(const PropertyMap &properties) {
 
   view_ref_ = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
   [(NSButton*)view_ref_ setButtonType:NSSwitchButton];
-  if (properties.Exists(Entity::kPropText))
+  if (properties.Exists(kPropText))
     [(NSButton*)view_ref_ setTitle:
-        NSStringWithString(properties[Entity::kPropText].Coerce<String>())];
+        NSStringWithString(properties[kPropText].Coerce<String>())];
   ConfigureView();
 }
 
@@ -694,9 +694,9 @@ void Cocoa::Label::InitializeProperties(const PropertyMap &properties) {
   [(NSTextField*)view_ref_ setBezeled:NO];
   [(NSTextField*)view_ref_ setDrawsBackground:NO];
   [(NSTextField*)view_ref_ setEditable:NO];
-  if (properties.Exists(Entity::kPropText))
+  if (properties.Exists(kPropText))
     [(NSTextField*)view_ref_ setStringValue:
-        NSStringWithString(properties[Entity::kPropText].Coerce<String>())];
+        NSStringWithString(properties[kPropText].Coerce<String>())];
   if (properties.Exists(kPropTextAlign)) {
     NSTextAlignment align = NSNaturalTextAlignment;
     const String align_value = properties[kPropTextAlign].Coerce<String>();
@@ -816,9 +816,9 @@ void Cocoa::EditField::InitializeProperties(const PropertyMap &properties) {
 
   view_ref_ = [[GetTextFieldClass() alloc]
       initWithFrame:NSMakeRect(0, 0, 50, 20)];
-  if (properties.Exists(Entity::kPropText))
+  if (properties.Exists(kPropText))
     [(NSTextField*)view_ref_ setStringValue:
-        NSStringWithString(properties[Entity::kPropText].Coerce<String>())];
+        NSStringWithString(properties[kPropText].Coerce<String>())];
   ConfigureView();
 }
 
@@ -839,7 +839,7 @@ Value Cocoa::EditField::GetProperty(PropertyName name) const {
 Bool Cocoa::EditField::SetProperty(PropertyName name, const Value &value) {
   ScopedAutoreleasePool pool;
 
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     [(NSTextField*)view_ref_ setStringValue:
         NSStringWithString(value.Coerce<String>())];
     return true;
@@ -868,7 +868,7 @@ Value Cocoa::PathBox::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropBaseline) == 0) {
     return 15;
   }
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     return String([[(PathBoxControl*)view_ref_ path] UTF8String]);
   }
   return View::GetProperty(name);
@@ -877,7 +877,7 @@ Value Cocoa::PathBox::GetProperty(PropertyName name) const {
 Bool Cocoa::PathBox::SetProperty(PropertyName name, const Value &value) {
   ScopedAutoreleasePool pool;
 
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     [(PathBoxControl*)view_ref_ setPath:
         NSStringWithString(value.Coerce<String>())];
     return true;
@@ -981,14 +981,14 @@ void Cocoa::PopupItem::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
   NSString *title = @"";
 
-  if (properties.Exists(Entity::kPropText))
-    title = NSStringWithString(properties[Entity::kPropText].Coerce<String>());
+  if (properties.Exists(kPropText))
+    title = NSStringWithString(properties[kPropText].Coerce<String>());
   item_ = [[NSMenuItem alloc]
       initWithTitle:title action:NULL keyEquivalent:@""];
 }
 
 Bool Cocoa::PopupItem::SetProperty(PropertyName name, const Value &value) {
-  if (strcmp(name, Entity::kPropEnabled) == 0) {
+  if (strcmp(name, kPropEnabled) == 0) {
     ScopedAutoreleasePool pool;
 
     [item_ setEnabled:value.Coerce<Bool>()];
@@ -998,7 +998,7 @@ Bool Cocoa::PopupItem::SetProperty(PropertyName name, const Value &value) {
 }
 
 Value Cocoa::PopupItem::GetProperty(PropertyName name) const {
-  if (strcmp(name, Entity::kPropEnabled) == 0) {
+  if (strcmp(name, kPropEnabled) == 0) {
     ScopedAutoreleasePool pool;
     return (Bool)[item_ isEnabled];
   }

@@ -459,9 +459,9 @@ initpyadem() {
       module, "Window", reinterpret_cast<PyObject*>(&WindowType));
 
   PyModule_AddStringConstant(
-      module, "PROP_TEXT", Diadem::Entity::kPropText);
+      module, "PROP_TEXT", Diadem::kPropText);
   PyModule_AddStringConstant(
-      module, "PROP_ENABLED", Diadem::Entity::kPropEnabled);
+      module, "PROP_ENABLED", Diadem::kPropEnabled);
   PyModule_AddStringConstant(
       module, "PROP_VISIBLE", Diadem::kPropVisible);
   PyModule_AddStringConstant(

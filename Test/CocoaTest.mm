@@ -246,26 +246,26 @@ TEST_F(CocoaTest, Enabled) {
   ASSERT_FALSE(item == NULL);
 
   EXPECT_TRUE(button->GetProperty(
-      Diadem::Entity::kPropEnabled).Coerce<Diadem::Bool>());
+      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
   EXPECT_TRUE(popup->GetProperty(
-      Diadem::Entity::kPropEnabled).Coerce<Diadem::Bool>());
+      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
   EXPECT_TRUE(item->GetProperty(
-      Diadem::Entity::kPropEnabled).Coerce<Diadem::Bool>());
+      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
 
-  EXPECT_TRUE(button->SetProperty(Diadem::Entity::kPropEnabled, false));
+  EXPECT_TRUE(button->SetProperty(Diadem::kPropEnabled, false));
   EXPECT_FALSE([(id)button->GetNative()->GetNativeRef() isEnabled]);
   EXPECT_FALSE(button->GetProperty(
-      Diadem::Entity::kPropEnabled).Coerce<Diadem::Bool>());
+      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
 
-  EXPECT_TRUE(popup->SetProperty(Diadem::Entity::kPropEnabled, false));
+  EXPECT_TRUE(popup->SetProperty(Diadem::kPropEnabled, false));
   EXPECT_FALSE([(id)popup->GetNative()->GetNativeRef() isEnabled]);
   EXPECT_FALSE(popup->GetProperty(
-      Diadem::Entity::kPropEnabled).Coerce<Diadem::Bool>());
+      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
 
-  EXPECT_TRUE(item->SetProperty(Diadem::Entity::kPropEnabled, false));
+  EXPECT_TRUE(item->SetProperty(Diadem::kPropEnabled, false));
   EXPECT_FALSE([(id)item->GetNative()->GetNativeRef() isEnabled]);
   EXPECT_FALSE(item->GetProperty(
-      Diadem::Entity::kPropEnabled).Coerce<Diadem::Bool>());
+      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
 }
 
 // Simple case for ShowMessage - message with OK buton

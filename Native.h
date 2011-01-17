@@ -21,19 +21,19 @@
 
 namespace Diadem {
 
-extern PropertyName
+extern const PropertyName
     kPropButtonType, kPropFile, kPropTextAlign, kPropUISize, kPropURL;
 
-extern TypeName
+extern const TypeName
     kTypeNameWindow, kTypeNameBox, kTypeNameButton, kTypeNameCheck,
     kTypeNameLabel, kTypeNameLink, kTypeNameEdit, kTypeNamePassword,
     kTypeNamePath, kTypeNameSeparator, kTypeNameImage, kTypeNamePopup,
     kTypeNameItem, kTypeNameCombo, kTypeNameDate, kTypeNameList,
     kTypeNameTabs, kTypeNameTab;
 
-extern const char* const kTextAlignLeft;
-extern const char* const kTextAlignCenter;
-extern const char* const kTextAlignRight;
+extern const StringConstant kTextAlignLeft, kTextAlignCenter, kTextAlignRight;
+
+extern const StringConstant kUISizeNormal, kUISizeSmall, kUISizeMini;
 
 class WindowInterface;
 

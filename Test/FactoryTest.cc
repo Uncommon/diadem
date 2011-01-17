@@ -45,7 +45,7 @@ TEST(FactoryTest, ConstructEntity) {
   Diadem::PropertyMap properties;
 
   factory.Register<Diadem::Entity>(kEntityClassName);
-  properties.Insert(Diadem::Entity::kPropName, "Flauze");
+  properties.Insert(Diadem::kPropName, "Flauze");
 
   Diadem::Entity *entity = factory.CreateEntity(kEntityClassName, properties);
 
@@ -61,7 +61,7 @@ TEST(FactoryTest, BasicSession) {
   Diadem::PropertyMap properties;
 
   factory.Register<TestEntity>(kEntityClassName);
-  properties.Insert(Diadem::Entity::kPropName, "Parent");
+  properties.Insert(Diadem::kPropName, "Parent");
   session.BeginEntity(kEntityClassName, properties);
   EXPECT_NE((Diadem::Entity*)NULL, session.RootEntity());
   EXPECT_EQ(session.RootEntity(), session.CurrentEntity());
@@ -70,7 +70,7 @@ TEST(FactoryTest, BasicSession) {
   TestEntity* const parent = dynamic_cast<TestEntity*>(session.RootEntity());
   ASSERT_NE((TestEntity*)NULL, parent);
 
-  properties[Diadem::Entity::kPropName] = Diadem::String("Child");
+  properties[Diadem::kPropName] = Diadem::String("Child");
   session.BeginEntity(kEntityClassName, properties);
   EXPECT_NE((Diadem::Entity*)NULL, session.CurrentEntity());
   EXPECT_NE(session.RootEntity(), session.CurrentEntity());

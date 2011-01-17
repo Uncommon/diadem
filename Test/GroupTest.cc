@@ -244,7 +244,7 @@ TEST_F(GroupTest, testColumnLabelGroupSimple) {
   EXPECT_STREQ(
       "Exit:",
       label->GetProperty(
-          Diadem::Entity::kPropText).Coerce<Diadem::String>().Get());
+          Diadem::kPropText).Coerce<Diadem::String>().Get());
   ASSERT_EQ(1, content->ChildrenCount());
 
   Diadem::Entity *content_label = content->ChildAt(0);
@@ -252,7 +252,7 @@ TEST_F(GroupTest, testColumnLabelGroupSimple) {
   EXPECT_STREQ(
       "Stage left",
       content_label->GetProperty(
-          Diadem::Entity::kPropText).Coerce<Diadem::String>().Get());
+          Diadem::kPropText).Coerce<Diadem::String>().Get());
 
   const Diadem::Spacing margins = GetWindowMargins();
   const Diadem::Layout *label_L = label->GetLayout();
@@ -301,10 +301,10 @@ TEST_F(GroupTest, testColumnLabelGroupDouble) {
 
   EXPECT_STREQ("AA",
       label1->GetProperty(
-          Diadem::Entity::kPropText).Coerce<Diadem::String>().Get());
+          Diadem::kPropText).Coerce<Diadem::String>().Get());
   EXPECT_STREQ("AAAA",
       label2->GetProperty(
-          Diadem::Entity::kPropText).Coerce<Diadem::String>().Get());
+          Diadem::kPropText).Coerce<Diadem::String>().Get());
 
   EXPECT_STREQ(
       label1->GetLayout()->GetWidthName().Get(),

@@ -263,8 +263,8 @@ TEST_F(PythonTest, PropertyConstants) {
   PyObject *in_layout = PyDict_GetItemString(locals_, "in_layout");
   PyObject *url = PyDict_GetItemString(locals_, "url");
 
-  EXPECT_STREQ(Diadem::Entity::kPropText, PyString_AsString(text));
-  EXPECT_STREQ(Diadem::Entity::kPropEnabled, PyString_AsString(enabled));
+  EXPECT_STREQ(Diadem::kPropText, PyString_AsString(text));
+  EXPECT_STREQ(Diadem::kPropEnabled, PyString_AsString(enabled));
   EXPECT_STREQ(Diadem::kPropVisible, PyString_AsString(visible));
   EXPECT_STREQ(Diadem::kPropInLayout, PyString_AsString(in_layout));
   EXPECT_STREQ(Diadem::kPropURL, PyString_AsString(url));

@@ -32,7 +32,7 @@ TEST_F(BasicWindowTest, SimpleWindow) {
 
   EXPECT_STREQ(
       "SimpleWindow",
-      windowRoot_->GetProperty(Entity::kPropText).Coerce<String>());
+      windowRoot_->GetProperty(Diadem::kPropText).Coerce<String>());
   ASSERT_EQ(1, windowRoot_->ChildrenCount());
 
   Entity* const button = windowRoot_->ChildAt(0);
@@ -40,7 +40,7 @@ TEST_F(BasicWindowTest, SimpleWindow) {
   ASSERT_FALSE(button == NULL);
   EXPECT_STREQ(
       "Death by Monkeys",
-      button->GetProperty(Entity::kPropText).Coerce<String>());
+      button->GetProperty(Diadem::kPropText).Coerce<String>());
 }
 
 // Change the contents of an edit field
@@ -55,11 +55,11 @@ TEST_F(BasicWindowTest, EditField) {
 
   EXPECT_STREQ(
       "platypus",
-      edit->GetProperty(Entity::kPropText).Coerce<String>());
-  EXPECT_TRUE(edit->SetProperty(Entity::kPropText, "skunk"));
+      edit->GetProperty(Diadem::kPropText).Coerce<String>());
+  EXPECT_TRUE(edit->SetProperty(Diadem::kPropText, "skunk"));
   EXPECT_STREQ(
       "skunk",
-      edit->GetProperty(Entity::kPropText).Coerce<String>());
+      edit->GetProperty(Diadem::kPropText).Coerce<String>());
 }
 
 // Change the contents of a password field
@@ -74,11 +74,11 @@ TEST_F(BasicWindowTest, PasswordField) {
 
   EXPECT_STREQ(
       "armadillo",
-      edit->GetProperty(Entity::kPropText).Coerce<String>());
-  EXPECT_TRUE(edit->SetProperty(Entity::kPropText, "gopher"));
+      edit->GetProperty(Diadem::kPropText).Coerce<String>());
+  EXPECT_TRUE(edit->SetProperty(Diadem::kPropText, "gopher"));
   EXPECT_STREQ(
       "gopher",
-      edit->GetProperty(Entity::kPropText).Coerce<String>());
+      edit->GetProperty(Diadem::kPropText).Coerce<String>());
 }
 
 // Tests entity type names

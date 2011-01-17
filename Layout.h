@@ -45,6 +45,10 @@ extern const PropertyName
 
 extern const TypeName kTypeNameGroup, kTypeNameSpacer;
 
+extern const StringConstant kAlignNameStart, kAlignNameCenter, kAlignNameEnd;
+
+extern const StringConstant kDirectionNameRow, kDirectionNameColumn;
+
 // A layout object manages an Entity's place in the dialog layout.
 class Layout : public EntityDelegate {
  public:

@@ -17,14 +17,14 @@
 
 namespace Diadem {
 
-PropertyName
+const PropertyName
     kPropButtonType = "type",
     kPropFile       = "file",
     kPropTextAlign  = "text-align",
     kPropUISize     = "uisize",
     kPropURL        = "url";
 
-TypeName
+const TypeName
     kTypeNameWindow     = "window",
     kTypeNameBox        = "box",
     kTypeNameButton     = "button",
@@ -44,9 +44,15 @@ TypeName
     kTypeNameTabs       = "tabs",
     kTypeNameTab        = "tab";
 
-const char* const kTextAlignLeft   = "left";
-const char* const kTextAlignCenter = "center";
-const char* const kTextAlignRight  = "right";
+const StringConstant
+    kTextAlignLeft   = "left",
+    kTextAlignCenter = "center",
+    kTextAlignRight  = "right";
+
+const StringConstant
+    kUISizeNormal = "normal",
+    kUISizeSmall  = "small",
+    kUISizeMini   = "mini";
 
 Location Native::GetViewOffset() const {
   Location view_location;

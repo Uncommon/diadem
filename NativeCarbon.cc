@@ -91,12 +91,12 @@ PlatformMetrics Carbon::NativeCarbon::metrics_ = {
 
 void Carbon::SetUpFactory(Factory *factory) {
   DASSERT(factory != NULL);
-  factory->RegisterNative<Label>("label");
-  factory->RegisterNative<Window>("window");
-  factory->RegisterNative<Button>("button");
-  factory->RegisterNative<Checkbox>("check");
-  factory->RegisterNative<EditField>("edit");
-  factory->RegisterNative<Separator>("separator");
+  factory->RegisterNative<Label>(kTypeNameLabel);
+  factory->RegisterNative<Window>(kTypeNameWindow);
+  factory->RegisterNative<Button>(kTypeNameButton);
+  factory->RegisterNative<Checkbox>(kTypeNameCheck);
+  factory->RegisterNative<EditField>(kTypeNameEdit);
+  factory->RegisterNative<Separator>(kTypeNameSeparator);
 }
 
 void Carbon::Window::InitializeProperties(const PropertyMap &properties) {
@@ -110,9 +110,9 @@ void Carbon::Window::InitializeProperties(const PropertyMap &properties) {
           kWindowCompositingAttribute,
       &default_bounds, &window_ref_);
   if ((err == noErr) && (window_ref_ != NULL)) {
-    if (properties.Exists(Entity::kPropText)) {
+    if (properties.Exists(kPropText)) {
       const String title_string =
-          properties[Entity::kPropText].Coerce<String>();
+          properties[kPropText].Coerce<String>();
       ScopedCFType<CFStringRef> cf_title(
           CFStringFromString(title_string),
           kDontRetain);
@@ -130,7 +130,7 @@ Carbon::Window::~Window() {
 Bool Carbon::Window::SetProperty(PropertyName name, const Value &value) {
   if (window_ref_ == NULL)
     return false;
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     ScopedCFType<CFStringRef> title(
         CFStringFromString(value.Coerce<String>()),
         kDontRetain);
@@ -154,7 +154,7 @@ Bool Carbon::Window::SetProperty(PropertyName name, const Value &value) {
 Value Carbon::Window::GetProperty(PropertyName name) const {
   if (window_ref_ == NULL)
     return false;
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     ScopedCFType<CFStringRef> title;
 
     ::CopyWindowTitleAsCFString(window_ref_, title.RetainedOutPtr());
@@ -282,7 +282,7 @@ Bool Carbon::Control::SetProperty(PropertyName name, const Value &value) {
     ::HIViewSetFrame(view_ref_, &frame);
     return true;
   }
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     ScopedCFType<CFStringRef> cf_text(
         CFStringFromString(value.Coerce<String>()),
         kDontRetain);
@@ -298,7 +298,7 @@ Bool Carbon::Control::SetProperty(PropertyName name, const Value &value) {
 Value Carbon::Control::GetProperty(PropertyName name) const {
   if (view_ref_ == NULL)
     return Value();
-  if (strcmp(name, Entity::kPropText) == 0) {
+  if (strcmp(name, kPropText) == 0) {
     ScopedCFType<CFStringRef> cf_text(::HIViewCopyText(view_ref_), kDontRetain);
 
     return StringFromCFString(cf_text);
@@ -334,9 +334,9 @@ Size Carbon::Control::GetSize() const {
 void Carbon::Button::InitializeProperties(const PropertyMap &properties) {
   ScopedCFType<CFStringRef> title;
 
-  if (properties.Exists(Entity::kPropText))
+  if (properties.Exists(kPropText))
     title.Set(
-        CFStringFromString(properties[Entity::kPropText].Coerce<String>()),
+        CFStringFromString(properties[kPropText].Coerce<String>()),
         kDontRetain);
 
   const Rect default_bounds = { 0, 0, 20, 50 };
@@ -358,9 +358,9 @@ Value Carbon::Button::GetProperty(PropertyName name) const {
 void Carbon::Checkbox::InitializeProperties(const PropertyMap &properties) {
   ScopedCFType<CFStringRef> title;
 
-  if (properties.Exists(Entity::kPropText))
+  if (properties.Exists(kPropText))
     title.Set(
-        CFStringFromString(properties[Entity::kPropText].Coerce<String>()),
+        CFStringFromString(properties[kPropText].Coerce<String>()),
         kDontRetain);
 
   const Rect default_bounds = { 0, 0, 20, 50 };
@@ -371,9 +371,9 @@ void Carbon::Checkbox::InitializeProperties(const PropertyMap &properties) {
 void Carbon::Label::InitializeProperties(const PropertyMap &properties) {
   ScopedCFType<CFStringRef> title;
 
-  if (properties.Exists(Entity::kPropText))
+  if (properties.Exists(kPropText))
     title.Set(
-        CFStringFromString(properties[Entity::kPropText].Coerce<String>()),
+        CFStringFromString(properties[kPropText].Coerce<String>()),
         kDontRetain);
 
   const Rect default_bounds = { 0, 0, 20, 50 };
@@ -426,9 +426,9 @@ Value Carbon::Label::GetProperty(PropertyName name) const {
 void Carbon::EditField::InitializeProperties(const PropertyMap &properties) {
   ScopedCFType<CFStringRef> title;
 
-  if (properties.Exists(Entity::kPropText))
+  if (properties.Exists(kPropText))
     title.Set(
-        CFStringFromString(properties[Entity::kPropText].Coerce<String>()),
+        CFStringFromString(properties[kPropText].Coerce<String>()),
         kDontRetain);
 
   const Rect default_bounds = { 0, 0, 20, 50 };
