@@ -31,6 +31,10 @@ extern TypeName
     kTypeNameItem, kTypeNameCombo, kTypeNameDate, kTypeNameList,
     kTypeNameTabs, kTypeNameTab;
 
+extern const char* const kTextAlignLeft;
+extern const char* const kTextAlignCenter;
+extern const char* const kTextAlignRight;
+
 class WindowInterface;
 
 // Wrapper for a platform-specific implementation for an Entity

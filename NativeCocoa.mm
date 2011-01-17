@@ -701,11 +701,11 @@ void Cocoa::Label::InitializeProperties(const PropertyMap &properties) {
     NSTextAlignment align = NSNaturalTextAlignment;
     const String align_value = properties[kPropTextAlign].Coerce<String>();
 
-    if (align_value == "left")
+    if (align_value == kTextAlignLeft)
       align = NSLeftTextAlignment;
-    else if (align_value == "center")
+    else if (align_value == kTextAlignCenter)
       align = NSCenterTextAlignment;
-    else if (align_value == "right")
+    else if (align_value == kTextAlignRight)
       align = NSRightTextAlignment;
     [(NSTextField*)view_ref_ setAlignment:align];
   }
@@ -767,20 +767,6 @@ Bool Cocoa::Label::SetProperty(const PropertyName name, const Value &value) {
       return true;
     } else {
       return Control::SetProperty(name, value);
-    }
-  }
-  if (strcmp(name,kPropTextAlign) == 0) {
-    if (value.IsValueType<String>()) {
-      String s = value.Coerce<String>();
-      NSTextAlignment alignment = NSNaturalTextAlignment;
-
-      if (s == "left")
-        alignment = NSLeftTextAlignment;
-      else if (s == "center")
-        alignment = NSCenterTextAlignment;
-      else if (s == "right")
-        alignment = NSRightTextAlignment;
-      [(NSControl*)view_ref_ setAlignment:alignment];
     }
   }
   return Control::SetProperty(name, value);

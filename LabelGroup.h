@@ -28,7 +28,7 @@ class LabelGroup : public Entity {
  public:
   LabelGroup() : label_(NULL), content_(NULL) {}
 
-  // Creates the label and content child entities
+  // Creates the label and content child entities.
   virtual void InitializeProperties(
       const PropertyMap &properties,
       const Factory &factory);
@@ -36,10 +36,10 @@ class LabelGroup : public Entity {
   // Reads the "type" property to specify layout: column, indent, etc.
   virtual Bool SetProperty(PropertyName name, const Value &value);
 
-  // Children are added to the content group instead
+  // Children are added to the content group instead.
   virtual void AddChild(Entity *child);
 
-  // Uses a default layout if none has been specified
+  // Uses a default layout if none has been specified.
   virtual void Finalize();
 
   Entity* GetLabel()             { return label_; }
@@ -48,8 +48,8 @@ class LabelGroup : public Entity {
   const Entity* GetContent() const { return content_; }
 
  protected:
-  Entity *label_;   // The text label
-  Entity *content_; // The content group
+  Entity *label_;   // The text label.
+  Entity *content_; // The content group.
 
   void InitializeLayout(Layout *layout);
 };
@@ -78,6 +78,7 @@ class ColumnLabelLayout : public LabelGroupLayout {
 class IndentLabelLayout : public LabelGroupLayout {
  public:
   IndentLabelLayout(LabelGroup *group) : LabelGroupLayout(group) {}
+  // TODO(catmull): finish implementation
 };
 
 }  // namespace Diadem

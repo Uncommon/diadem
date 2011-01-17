@@ -44,6 +44,10 @@ TypeName
     kTypeNameTabs       = "tabs",
     kTypeNameTab        = "tab";
 
+const char* const kTextAlignLeft   = "left";
+const char* const kTextAlignCenter = "center";
+const char* const kTextAlignRight  = "right";
+
 Location Native::GetViewOffset() const {
   Location view_location;
 

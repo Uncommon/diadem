@@ -29,7 +29,7 @@ void LabelGroup::InitializeProperties(
       const Factory &factory) {
   PropertyMap labelProperties;
 
-  labelProperties.Insert(kPropTextAlign, String("right"));
+  labelProperties.Insert(kPropTextAlign, String(kTextAlignRight));
   label_ = factory.CreateEntity(kTypeNameLabel, labelProperties);
 
   content_ = new Entity();
