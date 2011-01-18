@@ -330,12 +330,11 @@ Spacing LayoutContainer::GetMargins() const {
 
 void LayoutContainer::InvalidateLayout() {
   cached_min_size_ = Size();
-  layout_valid_ = false;
   Layout::InvalidateLayout();
 }
 
 void LayoutContainer::SetSize(const Size &s) {
-  if (layout_valid_ && (s == GetSize()))
+  if (s == GetSize())
     return;
 
   Size new_size;
@@ -394,12 +393,13 @@ void LayoutContainer::SetObjectSizes(
     const Size &s, Size *new_size, long *extra) {
   const Spacing margins = GetMargins();
   const unsigned int fill_count = FillChildCount();
+  Bool layout_valid = false;
 
   // For some objects, such as wrapped text, changing their size in one
   // direction will affect their minimum size in the other. When that happens,
   // the object will call InvalidateLayout, and the loop will be executed again.
-  for (uint32_t i = 0; !layout_valid_ && (i < kMaxLayoutIterations); ++i) {
-    layout_valid_ = true;
+  for (uint32_t i = 0; !layout_valid && (i < kMaxLayoutIterations); ++i) {
+    layout_valid = true;
     if (cached_min_size_ == Size())
       cached_min_size_ = GetMinimumSize();
 
@@ -448,8 +448,11 @@ void LayoutContainer::SetObjectSizes(
         }
       }
       child->SetSize(size);
+      // With wrapped text, changing the width may change the desired height.
+      if (child->GetMinimumSize() != min)
+        layout_valid = false;
     }
-    if (!layout_valid_) {
+    if (!layout_valid) {
       cached_min_size_ = Size();
       CalculateMinimumSize();
     }
@@ -671,14 +674,15 @@ void LayoutContainer::SetLocationImp(const Location &loc) {
 
 void LayoutContainer::ResizeToMinimum() {
   cached_min_size_ = Size();
-  layout_valid_ = false;
 
-  for (int i = 0; i < kMaxLayoutIterations; ++i) {
+  for (uint32_t i = 0; i < kMaxLayoutIterations; ++i) {
     const Size min = GetMinimumSize();
 
     if (min == GetSize())
       break;
     SetSize(min);
+    if (min != GetSize())
+      cached_min_size_ = Size();
   }
 }
 
@@ -772,6 +776,8 @@ Bool Group::SetProperty(PropertyName name, const Value &value) {
 Value Group::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropLocation) == 0)
     return GetLocation();
+  if (strcmp(name, kPropSize) == 0)
+    return GetSize();
   return LayoutContainer::GetProperty(name);
 }
 

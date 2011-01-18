@@ -167,7 +167,7 @@ class SelfMeasured : public Layout {
 class LayoutContainer : public Layout {
  public:
   LayoutContainer()
-      : direction_(kLayoutRow), visible_(true), layout_valid_(false),
+      : direction_(kLayoutRow), visible_(true),
         stream_align_(kAlignStart), cross_align_(kAlignStart) {}
   virtual ~LayoutContainer() {}
 
@@ -192,7 +192,7 @@ class LayoutContainer : public Layout {
 
  protected:
   LayoutDirection direction_;
-  Bool visible_, layout_valid_;
+  Bool visible_;
   AlignOption stream_align_, cross_align_;
   mutable Size cached_min_size_;
   mutable Size max_size_;
