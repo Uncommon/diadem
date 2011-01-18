@@ -477,3 +477,61 @@ TEST_F(LayoutTest, testNamedWidth2) {
   EXPECT_EQ(size4.width, size2.width);
   EXPECT_EQ(size4.width, size3.width);
 }
+
+// A paragraph wrapped to a specific width
+TEST_F(LayoutTest, testParagraph) {
+  ReadWindowData(
+      "<window text='testParagraph' width='36em'>"
+        "<label width='fill' text='Lorem ipsum dolor sit amet, consectetur "
+            "adipisici elit, sed do eiusmod tempor incididunt ut labore et "
+            "dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
+            "exercitation ullamco laboris nisi ut aliquip ex ea commodo "
+            "consequat. Duis aute irure dolor in reprehenderit in voluptate "
+            "velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint "
+            "occaecat cupidatat non proident, sunt in culpa qui officia "
+            "deserunt mollit anim id est laborum.'/>"
+      "</window>");
+  ASSERT_EQ(1, windowRoot_->ChildrenCount());
+
+  Diadem::Entity *label = windowRoot_->ChildAt(0);
+  const Diadem::Size l_size = label->GetLayout()->GetSize();
+  const Diadem::Location l_loc = label->GetLayout()->GetLocation();
+  const Diadem::Spacing margins = GetWindowMargins();
+  const Diadem::Size w_size = windowRoot_->GetLayout()->GetSize();
+
+  EXPECT_EQ(l_loc.x, margins.left);
+  EXPECT_EQ(l_loc.y, margins.top);
+  EXPECT_EQ(l_loc.x + l_size.width, w_size.width - margins.right);
+  EXPECT_EQ(l_loc.y + l_size.height, w_size.height - margins.bottom);
+}
+
+// Width-fill label inside a width-fill group
+TEST_F(LayoutTest, testFillInFill) {
+  ReadWindowData(
+      "<window text='testFillInFill' width='36em'>"
+        "<group width='fill'>"
+          "<label text='text text text text' width='fill'/>"
+        "</group>"
+        "<label text='lower'/>"
+      "</window>");
+  ASSERT_EQ(2, windowRoot_->ChildrenCount());
+
+  Diadem::Entity *group = windowRoot_->ChildAt(0);
+  Diadem::Entity *label = windowRoot_->ChildAt(1);
+  const Diadem::Size g_size = group->GetLayout()->GetSize();
+  const Diadem::Size l_size = label->GetLayout()->GetSize();
+  const Diadem::Location g_loc = group->GetLayout()->GetLocation();
+  const Diadem::Location l_loc = label->GetLayout()->GetLocation();
+  const Diadem::Spacing g_pad = group->GetLayout()->GetPadding();
+  const Diadem::Spacing l_pad = label->GetLayout()->GetPadding();
+
+  EXPECT_EQ(l_size.height, g_size.height);
+  EXPECT_EQ(
+      g_loc.y + g_size.height + std::max(g_pad.bottom, l_pad.top),
+      l_loc.y);
+
+  Diadem::Entity *label2 = group->ChildAt(0);
+  Diadem::Size l2_size = label2->GetLayout()->GetSize();
+
+  EXPECT_EQ(l_size.height, l2_size.height);
+}
