@@ -446,9 +446,9 @@ static PyObject* ShowMessage(
 }
 
 static PyMethodDef Pyadem_Methods[] = {
-    { "chooseFolder", ChooseFolder, METH_VARARGS,
+    { "ChooseFolder", ChooseFolder, METH_VARARGS,
       "Ask the user to choose a folder." },
-    { "showMessage", (PyCFunction)ShowMessage, METH_VARARGS | METH_KEYWORDS,
+    { "ShowMessage", (PyCFunction)ShowMessage, METH_VARARGS | METH_KEYWORDS,
       "Display a message or prompt." },
     { NULL },
     };
