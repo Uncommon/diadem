@@ -21,6 +21,7 @@ namespace Diadem {
 
 extern const PropertyName kPropLabelGroupType, kPropColumnWidthName;
 extern const TypeName kTypeNameLabelGroup;
+extern const StringConstant kLabelGroupTypeColumn, kLabelGroupTypeIndent;
 
 // A label grop is a text label and an associated group of controls. Various
 // layouts are possible, and the one to use could depend on the platform.
@@ -48,8 +49,8 @@ class LabelGroup : public Entity {
   const Entity* GetContent() const { return content_; }
 
  protected:
-  Entity *label_;   // The text label.
-  Entity *content_; // The content group.
+  Entity *label_;    // The text label.
+  Entity *content_;  // The content group.
 
   void InitializeLayout(Layout *layout);
 };
@@ -68,7 +69,7 @@ class LabelGroupLayout : public Group {
 // width for the label column, implemented using named widths.
 class ColumnLabelLayout : public LabelGroupLayout {
  public:
-   ColumnLabelLayout(LabelGroup *group) : LabelGroupLayout(group) {}
+  explicit ColumnLabelLayout(LabelGroup *group) : LabelGroupLayout(group) {}
 
   virtual void Finalize();
   virtual Bool SetProperty(PropertyName name, const Value &value);
@@ -77,7 +78,7 @@ class ColumnLabelLayout : public LabelGroupLayout {
 // The label appears left-aligned above, and the content is indented below.
 class IndentLabelLayout : public LabelGroupLayout {
  public:
-  IndentLabelLayout(LabelGroup *group) : LabelGroupLayout(group) {}
+  explicit IndentLabelLayout(LabelGroup *group) : LabelGroupLayout(group) {}
   // TODO(catmull): finish implementation
 };
 

@@ -245,12 +245,9 @@ TEST_F(CocoaTest, Enabled) {
 
   ASSERT_FALSE(item == NULL);
 
-  EXPECT_TRUE(button->GetProperty(
-      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
-  EXPECT_TRUE(popup->GetProperty(
-      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
-  EXPECT_TRUE(item->GetProperty(
-      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
+  EXPECT_TRUE(button->GetProperty(Diadem::kPropEnabled).Coerce<Diadem::Bool>());
+  EXPECT_TRUE(popup->GetProperty(Diadem::kPropEnabled).Coerce<Diadem::Bool>());
+  EXPECT_TRUE(item->GetProperty(Diadem::kPropEnabled).Coerce<Diadem::Bool>());
 
   EXPECT_TRUE(button->SetProperty(Diadem::kPropEnabled, false));
   EXPECT_FALSE([(id)button->GetNative()->GetNativeRef() isEnabled]);

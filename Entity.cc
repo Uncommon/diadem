@@ -68,7 +68,7 @@ String Entity::GetPath() const {
 
   if (name_.IsEmpty()) {
     const String my_name = GetTypeName();
-    
+
     if (GetParent() == NULL) {
       snprintf(path, kMaxPathLength, "/%s", my_name.Get());
     } else {

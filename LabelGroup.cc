@@ -24,6 +24,10 @@ const PropertyName
 
 const TypeName kTypeNameLabelGroup = "labelgroup";
 
+const StringConstant
+    kLabelGroupTypeColumn = "column",
+    kLabelGroupTypeIndent = "indent";
+
 void LabelGroup::InitializeProperties(
       const PropertyMap &properties,
       const Factory &factory) {
@@ -47,10 +51,10 @@ Bool LabelGroup::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropLabelGroupType) == 0) {
     DASSERT(layout_ == NULL);
     const String type = value.Coerce<String>();
-    
-    if (type == "column")
+
+    if (type == kLabelGroupTypeColumn)
       InitializeLayout(new ColumnLabelLayout(this));
-    else if (type == "indent")
+    else if (type == kLabelGroupTypeIndent)
       InitializeLayout(new IndentLabelLayout(this));
     return true;
   }
