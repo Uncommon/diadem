@@ -282,13 +282,27 @@ ButtonType Cocoa::ShowMessage(MessageData *message) {
 
 void Cocoa::Window::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
+  NSUInteger style_mask = NSTitledWindowMask;
+
+  if (properties.Exists(kPropStyle)) {
+    const uint32_t style =
+        Native::ParseWindowStyle(properties[kPropStyle].Coerce<String>());
+
+    if (style & kStyleClosable)
+      style_mask |= NSClosableWindowMask;
+    if (style & kStyleResizable)
+      style_mask |= NSResizableWindowMask;
+    if (style & kStyleMinimizable)
+      style_mask |= NSMiniaturizableWindowMask;
+  }
 
   window_ref_ = [[NSWindow alloc]
       initWithContentRect:NSMakeRect(0, 0, 50, 50)
-                styleMask:NSTitledWindowMask
+                styleMask:style_mask
                   backing:NSBackingStoreBuffered
                     defer:NO];
   [window_ref_ setContentMinSize:NSMakeSize(10, 10)];
+  [window_ref_ center];
   if ((window_ref_ != nil) && properties.Exists(kPropText)) {
     const String title_string = properties[kPropText].Coerce<String>();
 
@@ -366,7 +380,6 @@ void Cocoa::Window::AddChild(Native *child) {
 Bool Cocoa::Window::ShowModeless() {
   ScopedAutoreleasePool pool;
 
-  [window_ref_ center];
   [window_ref_ makeKeyAndOrderFront:nil];
   return true;
 }
@@ -410,7 +423,7 @@ Bool Cocoa::Window::SetFocus(Entity *new_focus) {
 }
 
 void Cocoa::View::ConfigureView() {
-  // The view needs to be anchored tho the top left of its parent
+  // The view needs to be anchored to the top left of its parent
   [view_ref_ setAutoresizingMask:NSViewMaxXMargin | NSViewMinYMargin];
 }
 

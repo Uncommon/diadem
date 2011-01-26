@@ -106,7 +106,7 @@ TEST_F(BasicWindowTest, TypeNames) {
   EXPECT_STREQ("password", password->GetTypeName());
 }
 
-// Test entity paths
+// Tests entity paths
 TEST_F(BasicWindowTest, Paths) {
   ReadWindowData(
       "<window text='Paths'>"
@@ -142,4 +142,17 @@ TEST_F(BasicWindowTest, Paths) {
   EXPECT_STREQ("/window/group2", group2->GetPath());
   EXPECT_STREQ("/window/group2/label1", labelC->GetPath());
   EXPECT_STREQ("/window/label2", labelD->GetPath());
+}
+
+// Tests parsing the window "style" attribute
+TEST_F(BasicWindowTest, ParseStyle) {
+  uint32_t result = Diadem::Native::ParseWindowStyle("close");
+
+  EXPECT_EQ(Diadem::kStyleClosable, result);
+
+  result = Diadem::Native::ParseWindowStyle("close,size");
+  EXPECT_EQ(Diadem::kStyleClosable | Diadem::kStyleResizable, result);
+
+  result = Diadem::Native::ParseWindowStyle("min");
+  EXPECT_EQ(Diadem::kStyleMinimizable, result);
 }

@@ -327,10 +327,42 @@ TEST_F(CocoaTest, testColumnLabelGroupSimple) {
       (NSWindow*)window_root_->GetNative()->GetNativeRef();
 
   EXPECT_EQ(native_window, [label_view window]);
-  EXPECT_EQ(NSRightTextAlignment, [(NSTextField*)label_view alignment]);
+  EXPECT_EQ(
+      (NSTextAlignment)NSRightTextAlignment,
+      [(NSTextField*)label_view alignment]);
 
   Diadem::Entity *content_label = labelgroup->GetContent()->ChildAt(0);
 
   label_view = (NSView*)content_label->GetNative()->GetNativeRef();
   EXPECT_EQ(native_window, [label_view window]);
+}
+
+TEST_F(CocoaTest, testWindowStyle1) {
+  ASSERT_TRUE(ReadWindowData(
+    "<window text='testWindowStyle1' style='close'/>"));
+
+  NSWindow *window = (NSWindow*)window_root_->GetNative()->GetNativeRef();
+
+  EXPECT_TRUE([window styleMask] & NSClosableWindowMask);
+  EXPECT_FALSE([window styleMask] & NSResizableWindowMask);
+}
+
+TEST_F(CocoaTest, testWindowStyle2) {
+  ASSERT_TRUE(ReadWindowData(
+    "<window text='testWindowStyle2' style='close,size'/>"));
+
+  NSWindow *window = (NSWindow*)window_root_->GetNative()->GetNativeRef();
+
+  EXPECT_TRUE([window styleMask] & NSClosableWindowMask);
+  EXPECT_TRUE([window styleMask] & NSResizableWindowMask);
+}
+
+TEST_F(CocoaTest, testWindowStyle3) {
+  ASSERT_TRUE(ReadWindowData(
+    "<window text='testWindowStyle3'/>"));
+
+  NSWindow *window = (NSWindow*)window_root_->GetNative()->GetNativeRef();
+
+  EXPECT_FALSE([window styleMask] & NSClosableWindowMask);
+  EXPECT_FALSE([window styleMask] & NSResizableWindowMask);
 }

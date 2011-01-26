@@ -20,6 +20,7 @@ namespace Diadem {
 const PropertyName
     kPropButtonType = "type",
     kPropFile       = "file",
+    kPropStyle      = "style",
     kPropTextAlign  = "text-align",
     kPropUISize     = "uisize",
     kPropURL        = "url";
@@ -54,6 +55,11 @@ const StringConstant
     kUISizeSmall  = "small",
     kUISizeMini   = "mini";
 
+const StringConstant
+    kWindowStyleNameClosable    = "close",
+    kWindowStyleNameResizable   = "size",
+    kWindowStyleNameMinimizable = "min";
+
 Location Native::GetViewOffset() const {
   Location view_location;
 
@@ -64,6 +70,35 @@ Location Native::GetViewOffset() const {
       view_location = parent_layout->GetViewLocation();
   }
   return view_location;
+}
+
+static const uint32_t kStyleCount = 3;
+
+uint32_t Native::ParseWindowStyle(const char *style) {
+  const StringConstant style_names[kStyleCount] = {
+      kWindowStyleNameClosable,
+      kWindowStyleNameResizable,
+      kWindowStyleNameMinimizable };
+  const uint32_t style_bits[kStyleCount] = {
+      kStyleClosable, kStyleResizable, kStyleMinimizable };
+  const char *separators = ", ";
+  uint32_t result = 0;
+  char * const style_copy = strdup(style);
+  char *word, *next = style_copy;
+
+  if (style_copy == NULL)
+    return 0;
+  while (next != NULL) {
+    word = strsep(&next, separators);
+    for (uint32_t i = 0; i < kStyleCount; ++i) {
+      if (strncmp(word, style_names[i], strlen(style_names[i])) == 0) {
+        result |= style_bits[i];
+        break;
+      }
+    }
+  }
+  free(style_copy);
+  return result;
 }
 
 }  // namespace Diadem

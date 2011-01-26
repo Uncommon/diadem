@@ -22,7 +22,8 @@
 namespace Diadem {
 
 extern const PropertyName
-    kPropButtonType, kPropFile, kPropTextAlign, kPropUISize, kPropURL;
+    kPropButtonType, kPropFile, kPropStyle, kPropTextAlign, kPropUISize,
+    kPropURL;
 
 extern const TypeName
     kTypeNameWindow, kTypeNameBox, kTypeNameButton, kTypeNameCheck,
@@ -34,6 +35,17 @@ extern const TypeName
 extern const StringConstant kTextAlignLeft, kTextAlignCenter, kTextAlignRight;
 
 extern const StringConstant kUISizeNormal, kUISizeSmall, kUISizeMini;
+
+extern const StringConstant
+    kWindowStyleNameClosable, kWindowStyleNameResizable,
+    kWindowStyleNameMinimizable;
+
+// Style mask bits for window attributes
+enum WindowStyleBit {
+  kStyleClosable    = 0x01,
+  kStyleResizable   = 0x02,
+  kStyleMinimizable = 0x04,
+};
 
 class WindowInterface;
 
@@ -60,8 +72,11 @@ class Native : public EntityDelegate {
 
   typedef Factory::NoLayout LayoutType;
 
+  // Parses a window's style attribute into a combination of WindowStyleBits
+  static uint32_t ParseWindowStyle(const char *style);
+
  protected:
-  // Location must be get and set relative to the parent container. This
+  // Location must be gotten and set relative to the parent container. This
   // convenience function helps with the coordinate conversion.
   Location GetViewOffset() const;
 };

@@ -190,7 +190,13 @@ static PyGetSetDef Entity_getsetters[] = {
 static PyObject* Entity_getProperty(PyademEntity *self, PyObject *name) {
   if (self->object == NULL)
     return NULL;
-  return self->object->GetProperty(PyString_AsString(name)).Coerce<PyObject*>();
+
+  PyObject *result =
+      self->object->GetProperty(PyString_AsString(name)).Coerce<PyObject*>();
+
+  // Sometimes PyString_AsString sets the error indicator even when it succeeds.
+  PyErr_Clear();
+  return result;
 }
 
 static PyObject* Entity_setProperty(PyademEntity *self, PyObject *args) {
@@ -209,11 +215,17 @@ static PyObject* Entity_setProperty(PyademEntity *self, PyObject *args) {
     PyErr_SetString(PyExc_KeyError, "property not found");
     return NULL;
   }
+  PyErr_Clear();
   return Py_None;
 }
 
 static PyObject* Entity_findByName(PyademEntity *self, PyObject *name) {
-  Diadem::Entity *entity = self->object->FindByName(PyString_AsString(name));
+  const char *name_chars = PyString_AsString(name);
+
+  if (name_chars == NULL)
+    return NULL;
+
+  Diadem::Entity *entity = self->object->FindByName(name_chars);
 
   if (entity == NULL)
     return Py_None;
