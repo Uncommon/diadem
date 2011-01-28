@@ -219,6 +219,41 @@ TEST_F(PythonTest, ButtonCallback) {
   EXPECT_TRUE(PyObject_IsTrue(window->context));
 }
 
+// Tests the window close button callback
+TEST_F(PythonTest, CloseCallback) {
+  PyObject *result = PyRun_String(
+      "window = pyadem.Window(data=\""
+        "<window style='close'><button text='OK'/></window>\")\n"
+      "window.context = False\n"
+      "def callback(win):\n"
+      "  win.context = True\n"
+      "window.close_callback = callback\n",
+      Py_file_input, globals_, locals_);
+  PyObject *error = PyErr_Occurred();
+
+  if (error != NULL) {
+    PyErr_Print();
+    PyErr_Clear();
+    FAIL();
+  }
+  ASSERT_FALSE(result == NULL);
+
+  PyademWindow *window =
+      reinterpret_cast<PyademWindow*>(PyDict_GetItemString(locals_, "window"));
+
+  ASSERT_FALSE(window == NULL);
+  ASSERT_FALSE(window->entity.context == NULL);
+  EXPECT_FALSE(window->close_callback == NULL);
+  EXPECT_FALSE(PyObject_IsTrue(window->entity.context));
+
+  Diadem::WindowInterface *wi =
+      window->entity.object->GetNative()->GetWindowInterface();
+
+  ASSERT_FALSE(wi == NULL);
+  wi->TestClose();
+  EXPECT_TRUE(PyObject_IsTrue(window->entity.context));
+}
+
 // Loads a window from a file; other tests use raw data.
 TEST_F(PythonTest, LoadFromFile) {
   PyObject *result = PyRun_String(

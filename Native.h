@@ -120,6 +120,9 @@ class WindowInterface {
   virtual Bool EndModal() = 0;
   // Sets the user focus to the given entity's control.
   virtual Bool SetFocus(Entity *new_focus) = 0;
+
+  // Methods for testing
+  virtual Bool TestClose() { return false; }
 };
 
 }  // namespace Diadem

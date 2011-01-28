@@ -41,6 +41,30 @@ SInt32 GetThemeMetric() {
 
 } // namespace
 
+@interface WindowDelegate : NSObject {
+  Diadem::Cocoa::Window *window_;
+}
+@end
+
+@implementation WindowDelegate
+
+- (id)initWithNativeWindow:(Diadem::Cocoa::Window*)window {
+  if ([super init] == nil)
+    return nil;
+  window_ = window;
+  return self;
+}
+
+- (BOOL)windowShouldClose:(NSWindow*)sender {
+  Diadem::Window *window = window_->GetEntity()->GetWindow();
+  DASSERT(window != NULL);
+
+  return window->AttemptClose();
+}
+
+@end
+
+
 @interface ButtonTarget : NSObject {
  @private
   Diadem::Cocoa::Button *button_;
@@ -280,6 +304,10 @@ ButtonType Cocoa::ShowMessage(MessageData *message) {
   }
 }
 
+Cocoa::Window::Window()
+    : window_ref_(nil), delegate_(nil) {
+}
+
 void Cocoa::Window::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
   NSUInteger style_mask = NSTitledWindowMask;
@@ -301,8 +329,11 @@ void Cocoa::Window::InitializeProperties(const PropertyMap &properties) {
                 styleMask:style_mask
                   backing:NSBackingStoreBuffered
                     defer:NO];
+  [window_ref_ setReleasedWhenClosed:NO];
   [window_ref_ setContentMinSize:NSMakeSize(10, 10)];
   [window_ref_ center];
+  delegate_ = [[WindowDelegate alloc] initWithNativeWindow:this];
+  [window_ref_ setDelegate:delegate_];
   if ((window_ref_ != nil) && properties.Exists(kPropText)) {
     const String title_string = properties[kPropText].Coerce<String>();
 
@@ -315,6 +346,7 @@ Cocoa::Window::~Window() {
 
   Close();
   [window_ref_ release];
+  [delegate_ release];
 }
 
 Bool Cocoa::Window::SetProperty(PropertyName name, const Value &value) {
@@ -419,6 +451,13 @@ Bool Cocoa::Window::SetFocus(Entity *new_focus) {
   if (![focus isKindOfClass:[NSResponder class]])
     return false;
   [window_ref_ makeFirstResponder:focus];
+  return true;
+}
+
+Bool Cocoa::Window::TestClose() {
+  ScopedAutoreleasePool pool;
+
+  [window_ref_ performClose:nil];
   return true;
 }
 
@@ -634,10 +673,8 @@ Bool Cocoa::Button::SetProperty(PropertyName name, const Value &value) {
 
     if (type == "default")
       [(NSButton*)view_ref_ setKeyEquivalent:@"\r"];
-    else if (type == "cancel") {
-      [(NSButton*)view_ref_ setKeyEquivalent:@"."];
-      [(NSButton*)view_ref_ setKeyEquivalentModifierMask:NSCommandKeyMask];
-    }
+    else if (type == "cancel")
+      [(NSButton*)view_ref_ setKeyEquivalent:@"\E"];
     return true;
   }
 

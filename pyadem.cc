@@ -25,6 +25,19 @@
 #include "Diadem/NativeCocoa.h"
 #include "Diadem/Value.h"
 
+// Stack-based class for acquiring Python's Global Interpreter Lock.
+// This is needed in UI event handlers that call Python callbacks. Otherwise
+// PyObject_Call can crash because the thread state is unset.
+class GILState {
+ public:
+  GILState() : state_(PyGILState_Ensure()) {}
+  ~GILState() {
+    PyGILState_Release(state_);
+  }
+ protected:
+  PyGILState_STATE state_;
+};
+
 // Wraps an Entity in a Python object.
 static PyademEntity* WrapEntity(Diadem::Entity *entity) {
   PyademEntity *result = PyObject_New(PyademEntity, &EntityType);
@@ -32,6 +45,8 @@ static PyademEntity* WrapEntity(Diadem::Entity *entity) {
   if (result == NULL)
     return NULL;
   result->object = entity;
+  result->button_callback = NULL;
+  result->context = NULL;
   return result;
 }
 
@@ -39,10 +54,11 @@ static PyademEntity* WrapEntity(Diadem::Entity *entity) {
 static void ButtonCallback(Diadem::Entity *button, PyademEntity *self) {
   if ((self->button_callback != NULL) &&
       (PyCallable_Check(self->button_callback))) {
+    GILState gil;
     PyademEntity *button_object = WrapEntity(button);
     PyObject *args = PyTuple_Pack(2, self, button_object);
 
-    PyEval_CallObject(self->button_callback, args);
+    PyObject_CallObject(self->button_callback, args);
     Py_DECREF(args);
     Py_DECREF(button_object);
     if (PyErr_Occurred()) {
@@ -58,6 +74,25 @@ static void ButtonCallback(Diadem::Entity *button, PyademEntity *self) {
       }
     }
   }
+}
+
+// Diadem close callback that calls through to the Python window's callback
+static bool WindowCloseCallback(Diadem::Window *window, PyademWindow *self) {
+  if ((self->close_callback == NULL) || !PyCallable_Check(self->close_callback))
+    return true;
+
+  GILState gil;
+  PyObject *args = PyTuple_Pack(1, self);
+  PyObject *result = PyObject_CallObject(self->close_callback, args);
+
+  Py_DECREF(args);
+  if (result == NULL)
+    return true;
+
+  const bool should_close = PyObject_IsTrue(result);
+
+  Py_DECREF(result);
+  return should_close;
 }
 
 // Returns the path to the named file in the default resources directory.
@@ -163,6 +198,8 @@ static void Entity_dealloc(PyademEntity *self) {
     delete self->object;
     self->object = NULL;
   }
+  Py_XDECREF(self->button_callback);
+  Py_XDECREF(self->context);
   self->ob_type->tp_free(reinterpret_cast<PyObject*>(self));
 }
 
@@ -182,8 +219,8 @@ static int Entity_setName(PyademEntity *self, PyObject *value, void *closure) {
 }
 
 static PyGetSetDef Entity_getsetters[] = {
-    { (char*)"name", (getter)Entity_getName, (setter)Entity_setName,
-      (char*)"name", NULL },
+    { const_cast<char*>("name"), (getter)Entity_getName, (setter)Entity_setName,
+      const_cast<char*>("name"), NULL },
     { NULL },
     };
 
@@ -240,9 +277,9 @@ static PyMethodDef Entity_methods[] = {
     };
 
 static PyMemberDef Entity_members[] = {
-    { (char*)"button_callback", T_OBJECT,
+    { const_cast<char*>("button_callback"), T_OBJECT,
       offsetof(PyademEntity, button_callback), 0, NULL },
-    { (char*)"context", T_OBJECT,
+    { const_cast<char*>("context"), T_OBJECT,
       offsetof(PyademEntity, context), 0, NULL },
     { NULL },
     };
@@ -262,29 +299,29 @@ PyTypeObject EntityType = {
     0,                        /*tp_as_number*/
     0,                        /*tp_as_sequence*/
     0,                        /*tp_as_mapping*/
-    0,                        /*tp_hash */
+    0,                        /*tp_hash*/
     0,                        /*tp_call*/
     0,                        /*tp_str*/
     0,                        /*tp_getattro*/
     0,                        /*tp_setattro*/
     0,                        /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT,       /*tp_flags*/
-    "Diadem Entity",          /* tp_doc */
-    0,                        /* tp_traverse */
-    0,                        /* tp_clear */
-    0,                        /* tp_richcompare */
-    0,                        /* tp_weaklistoffset */
-    0,                        /* tp_iter */
-    0,                        /* tp_iternext */
-    Entity_methods,           /* tp_methods */
-    Entity_members,           /* tp_members */
-    Entity_getsetters,        /* tp_getset */
-    0,                        /* tp_base */
-    0,                        /* tp_dict */
-    0,                        /* tp_descr_get */
-    0,                        /* tp_descr_set */
-    0,                        /* tp_dictoffset */
-    (initproc)Entity_init,    /* tp_init */
+    "Diadem Entity",          /*tp_doc*/
+    0,                        /*tp_traverse*/
+    0,                        /*tp_clear*/
+    0,                        /*tp_richcompare*/
+    0,                        /*tp_weaklistoffset*/
+    0,                        /*tp_iter*/
+    0,                        /*tp_iternext*/
+    Entity_methods,           /*tp_methods*/
+    Entity_members,           /*tp_members*/
+    Entity_getsetters,        /*tp_getset*/
+    0,                        /*tp_base*/
+    0,                        /*tp_dict*/
+    0,                        /*tp_descr_get*/
+    0,                        /*tp_descr_set*/
+    0,                        /*tp_dictoffset*/
+    (initproc)Entity_init,    /*tp_init*/
     };
 
 static int Window_init(PyademWindow *self, PyObject *args, PyObject *keywords) {
@@ -295,6 +332,10 @@ static int Window_init(PyademWindow *self, PyObject *args, PyObject *keywords) {
     PyErr_SetString(PyExc_RuntimeError, "invalid entity for window");
     return -1;
   }
+  self->close_callback = NULL;
+  self->window->SetCloseCallback(
+      reinterpret_cast<Diadem::Window::CloseCallback>(&WindowCloseCallback),
+      self);
   return 0;
 }
 
@@ -303,6 +344,7 @@ static void Window_dealloc(PyademWindow *self) {
     delete self->window;
     self->entity.object = NULL;  // deleted by ~Window
   }
+  Py_XDECREF(self->close_callback);
   Entity_dealloc(&self->entity);
 }
 
@@ -336,7 +378,6 @@ static PyObject* Window_endModal(PyademWindow *self) {
   return PyBool_FromLong(self->window->EndModal());
 }
 
-
 static PyMethodDef Window_methods[] = {
     { "ShowModeless", (PyCFunction)Window_showModeless, METH_NOARGS, NULL },
     { "Close",        (PyCFunction)Window_close,        METH_NOARGS, NULL },
@@ -345,11 +386,17 @@ static PyMethodDef Window_methods[] = {
     { NULL },
     };
 
+static PyMemberDef Window_members[] = {
+    { const_cast<char*>("close_callback"), T_OBJECT,
+      offsetof(PyademWindow, close_callback), 0, NULL },
+    { NULL },
+    };
+
 PyTypeObject WindowType = {
     PyObject_HEAD_INIT(NULL)
     0,                        /*ob_size*/
     "pyadem.Window",          /*tp_name*/
-    sizeof(PyademEntity),     /*tp_basicsize*/
+    sizeof(PyademWindow),     /*tp_basicsize*/
     0,                        /*tp_itemsize*/
     (destructor)Window_dealloc,/*tp_dealloc*/
     0,                        /*tp_print*/
@@ -360,29 +407,29 @@ PyTypeObject WindowType = {
     0,                        /*tp_as_number*/
     0,                        /*tp_as_sequence*/
     0,                        /*tp_as_mapping*/
-    0,                        /*tp_hash */
+    0,                        /*tp_hash*/
     0,                        /*tp_call*/
     0,                        /*tp_str*/
     0,                        /*tp_getattro*/
     0,                        /*tp_setattro*/
     0,                        /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT,       /*tp_flags*/
-    "Diadem Window",          /* tp_doc */
-    0,                        /* tp_traverse */
-    0,                        /* tp_clear */
-    0,                        /* tp_richcompare */
-    0,                        /* tp_weaklistoffset */
-    0,                        /* tp_iter */
-    0,                        /* tp_iternext */
-    Window_methods,           /* tp_methods */
-    0,                        /* tp_members */
-    0,                        /* tp_getset */
-    &EntityType,              /* tp_base */
-    0,                        /* tp_dict */
-    0,                        /* tp_descr_get */
-    0,                        /* tp_descr_set */
-    0,                        /* tp_dictoffset */
-    (initproc)Window_init,    /* tp_init */
+    "Diadem Window",          /*tp_doc*/
+    0,                        /*tp_traverse*/
+    0,                        /*tp_clear*/
+    0,                        /*tp_richcompare*/
+    0,                        /*tp_weaklistoffset*/
+    0,                        /*tp_iter*/
+    0,                        /*tp_iternext*/
+    Window_methods,           /*tp_methods*/
+    Window_members,           /*tp_members*/
+    0,                        /*tp_getset*/
+    &EntityType,              /*tp_base*/
+    0,                        /*tp_dict*/
+    0,                        /*tp_descr_get*/
+    0,                        /*tp_descr_set*/
+    0,                        /*tp_dictoffset*/
+    (initproc)Window_init,    /*tp_init*/
     };
 
 static PyObject* ChooseFolder(PyObject *self, PyObject *args) {

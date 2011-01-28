@@ -40,6 +40,7 @@ struct PyademEntity {
 struct PyademWindow {
   PyademEntity entity;
   Diadem::Window *window;
+  PyObject *close_callback;
 };
 
 extern PyTypeObject EntityType;

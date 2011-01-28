@@ -18,9 +18,10 @@
 #ifdef __OBJC__
 #include <Cocoa/Cocoa.h>
 @class ButtonTarget;
+@class WindowDelegate;
 #else
 typedef void NSWindow, NSView, NSMenuItem, NSAlert, *Class;
-typedef void ButtonTarget;
+typedef void ButtonTarget, WindowDelegate;
 struct NSPoint { CGFloat x, y; };
 #endif
 
@@ -50,7 +51,7 @@ class Cocoa {
 
   class Window : public NativeCocoa, public WindowInterface {
    public:
-    Window() : window_ref_(NULL), is_alert_(false) {}
+    Window();
     ~Window();
 
     virtual void InitializeProperties(const PropertyMap &properties);
@@ -70,13 +71,14 @@ class Cocoa {
     virtual Bool ShowModal(void *parent);
     virtual Bool EndModal();
     virtual Bool SetFocus(Entity *new_focus);
+    virtual Bool TestClose();
 
     typedef Diadem::Entity EntityType;
     typedef BorderedContainer LayoutType;
 
    protected:
     NSWindow *window_ref_;
-    Bool is_alert_;
+    WindowDelegate *delegate_;
   };
 
   class View : public NativeCocoa {

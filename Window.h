@@ -45,6 +45,21 @@ class Window {
   Bool EndModal()
     { return root_->GetNative()->GetWindowInterface()->EndModal(); }
 
+  // Function to be called when the user attempts to close a window. Return
+  // false to disallow closing.
+  typedef Bool (*CloseCallback)(Window *window, void *data);
+
+  void SetCloseCallback(CloseCallback callback, void *data) {
+    close_callback_ = callback;
+    close_data_ = data;
+  }
+  // Calls the close callback and returns the result. Returns true if no
+  // callback is set.
+  Bool AttemptClose() {
+    return (close_callback_ == NULL) ?
+        true : (*close_callback_)(this, close_data_);
+  }
+
   template <class Platform, class Parser>
   void LoadFromFile(const char *path) {
     Factory factory;
@@ -55,8 +70,9 @@ class Window {
   }
 
  protected:
-  // Root entity for window content. Owning reference.
-  Entity *root_;
+  Entity *root_;  // Root entity for window content. Owning reference.
+  CloseCallback close_callback_;
+  void *close_data_;
 };
 
 }  // namespace Diadem
