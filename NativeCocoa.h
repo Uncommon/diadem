@@ -39,6 +39,12 @@ class Cocoa {
   // string if the user cancels.
   static String ChooseFolder(const String &initial_path);
 
+  // Displays a "Save As" type dialog.
+  static String ChooseNewPath(
+      const String &prompt,
+      const String &initial_path,
+      const String &initial_name);
+
   static ButtonType ShowMessage(MessageData *message);
 
   class NativeCocoa : public Native {
@@ -160,11 +166,14 @@ class Cocoa {
     Checkbox() {}
 
     virtual void InitializeProperties(const PropertyMap &properties);
+    virtual void Finalize();
+    virtual Bool SetProperty(PropertyName name, const Value &value);
+    virtual Value GetProperty(PropertyName name) const;
 
     virtual String GetTypeName() const { return kTypeNameCheck; }
 
    protected:
-    Spacing GetInset() const { return Spacing(2, 2, 2, 0); }
+    Spacing GetInset() const { return Spacing(-2, -2, -2, 0); }
   };
 
   class Label : public Control {

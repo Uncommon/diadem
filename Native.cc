@@ -23,7 +23,8 @@ const PropertyName
     kPropStyle      = "style",
     kPropTextAlign  = "text-align",
     kPropUISize     = "uisize",
-    kPropURL        = "url";
+    kPropURL        = "url",
+    kPropValue      = "value";
 
 const TypeName
     kTypeNameWindow     = "window",

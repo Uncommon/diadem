@@ -23,7 +23,7 @@ namespace Diadem {
 
 extern const PropertyName
     kPropButtonType, kPropFile, kPropStyle, kPropTextAlign, kPropUISize,
-    kPropURL;
+    kPropURL, kPropValue;
 
 extern const TypeName
     kTypeNameWindow, kTypeNameBox, kTypeNameButton, kTypeNameCheck,

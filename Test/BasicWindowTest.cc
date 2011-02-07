@@ -156,3 +156,21 @@ TEST_F(BasicWindowTest, ParseStyle) {
   result = Diadem::Native::ParseWindowStyle("min");
   EXPECT_EQ(Diadem::kStyleMinimizable, result);
 }
+
+// Tests getting and setting a checkbox value
+TEST_F(BasicWindowTest, CheckboxValue) {
+  ReadWindowData(
+      "<window text='CheckboxValue'>"
+        "<check text='Check'/>"
+      "</window>");
+  ASSERT_EQ(1, windowRoot_->ChildrenCount());
+
+  Diadem::Entity* const checkbox = windowRoot_->ChildAt(0);
+
+  ASSERT_FALSE(checkbox->GetNative() == NULL);
+  EXPECT_STREQ(Diadem::kTypeNameCheck, checkbox->GetTypeName().Get());
+  EXPECT_EQ(0, checkbox->GetProperty(Diadem::kPropValue).Coerce<int32_t>());
+  EXPECT_TRUE(checkbox->SetProperty(Diadem::kPropValue, 1));
+  EXPECT_EQ(1, checkbox->GetProperty(Diadem::kPropValue).Coerce<int32_t>());
+}
+

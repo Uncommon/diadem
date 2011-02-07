@@ -366,3 +366,22 @@ TEST_F(CocoaTest, testWindowStyle3) {
   EXPECT_FALSE([window styleMask] & NSClosableWindowMask);
   EXPECT_FALSE([window styleMask] & NSResizableWindowMask);
 }
+
+TEST_F(CocoaTest, testCheckbox) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='CheckboxValue'>"
+        "<check text='Check'/>"
+      "</window>"));
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+
+  Diadem::Entity* const checkbox = window_root_->ChildAt(0);
+  NSButton *button = reinterpret_cast<NSButton*>(
+      checkbox->GetNative()->GetNativeRef());
+
+  ASSERT_TRUE([button isKindOfClass:[NSButton class]]);
+  EXPECT_EQ(NSOffState, [button state]);
+  EXPECT_TRUE(checkbox->SetProperty(Diadem::kPropValue, 1));
+  EXPECT_EQ(NSOnState, [button state]);
+  [button setState:NSOffState];
+  EXPECT_EQ(0, checkbox->GetProperty(Diadem::kPropValue).Coerce<int32_t>());
+}

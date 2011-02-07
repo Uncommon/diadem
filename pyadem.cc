@@ -25,6 +25,10 @@
 #include "Diadem/NativeCocoa.h"
 #include "Diadem/Value.h"
 
+#if TARGET_OS_MAC
+#define DIADEM_PLATFORM Diadem::Cocoa
+#endif
+
 // Stack-based class for acquiring Python's Global Interpreter Lock.
 // This is needed in UI event handlers that call Python callbacks. Otherwise
 // PyObject_Call can crash because the thread state is unset.
@@ -162,7 +166,7 @@ static int Entity_init(PyademEntity *self, PyObject *args, PyObject *keywords) {
   Diadem::Factory factory;
   Diadem::LibXMLParser parser(factory);
 
-  Diadem::Cocoa::SetUpFactory(&factory);
+  DIADEM_PLATFORM::SetUpFactory(&factory);
 
   if (path != NULL) {
     char *cpath = PyString_AsString(path);
@@ -228,12 +232,17 @@ static PyObject* Entity_getProperty(PyademEntity *self, PyObject *name) {
   if (self->object == NULL)
     return NULL;
 
-  PyObject *result =
-      self->object->GetProperty(PyString_AsString(name)).Coerce<PyObject*>();
+  const Diadem::Value value =
+      self->object->GetProperty(PyString_AsString(name));
+
+  if (!value.IsValid()) {
+    PyErr_SetString(PyExc_KeyError, "property not found");
+    return NULL;
+  }
 
   // Sometimes PyString_AsString sets the error indicator even when it succeeds.
   PyErr_Clear();
-  return result;
+  return value.Coerce<PyObject*>();
 }
 
 static PyObject* Entity_setProperty(PyademEntity *self, PyObject *args) {
@@ -253,7 +262,7 @@ static PyObject* Entity_setProperty(PyademEntity *self, PyObject *args) {
     return NULL;
   }
   PyErr_Clear();
-  return Py_None;
+  Py_RETURN_NONE;
 }
 
 static PyObject* Entity_findByName(PyademEntity *self, PyObject *name) {
@@ -265,8 +274,8 @@ static PyObject* Entity_findByName(PyademEntity *self, PyObject *name) {
   Diadem::Entity *entity = self->object->FindByName(name_chars);
 
   if (entity == NULL)
-    return Py_None;
-  return (PyObject*)WrapEntity(entity);
+    Py_RETURN_NONE;
+  return reinterpret_cast<PyObject*>(WrapEntity(entity));
 }
 
 static PyMethodDef Entity_methods[] = {
@@ -439,10 +448,30 @@ static PyObject* ChooseFolder(PyObject *self, PyObject *args) {
   if (PyArg_ParseTuple(args, "S", &start_string))
     start_folder = PyString_AsString(start_string);
 
-  const Diadem::String result = Diadem::Cocoa::ChooseFolder(start_folder);
+  const Diadem::String result = DIADEM_PLATFORM::ChooseFolder(start_folder);
 
-  if (strlen(result.Get()) == 0)
-    return Py_None;
+  if (result.IsEmpty())
+    Py_RETURN_NONE;
+  return PyString_FromString(result.Get());
+}
+
+static PyObject* ChooseNewPath(
+    PyObject *self, PyObject *args, PyObject *keywords) {
+  static const char *keys[] = { "prompt", "path", "name", NULL };
+  PyObject *prompt = NULL, *path = NULL, *name = NULL;
+
+  if (!PyArg_ParseTupleAndKeywords(
+      args, keywords, "|SSS", const_cast<char**>(keys),
+      &prompt, &path, &name))
+    return NULL;
+
+  const Diadem::String result = DIADEM_PLATFORM::ChooseNewPath(
+      Diadem::String((prompt == NULL) ? "" : PyString_AsString(prompt)),
+      Diadem::String((path == NULL) ? "" : PyString_AsString(path)),
+      Diadem::String((name == NULL) ? "" : PyString_AsString(name)));
+
+  if (result.IsEmpty())
+    Py_RETURN_NONE;
   return PyString_FromString(result.Get());
 }
 
@@ -482,7 +511,7 @@ static PyObject* ShowMessage(
       data.suppress_text_ = PyString_AsString(suppress);
   }
 
-  const Diadem::ButtonType button = Diadem::Cocoa::ShowMessage(&data);
+  const Diadem::ButtonType button = DIADEM_PLATFORM::ShowMessage(&data);
   const char *button_name;
 
   switch (button) {
@@ -506,9 +535,11 @@ static PyObject* ShowMessage(
 
 static PyMethodDef Pyadem_Methods[] = {
     { "ChooseFolder", ChooseFolder, METH_VARARGS,
-      "Ask the user to choose a folder." },
+      "Asks the user to choose a folder." },
+    { "ChooseNewPath", (PyCFunction)ChooseNewPath, METH_VARARGS | METH_KEYWORDS,
+      "Displays a Save As prompt." },
     { "ShowMessage", (PyCFunction)ShowMessage, METH_VARARGS | METH_KEYWORDS,
-      "Display a message or prompt." },
+      "Displays a message or prompt." },
     { NULL },
     };
 
@@ -541,4 +572,6 @@ initpyadem() {
       module, "PROP_IN_LAYOUT", Diadem::kPropInLayout);
   PyModule_AddStringConstant(
       module, "PROP_URL", Diadem::kPropURL);
+  PyModule_AddStringConstant(
+      module, "PROP_VALUE", Diadem::kPropValue);
 }

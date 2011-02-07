@@ -16,6 +16,10 @@
 #include "Diadem/Factory.h"
 #include "Diadem/Layout.h"
 
+// Measurements (mostly for padding) have two main sources: the Apple Human
+// Interface Guidelines (AHIG), and the distances that Interface Builder (IB)
+// snaps to. Conflicts are resolved by judgment call.
+
 namespace {
 
 NSString* NSStringWithString(const Diadem::String string) {
@@ -236,6 +240,29 @@ String Cocoa::ChooseFolder(const String &initial_path) {
   if ([urls count] == 0)
     return String();
   return String([[[urls objectAtIndex:0] path] fileSystemRepresentation]);
+}
+
+String Cocoa::ChooseNewPath(
+    const String &prompt,
+    const String &initial_path,
+    const String &initial_name) {
+  ScopedAutoreleasePool pool;
+  NSSavePanel *panel = [NSSavePanel savePanel];
+  NSString *path = nil, *name = nil;
+
+  if (!prompt.IsEmpty())
+    [panel setPrompt:[NSString stringWithUTF8String:prompt.Get()]];
+  if (!initial_path.IsEmpty())
+    path = [NSString stringWithUTF8String:initial_path.Get()];
+  if (!initial_name.IsEmpty())
+    name = [NSString stringWithUTF8String:initial_name.Get()];
+
+  const NSInteger result = [panel runModalForDirectory:path file:name];
+
+  if (result == NSOKButton)
+    return String([[[panel URL] path] UTF8String]);
+  else
+    return String();
 }
 
 NSAlert* Cocoa::AlertForMessageData(MessageData *message) {
@@ -564,9 +591,11 @@ void Cocoa::Box::InitializeProperties(const PropertyMap &properties) {
 
 Value Cocoa::Box::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropMargins) == 0) {
-    return Spacing(20, 20, 20, 20);
+    // AHIG: 10, 16, 16, 16  IB: 11, 16, 11, 16
+    return Spacing(10, 16, 16, 16);
   }
   if (strcmp(name, kPropPadding) == 0) {
+    // AHIG: no recommendation  IB: 8, seems too small
     return Spacing(12, 12, 12, 12);
   }
   return View::GetProperty(name);
@@ -604,11 +633,15 @@ Bool Cocoa::Control::SetProperty(PropertyName name, const Value &value) {
     [(NSControl*)view_ref_ setEnabled:value.Coerce<Bool>()];
     return true;
   }
+  if (strcmp(name, kPropValue) == 0) {
+    [(NSControl*)view_ref_ setIntValue:value.Coerce<int32_t>()];
+    return true;
+  }
   return View::SetProperty(name, value);
 }
 
 // -cellSize is documented to return this in some cases
-static NSSize kMaxCellSize = { 10000, 10000 };
+static const NSSize kMaxCellSize = { 10000, 10000 };
 
 Value Cocoa::Control::GetProperty(PropertyName name) const {
   ScopedAutoreleasePool pool;
@@ -628,7 +661,10 @@ Value Cocoa::Control::GetProperty(PropertyName name) const {
     return String([text UTF8String]);
   }
   if (strcmp(name, kPropEnabled) == 0) {
-    return (Bool)[(NSControl*)view_ref_ isEnabled];
+    return static_cast<Bool>([(NSControl*)view_ref_ isEnabled]);
+  }
+  if (strcmp(name, kPropValue) == 0) {
+    return static_cast<int32_t>([(NSControl*)view_ref_ intValue]);
   }
   return View::GetProperty(name);
 }
@@ -698,10 +734,17 @@ Value Cocoa::Button::GetProperty(PropertyName name) const {
     return min_size;
   }
   if (strcmp(name, kPropPadding) == 0) {
-    if ([[(NSButton*)view_ref_ cell] controlSize] == NSSmallControlSize)
-      return Spacing(10, 10, 10, 10);
-    else
-      return Spacing(12, 12, 12, 12);
+    // AHIG and IB agree on 12/10/8
+    switch ([[(NSButton*)view_ref_ cell] controlSize]) {
+      case NSRegularControlSize:
+        return Spacing(12, 12, 12, 12);
+      case NSSmallControlSize:
+        return Spacing(10, 10, 10, 10);
+      case NSMiniControlSize:
+        return Spacing(8, 8, 8, 8);
+      default:
+        return Value();
+    }
   }
   if (strcmp(name, kPropText) == 0) {
     NSString *text = [(NSButton*)view_ref_ title];
@@ -718,8 +761,8 @@ Value Cocoa::Button::GetProperty(PropertyName name) const {
 }
 
 Spacing Cocoa::Button::GetInset() const {
-  // extra space on botom for the shadow, apparently
-  // the need for the left/right inset is mysterious
+  // Extra space on botom for the shadow, apparently.
+  // The need for the left/right inset is mysterious.
   if ([[(NSButton*)view_ref_ cell] controlSize] == NSSmallControlSize)
     return Spacing(-3, -5, -6, -5);
   else
@@ -735,6 +778,35 @@ void Cocoa::Checkbox::InitializeProperties(const PropertyMap &properties) {
     [(NSButton*)view_ref_ setTitle:
         NSStringWithString(properties[kPropText].Coerce<String>())];
   ConfigureView();
+}
+
+void Cocoa::Checkbox::Finalize() {
+  // Setting this in InitializeProperties doesn't work.
+  [(NSButton*)view_ref_ setState:NSOffState];
+}
+
+Bool Cocoa::Checkbox::SetProperty(PropertyName name, const Value &value) {
+  if (strcmp(name, kPropValue) == 0) {
+    [(NSButton*)view_ref_ setState:value.Coerce<Bool>() ?
+        NSOnState : NSOffState];
+  }
+  return Control::SetProperty(name, value);
+}
+
+Value Cocoa::Checkbox::GetProperty(PropertyName name) const {
+  ScopedAutoreleasePool pool;
+
+  if (strcmp(name, kPropPadding) == 0) {
+    // AHIG recommends 8 pixels for normal/small, but Interface Builder uses 6.
+    if ([[(NSButton*)view_ref_ cell] controlSize] == NSMiniControlSize)
+      return Spacing(5, 5, 5, 5);
+    else  // regular and small
+      return Spacing(6, 6, 6, 6);
+  }
+  if (strcmp(name, kPropValue) == 0) {
+    return static_cast<int32_t>([(NSButton*)view_ref_ state]);
+  }
+  return Control::GetProperty(name);
 }
 
 void Cocoa::Label::InitializeProperties(const PropertyMap &properties) {
@@ -766,7 +838,17 @@ Value Cocoa::Label::GetProperty(PropertyName name) const {
   ScopedAutoreleasePool pool;
 
   if (strcmp(name, kPropPadding) == 0) {
-    return Spacing(8, 8, 8, 8);
+    // AHIG recommends 8/6/5, IB uses 8
+    switch ([[(NSControl*)view_ref_ cell] controlSize]) {
+      case NSRegularControlSize:
+        return Spacing(8, 8, 8, 8);
+      case NSSmallControlSize:
+        return Spacing(6, 6, 6, 6);
+      case NSMiniControlSize:
+        return Spacing(5, 5, 5, 5);
+      default:
+        return Value();
+    }
   }
   if (strcmp(name, kPropMinimumSize) == 0) {
     Layout *layout = entity_->GetLayout();
@@ -878,7 +960,8 @@ Class Cocoa::EditField::GetTextFieldClass() {
 
 Value Cocoa::EditField::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropPadding) == 0) {
-    return Spacing(10, 10, 10, 10);
+    // AHIG and IB agree
+    return Spacing(10, 8, 10, 8);
   }
   if (strcmp(name, kPropBaseline) == 0) {
     return 16;
@@ -910,7 +993,8 @@ void Cocoa::PathBox::InitializeProperties(const PropertyMap &properties) {
 
 Value Cocoa::PathBox::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropPadding) == 0) {
-    return Spacing(10, 10, 10, 10);
+    // Use same as edit field
+    return Spacing(10, 8, 10, 8);
   }
   if (strcmp(name, kPropMinimumSize) == 0) {
     return Size(20, 20);
@@ -1010,7 +1094,17 @@ void Cocoa::Popup::InitializeProperties(const PropertyMap &properties) {
 
 Value Cocoa::Popup::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropPadding) == 0) {
-    return Spacing(10, 8, 10, 8);
+    // Using AHIG spacing.
+    switch ([[(NSControl*)view_ref_ cell] controlSize]) {
+      case NSRegularControlSize:
+        return Spacing(10, 8, 10, 8);
+      case NSSmallControlSize:
+        return Spacing(8, 6, 8, 6);
+      case NSMiniControlSize:
+        return Spacing(6, 5, 6, 5);
+      default:
+        return Value();
+    }
   }
   if (strcmp(name, kPropBaseline) == 0) {
     return 15;  // depending on UI size
