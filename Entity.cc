@@ -186,7 +186,7 @@ Entity* Entity::FindByName(const char *name) {
   return NULL;
 }
 
-Bool Entity::SetProperty(const char *name, const Value &value) {
+bool Entity::SetProperty(const char *name, const Value &value) {
   if (strcmp(name, kPropName) == 0) {
     SetName(value.Coerce<String>());
     return true;
@@ -209,7 +209,7 @@ Value Entity::GetProperty(const char *name) const {
   return GetNativeProperty(name);
 }
 
-Bool Entity::SetLayoutProperty(const char *name, const Value &value) {
+bool Entity::SetLayoutProperty(const char *name, const Value &value) {
   if (layout_ != NULL)
     return layout_->SetProperty(name, value);
   return false;
@@ -221,7 +221,7 @@ Value Entity::GetLayoutProperty(const char *name) const {
   return Value();
 }
 
-Bool Entity::SetNativeProperty(const char *name, const Value &value) {
+bool Entity::SetNativeProperty(const char *name, const Value &value) {
   if (native_ != NULL)
     return native_->SetProperty(name, value);
   return false;
@@ -250,7 +250,7 @@ void Entity::Clicked(Entity *target) {
     GetParent()->Clicked(target);
 }
 
-Bool EntityDelegate::SetProperty(PropertyName name, const Value &value) {
+bool EntityDelegate::SetProperty(PropertyName name, const Value &value) {
   return false;
 }
 

@@ -65,19 +65,19 @@ class Cocoa {
 
     virtual String GetTypeName() const { return kTypeNameWindow; }
 
-    virtual Bool SetProperty(PropertyName name, const Value &value);
+    virtual bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
     virtual void AddChild(Native *child);
 
     void* GetNativeRef() { return window_ref_; }
 
     // WindowInterface
-    virtual Bool ShowModeless();
-    virtual Bool Close();
-    virtual Bool ShowModal(void *parent);
-    virtual Bool EndModal();
-    virtual Bool SetFocus(Entity *new_focus);
-    virtual Bool TestClose();
+    virtual bool ShowModeless();
+    virtual bool Close();
+    virtual bool ShowModal(void *parent);
+    virtual bool EndModal();
+    virtual bool SetFocus(Entity *new_focus);
+    virtual bool TestClose();
 
     typedef Diadem::Entity EntityType;
     typedef BorderedContainer LayoutType;
@@ -92,7 +92,7 @@ class Cocoa {
     View() : view_ref_(NULL) {}
     virtual ~View();
 
-    virtual Bool SetProperty(PropertyName name, const Value &value);
+    virtual bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
 
     void* GetNativeRef() { return view_ref_; }
@@ -127,7 +127,7 @@ class Cocoa {
     // Adds children as subviews
     virtual void AddChild(Native *child);
     // A box is a native superview
-    virtual Bool IsSuperview() const { return true; }
+    virtual bool IsSuperview() const { return true; }
     // Returns an offset to compensate for the box's metrics
     virtual Location GetSubviewAdjustment() const;
 
@@ -139,7 +139,7 @@ class Cocoa {
     Control() {}
     virtual ~Control() {}
 
-    virtual Bool SetProperty(PropertyName name, const Value &value);
+    virtual bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
   };
 
@@ -163,7 +163,7 @@ class Cocoa {
 
     virtual String GetTypeName() const { return kTypeNameButton; }
 
-    virtual Bool SetProperty(PropertyName name, const Value &value);
+    virtual bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
 
     virtual Spacing GetInset() const;
@@ -175,7 +175,7 @@ class Cocoa {
 
     virtual void InitializeProperties(const PropertyMap &properties);
     virtual void Finalize();
-    virtual Bool SetProperty(PropertyName name, const Value &value);
+    virtual bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
 
     virtual String GetTypeName() const { return kTypeNameCheck; }
@@ -191,7 +191,7 @@ class Cocoa {
     virtual void InitializeProperties(const PropertyMap &properties);
     virtual String GetTypeName() const { return kTypeNameLabel; }
     virtual Value GetProperty(PropertyName name) const;
-    virtual Bool SetProperty(PropertyName name, const Value &value);
+    virtual bool SetProperty(PropertyName name, const Value &value);
 
     virtual Spacing GetInset() const;
   };
@@ -202,7 +202,7 @@ class Cocoa {
 
     void InitializeProperties(const PropertyMap &properties);
     String GetTypeName() const { return kTypeNameLink; }
-    Bool SetProperty(PropertyName name, const Value &value);
+    bool SetProperty(PropertyName name, const Value &value);
 
     void SetURL(const String &url);
   };
@@ -214,7 +214,7 @@ class Cocoa {
     void InitializeProperties(const PropertyMap &properties);
     virtual String GetTypeName() const { return kTypeNameEdit; }
     Value GetProperty(PropertyName name) const;
-    Bool SetProperty(PropertyName name, const Value &value);
+    bool SetProperty(PropertyName name, const Value &value);
 
    protected:
     virtual Class GetTextFieldClass();
@@ -237,7 +237,7 @@ class Cocoa {
     void InitializeProperties(const PropertyMap &properties);
     virtual String GetTypeName() const { return kTypeNamePath; }
     Value GetProperty(PropertyName name) const;
-    Bool SetProperty(PropertyName name, const Value &value);
+    bool SetProperty(PropertyName name, const Value &value);
   };
 
   class Separator : public Control {
@@ -278,7 +278,7 @@ class Cocoa {
     void InitializeProperties(const PropertyMap &properties);
     String GetTypeName() const { return kTypeNameItem; }
     void* GetNativeRef() { return item_; }
-    Bool SetProperty(PropertyName name, const Value &value);
+    bool SetProperty(PropertyName name, const Value &value);
     Value GetProperty(PropertyName name) const;
 
     typedef Entity EntityType;

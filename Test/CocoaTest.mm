@@ -245,24 +245,22 @@ TEST_F(CocoaTest, Enabled) {
 
   ASSERT_FALSE(item == NULL);
 
-  EXPECT_TRUE(button->GetProperty(Diadem::kPropEnabled).Coerce<Diadem::Bool>());
-  EXPECT_TRUE(popup->GetProperty(Diadem::kPropEnabled).Coerce<Diadem::Bool>());
-  EXPECT_TRUE(item->GetProperty(Diadem::kPropEnabled).Coerce<Diadem::Bool>());
+  EXPECT_TRUE(button->GetProperty(Diadem::kPropEnabled).Coerce<bool>());
+  EXPECT_TRUE(popup->GetProperty(Diadem::kPropEnabled).Coerce<bool>());
+  EXPECT_TRUE(item->GetProperty(Diadem::kPropEnabled).Coerce<bool>());
 
   EXPECT_TRUE(button->SetProperty(Diadem::kPropEnabled, false));
   EXPECT_FALSE([(id)button->GetNative()->GetNativeRef() isEnabled]);
   EXPECT_FALSE(button->GetProperty(
-      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
+      Diadem::kPropEnabled).Coerce<bool>());
 
   EXPECT_TRUE(popup->SetProperty(Diadem::kPropEnabled, false));
   EXPECT_FALSE([(id)popup->GetNative()->GetNativeRef() isEnabled]);
-  EXPECT_FALSE(popup->GetProperty(
-      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
+  EXPECT_FALSE(popup->GetProperty(Diadem::kPropEnabled).Coerce<bool>());
 
   EXPECT_TRUE(item->SetProperty(Diadem::kPropEnabled, false));
   EXPECT_FALSE([(id)item->GetNative()->GetNativeRef() isEnabled]);
-  EXPECT_FALSE(item->GetProperty(
-      Diadem::kPropEnabled).Coerce<Diadem::Bool>());
+  EXPECT_FALSE(item->GetProperty(Diadem::kPropEnabled).Coerce<bool>());
 }
 
 // Simple case for ShowMessage - message with OK buton
@@ -379,9 +377,9 @@ TEST_F(CocoaTest, testCheckbox) {
       checkbox->GetNative()->GetNativeRef());
 
   ASSERT_TRUE([button isKindOfClass:[NSButton class]]);
-  EXPECT_EQ(NSOffState, [button state]);
+  EXPECT_EQ((NSCellStateValue)NSOffState, [button state]);
   EXPECT_TRUE(checkbox->SetProperty(Diadem::kPropValue, 1));
-  EXPECT_EQ(NSOnState, [button state]);
+  EXPECT_EQ((NSCellStateValue)NSOnState, [button state]);
   [button setState:NSOffState];
   EXPECT_EQ(0, checkbox->GetProperty(Diadem::kPropValue).Coerce<int32_t>());
   EXPECT_FALSE([button target] == nil);

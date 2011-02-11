@@ -48,7 +48,7 @@ class Value {
 #define Value_Construct(T) \
   Value(const T &t) : holder_(new ValueHolder<T>(t)) {}
 
-  Value_Construct(Bool)
+  Value_Construct(bool)
   Value_Construct(int32_t)
   Value_Construct(uint32_t)
   Value_Construct(int64_t)
@@ -72,10 +72,10 @@ class Value {
 
   ~Value() { delete holder_; }
 
-  Bool IsValid() const { return holder_ != NULL; }
+  bool IsValid() const { return holder_ != NULL; }
 
   template <class T>
-  Bool IsValueType() const
+  bool IsValueType() const
     { return (holder_ != NULL) && (holder_->Type() == typeid(T)); }
 
   void Clear() {
@@ -117,7 +117,7 @@ class Value {
     // cannot be virtual.
     virtual int32_t Coerce(const type<int32_t>&) const = 0;
     virtual int64_t Coerce(const type<int64_t>&) const = 0;
-    virtual Bool Coerce(const type<Bool>&) const = 0;
+    virtual bool Coerce(const type<bool>&) const = 0;
     virtual String Coerce(const type<String>&) const = 0;
     virtual double Coerce(const type<double>&) const = 0;
     virtual Spacing Coerce(const type<Spacing>&) const = 0;
@@ -146,7 +146,7 @@ class Value {
     // by specializations below.
     int32_t Coerce(const type<int32_t>&) const { return (int32_t)data; }
     int64_t Coerce(const type<int64_t>&) const { return (int64_t)data; }
-    Bool    Coerce(const type<Bool>&) const    { return data ? true : false; }
+    bool    Coerce(const type<bool>&) const    { return data ? true : false; }
     String  Coerce(const type<String>&) const
         { return StringFromInt((int)data); }
     double  Coerce(const type<double>&) const  { return (double)data; }
@@ -168,8 +168,8 @@ template<> inline int32_t Value::ValueHolder<String>::Coerce(
     const Value::type<int32_t>&) const { return data.ToInteger(); }
 template<> inline int64_t Value::ValueHolder<String>::Coerce(
     const Value::type<int64_t>&) const { return data.ToInteger64(); }
-template<> inline Bool Value::ValueHolder<String>::Coerce(
-    const Value::type<Bool>&) const
+template<> inline bool Value::ValueHolder<String>::Coerce(
+    const Value::type<bool>&) const
   { return Coerce(Value::type<int32_t>()) ? true : false; }
 template<> inline String Value::ValueHolder<String>::Coerce(
     const Value::type<String>&) const { return data; }
@@ -180,7 +180,7 @@ template<> inline double Value::ValueHolder<String>::Coerce(
   template<> inline T Value::ValueHolder<T>::Coerce( \
       const Value::type<T>&) const { return data; }
 
-ValueReturnData(Bool)
+ValueReturnData(bool)
 ValueReturnData(Spacing)
 ValueReturnData(Location)
 
@@ -189,8 +189,8 @@ ValueReturnData(Location)
       const Value::type<int32_t>&) const { return 0; } \
   template<> inline int64_t Value::ValueHolder<T>::Coerce( \
       const Value::type<int64_t>&) const { return 0; } \
-  template<> inline Bool Value::ValueHolder<T>::Coerce( \
-      const Value::type<Bool>&) const { return false; } \
+  template<> inline bool Value::ValueHolder<T>::Coerce( \
+      const Value::type<bool>&) const { return false; } \
   template<> inline String Value::ValueHolder<T>::Coerce( \
       const Value::type<String>&) const { return String(); } \
   template<> inline double Value::ValueHolder<T>::Coerce( \
@@ -207,8 +207,8 @@ CoerceToPODZero(Location)
 template<> inline int32_t Value::ValueHolder<PyObjectPtr>::Coerce(
     const Value::type<int32_t>&) const { return PyInt_AsLong(data); }
 // there is no PyInt_AsLongLong
-template<> inline Bool Value::ValueHolder<PyObjectPtr>::Coerce(
-    const Value::type<Bool>&) const { return PyObject_IsTrue(data); }
+template<> inline bool Value::ValueHolder<PyObjectPtr>::Coerce(
+    const Value::type<bool>&) const { return PyObject_IsTrue(data); }
 template<> inline String Value::ValueHolder<PyObjectPtr>::Coerce(
     const Value::type<String>&) const { return PyString_AsString(data); }
 template<> inline double Value::ValueHolder<PyObjectPtr>::Coerce(
@@ -217,7 +217,7 @@ template<> inline double Value::ValueHolder<PyObjectPtr>::Coerce(
 
 template<> inline PyObjectPtr Value::ValueHolder<int32_t>::Coerce(
     const Value::type<PyObjectPtr>&) const { return PyInt_FromLong(data); }
-template<> inline PyObjectPtr Value::ValueHolder<Bool>::Coerce(
+template<> inline PyObjectPtr Value::ValueHolder<bool>::Coerce(
     const Value::type<PyObjectPtr>&) const { return PyBool_FromLong(data); }
 template<> inline PyObjectPtr Value::ValueHolder<String>::Coerce(
     const Value::type<PyObjectPtr>&) const { return PyString_FromString(data); }

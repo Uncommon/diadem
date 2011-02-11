@@ -43,7 +43,7 @@ void LabelGroup::InitializeProperties(
   Entity::InitializeProperties(properties, factory);
 }
 
-Bool LabelGroup::SetProperty(PropertyName name, const Value &value) {
+bool LabelGroup::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropText) == 0) {
     label_->SetProperty(kPropText, value);
     return true;
@@ -84,7 +84,7 @@ void LabelGroup::InitializeLayout(Layout *layout) {
   layout->ChildAdded(content_);
 }
 
-Bool ColumnLabelLayout::SetProperty(PropertyName name, const Value &value) {
+bool ColumnLabelLayout::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropColumnWidthName)) {
     label_group_->GetLabel()->SetProperty(kPropWidthName, value);
     return true;

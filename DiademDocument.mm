@@ -175,7 +175,7 @@
   if (entity->GetLayout() == NULL)
     return;
   if ((entity != entity_) &&
-      !entity->GetProperty(Diadem::kPropVisible).Coerce<Diadem::Bool>())
+      !entity->GetProperty(Diadem::kPropVisible).Coerce<bool>())
     return;
 
   const Diadem::Location loc = (entity->GetParent() == NULL) ?

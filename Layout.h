@@ -71,7 +71,7 @@ class Layout : public EntityDelegate {
   Layout* GetLayoutParent();
   const Layout* GetLayoutParent() const;
 
-  virtual Bool SetProperty(PropertyName name, const Value &value);
+  virtual bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
 
   virtual void Finalize() { ResizeToMinimum(); }
@@ -114,15 +114,15 @@ class Layout : public EntityDelegate {
 
   // Visibility is simply whether the object is displayed, though it still
   // may take up space in the layout.
-  void SetVisible(Bool visible)
+  void SetVisible(bool visible)
     { entity_->SetNativeProperty(kPropVisible, visible); }
-  Bool IsVisible() const
-    { return entity_->GetNativeProperty(kPropVisible).Coerce<Bool>(); }
+  bool IsVisible() const
+    { return entity_->GetNativeProperty(kPropVisible).Coerce<bool>(); }
 
   // "Not in layout" means it takes up no space in the layout. It also implies
   // not visible.
-  void SetInLayout(Bool in_layout);
-  Bool IsInLayout() const { return in_layout_; }
+  void SetInLayout(bool in_layout);
+  bool IsInLayout() const { return in_layout_; }
 
   const String& GetWidthName() const  { return width_name_; }
   const String& GetHeightName() const { return height_name_; }
@@ -141,7 +141,7 @@ class Layout : public EntityDelegate {
   const PlatformMetrics& GetPlatformMetrics() const;
 
  protected:
-  Bool in_layout_;
+  bool in_layout_;
   SizeOption h_size_, v_size_;
   ExplicitSize explicit_size_;
   String width_name_, height_name_;
@@ -202,7 +202,7 @@ class LayoutContainer : public Layout {
         stream_align_(kAlignStart), cross_align_(kAlignStart) {}
   virtual ~LayoutContainer() {}
 
-  virtual Bool SetProperty(PropertyName name, const Value &value);
+  virtual bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
 
   virtual LayoutDirection GetDirection() const { return direction_; }
@@ -223,7 +223,7 @@ class LayoutContainer : public Layout {
 
  protected:
   LayoutDirection direction_;
-  Bool visible_;
+  bool visible_;
   AlignOption stream_align_, cross_align_;
   mutable Size cached_min_size_;
   mutable Size max_size_;
@@ -251,7 +251,7 @@ class LayoutContainer : public Layout {
 
   // Return true if the application is running in an RTL language, indicating
   // to ArrangeObjects that rows should be laid out in reverse order.
-  Bool IsRTL() const { return false; }  // TODO(catmull): implement
+  bool IsRTL() const { return false; }  // TODO(catmull): implement
 
   // Convenience functions to make layout code more readable.  For rows,
   // "stream" is horizontal and "cross" is vertical.  Opposite for columns.
@@ -328,7 +328,7 @@ class Group : public LayoutContainer {
   virtual Size GetSize() const { return size_; }
   virtual Location GetLocation() const { return location_; }
 
-  virtual Bool SetProperty(PropertyName name, const Value &value);
+  virtual bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
 
  protected:

@@ -94,15 +94,15 @@ class Entity : public Base {
   const Window* GetWindow() const;
 
   // Gets/sets a named property, which may be delegated to a helper.
-  virtual Bool SetProperty(PropertyName name, const Value &value);
+  virtual bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
 
   // Shortcuts for when the caller knows Layout will handle the property.
-  virtual Bool SetLayoutProperty(PropertyName name, const Value &value);
+  virtual bool SetLayoutProperty(PropertyName name, const Value &value);
   virtual Value GetLayoutProperty(PropertyName name) const;
 
   // Shortcuts for when the caller knows Native will handle the property.
-  virtual Bool SetNativeProperty(PropertyName name, const Value &value);
+  virtual bool SetNativeProperty(PropertyName name, const Value &value);
   virtual Value GetNativeProperty(PropertyName name) const;
 
   // Every Entity can have a name, which should be unique within the hierarchy
@@ -177,7 +177,7 @@ class EntityDelegate : public Base {
 
   virtual void InitializeProperties(const PropertyMap &properties) {}
 
-  virtual Bool SetProperty(PropertyName name, const Value &value);
+  virtual bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
 
  protected:

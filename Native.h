@@ -64,7 +64,7 @@ class Native : public EntityDelegate {
 
   // If the object is a superview that contains native objects for child
   // entities, adjustments need to be made to their locations.
-  virtual Bool IsSuperview() const { return false; }
+  virtual bool IsSuperview() const { return false; }
   virtual Location GetSubviewAdjustment() const { return Location(); }
 
   virtual const PlatformMetrics& GetPlatformMetrics() const = 0;
@@ -96,9 +96,9 @@ struct MessageData {
   // "OK", "Cancel", "Don't Save", "Don't show this message again".
   String accept_text_, cancel_text_, other_text_, suppress_text_;
   // True if the button should be shown. The accept button is always shown.
-  Bool show_cancel_, show_other_, show_suppress_;
+  bool show_cancel_, show_other_, show_suppress_;
   // True if the user clicked the suppress button.
-  Bool suppressed_;
+  bool suppressed_;
   // Which button should be activated by the enter/return key.
   ButtonType default_button_;
 };
@@ -111,18 +111,18 @@ class WindowInterface {
   // error.
 
   // Shows the window for use as a modeless dialog.
-  virtual Bool ShowModeless() = 0;
+  virtual bool ShowModeless() = 0;
   // Hides a modeless window.
-  virtual Bool Close() = 0;
+  virtual bool Close() = 0;
   // Shows the window and starts a blocking modal event loop.
-  virtual Bool ShowModal(void *parent) = 0;
+  virtual bool ShowModal(void *parent) = 0;
   // Ends a modal event loop. Returns false if the window is not modal.
-  virtual Bool EndModal() = 0;
+  virtual bool EndModal() = 0;
   // Sets the user focus to the given entity's control.
-  virtual Bool SetFocus(Entity *new_focus) = 0;
+  virtual bool SetFocus(Entity *new_focus) = 0;
 
   // Methods for testing
-  virtual Bool TestClose() { return false; }
+  virtual bool TestClose() { return false; }
 };
 
 }  // namespace Diadem

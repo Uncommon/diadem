@@ -35,7 +35,7 @@ class LabelGroup : public Entity {
       const Factory &factory);
 
   // Reads the "type" property to specify layout: column, indent, etc.
-  virtual Bool SetProperty(PropertyName name, const Value &value);
+  virtual bool SetProperty(PropertyName name, const Value &value);
 
   // Children are added to the content group instead.
   virtual void AddChild(Entity *child);
@@ -72,7 +72,7 @@ class ColumnLabelLayout : public LabelGroupLayout {
   explicit ColumnLabelLayout(LabelGroup *group) : LabelGroupLayout(group) {}
 
   virtual void Finalize();
-  virtual Bool SetProperty(PropertyName name, const Value &value);
+  virtual bool SetProperty(PropertyName name, const Value &value);
 };
 
 // The label appears left-aligned above, and the content is indented below.

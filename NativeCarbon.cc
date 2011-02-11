@@ -127,7 +127,7 @@ Carbon::Window::~Window() {
     ::CFRelease(window_ref_);
 }
 
-Bool Carbon::Window::SetProperty(PropertyName name, const Value &value) {
+bool Carbon::Window::SetProperty(PropertyName name, const Value &value) {
   if (window_ref_ == NULL)
     return false;
   if (strcmp(name, kPropText) == 0) {
@@ -184,7 +184,7 @@ void Carbon::Window::AddChild(Native *child) {
     ::HIViewAddSubview(content_view, (HIViewRef)child->GetNativeRef());
 }
 
-Bool Carbon::Window::ShowModeless() {
+bool Carbon::Window::ShowModeless() {
   if (window_ref_ == NULL)
     return false;
   ::SelectWindow(window_ref_);
@@ -192,14 +192,14 @@ Bool Carbon::Window::ShowModeless() {
   return true;
 }
 
-Bool Carbon::Window::Close() {
+bool Carbon::Window::Close() {
   if (window_ref_ == NULL)
     return false;
   ::HideWindow(window_ref_);
   return true;
 }
 
-Bool Carbon::Window::ShowModal(void *on_parent) {
+bool Carbon::Window::ShowModal(void *on_parent) {
   if (window_ref_ == NULL)
     return false;
 
@@ -229,7 +229,7 @@ Bool Carbon::Window::ShowModal(void *on_parent) {
   return true;
 }
 
-Bool Carbon::Window::EndModal() {
+bool Carbon::Window::EndModal() {
   if (window_ref_ == NULL)
     return false;
 
@@ -242,7 +242,7 @@ Bool Carbon::Window::EndModal() {
   return true;
 }
 
-Bool Carbon::Window::SetFocus(Entity *new_focus) {
+bool Carbon::Window::SetFocus(Entity *new_focus) {
   if ((window_ref_ == NULL) || (new_focus == NULL) ||
       (new_focus->GetNative() == NULL) ||
       (new_focus->GetNative()->GetNativeRef() == NULL))
@@ -263,7 +263,7 @@ Carbon::Control::~Control() {
     ::CFRelease(view_ref_);
 }
 
-Bool Carbon::Control::SetProperty(PropertyName name, const Value &value) {
+bool Carbon::Control::SetProperty(PropertyName name, const Value &value) {
   if (view_ref_ == NULL)
     return false;
   if (strcmp(name, kPropLocation) == 0) {
@@ -290,7 +290,7 @@ Bool Carbon::Control::SetProperty(PropertyName name, const Value &value) {
     return ::HIViewSetText(view_ref_, cf_text) == noErr;
   }
   if (strcmp(name, kPropVisible) == 0) {
-    ::HIViewSetVisible(view_ref_, value.Coerce<Bool>());
+    ::HIViewSetVisible(view_ref_, value.Coerce<bool>());
   }
   return false;
 }
@@ -319,7 +319,7 @@ Value Carbon::Control::GetProperty(PropertyName name) const {
     return GetSize() - GetInset();
   }
   if (strcmp(name, kPropVisible) == 0) {
-    return (Bool)::HIViewIsVisible(view_ref_);
+    return (bool)::HIViewIsVisible(view_ref_);
   }
   return Value();
 }
@@ -344,7 +344,7 @@ void Carbon::Button::InitializeProperties(const PropertyMap &properties) {
   ::CreatePushButtonControl(NULL, &default_bounds, title, &view_ref_);
 }
 
-Bool Carbon::Button::SetProperty(PropertyName name, const Value &value) {
+bool Carbon::Button::SetProperty(PropertyName name, const Value &value) {
   return Control::SetProperty(name, value);
 }
 
@@ -387,7 +387,7 @@ Value Carbon::Label::GetProperty(PropertyName name) const {
   }
   if (strcmp(name, kPropMinimumSize) == 0) {
     float wrap_width = 0;
-    Bool variable = false;
+    bool variable = false;
 
 #if 0  // TODO(catmull): variable height
     GetControlProperty(view_ref_, kFenSig, 'VHgt', variable);

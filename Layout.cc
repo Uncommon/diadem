@@ -61,7 +61,7 @@ const StringConstant
 // size. Fit is the smallest size that will fit the object's contents. Fill
 // expands to take up any extra space in the parent container. Default will
 // vary depending on the object type.
-static Bool ParseSizeOption(const char *c, SizeOption *size) {
+static bool ParseSizeOption(const char *c, SizeOption *size) {
   const char* strings[3] = {
       "default", "fit", "fill" };
   const SizeOption options[3] = { kSizeDefault, kSizeFit, kSizeFill };
@@ -159,9 +159,9 @@ Layout::LayoutDirection Layout::GetDirection() const {
   return parent->GetDirection();
 }
 
-Bool Layout::SetProperty(PropertyName name, const Value &value) {
+bool Layout::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropInLayout) == 0) {
-    in_layout_ = value.Coerce<Bool>();
+    in_layout_ = value.Coerce<bool>();
     return true;
   }
   if (strcmp(name, kPropWidthOption) == 0) {
@@ -331,7 +331,7 @@ uint32_t Layout::FindDimensionForName(
   return max;
 }
 
-void Layout::SetInLayout(Bool in_layout) {
+void Layout::SetInLayout(bool in_layout) {
   in_layout_ = in_layout;
   SetVisible(in_layout);
 }
@@ -350,7 +350,7 @@ const PlatformMetrics& Layout::GetPlatformMetrics() const {
   return no_metrics;
 }
 
-Bool LayoutContainer::SetProperty(const char *name, const Value &value) {
+bool LayoutContainer::SetProperty(const char *name, const Value &value) {
   if (strcmp(name, kPropDirection) == 0) {
     if (value.IsValueType<String>()) {
       const String direction_string = value.Coerce<String>();
@@ -366,7 +366,7 @@ Bool LayoutContainer::SetProperty(const char *name, const Value &value) {
     }
   }
   if (strcmp(name, kPropVisible) == 0) {
-    visible_ = value.Coerce<Bool>();
+    visible_ = value.Coerce<bool>();
     // TODO(catmull): hide children
     return true;
   }
@@ -459,7 +459,7 @@ void LayoutContainer::SetObjectSizes(
     const Size &s, Size *new_size, long *extra) {
   const Spacing margins = GetMargins();
   const unsigned int fill_count = FillChildCount();
-  Bool layout_valid = false;
+  bool layout_valid = false;
 
   // For some objects, such as wrapped text, changing their size in one
   // direction will affect their minimum size in the other. When that happens,
@@ -534,8 +534,8 @@ void LayoutContainer::ArrangeObjects(const Size &new_size, long extra) {
   const Spacing margins = GetMargins();
   long prev_pad = StreamBefore(margins);
   long last_edge = 0;
-  const Bool reverse_row = (direction_ == kLayoutRow) && IsRTL();
-  const Bool reverse_col = (direction_ == kLayoutColumn) && IsRTL();
+  const bool reverse_row = (direction_ == kLayoutRow) && IsRTL();
+  const bool reverse_col = (direction_ == kLayoutColumn) && IsRTL();
 
   switch (reverse_row ? ReverseAlignment(stream_align_) : stream_align_) {
     case kAlignStart:
@@ -549,7 +549,7 @@ void LayoutContainer::ArrangeObjects(const Size &new_size, long extra) {
   }
 
   long cross_extra;
-  Bool first = true;
+  bool first = true;
   const uint32_t end = reverse_row ? UINT32_MAX : entity_->ChildrenCount();
   const uint8_t inc = reverse_row ? -1 : 1;
 
@@ -831,7 +831,7 @@ void Group::SetSize(const Size &new_size) {
   }
 }
 
-Bool Group::SetProperty(PropertyName name, const Value &value) {
+bool Group::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropLocation) == 0) {
     SetLocation(value.Coerce<Location>());
     return true;

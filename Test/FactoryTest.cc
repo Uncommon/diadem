@@ -29,10 +29,10 @@ class TestEntity : public Diadem::Entity {
   TestEntity()
       : didFinalize_(false) {}
 
-  Diadem::Bool DidFinalize() const { return didFinalize_; }
+  bool DidFinalize() const { return didFinalize_; }
 
  protected:
-  Diadem::Bool didFinalize_;
+  bool didFinalize_;
 
   void Finalize() { didFinalize_ = true; }
 };

@@ -89,7 +89,7 @@ class Factory : public Base {
   Entity* CreateEntity(
       const char *class_name, const PropertyMap &properties) const;
 
-  Bool IsRegistered(const char *class_name) {
+  bool IsRegistered(const char *class_name) {
     return registry_.Exists(class_name);
   }
 

@@ -41,25 +41,25 @@ class Carbon {
     virtual void InitializeProperties(const PropertyMap &properties);
     WindowInterface* GetWindowInterface() { return this; }
 
-    virtual Bool SetProperty(PropertyName name, const Value &value);
+    virtual bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
     virtual void AddChild(Native *child);
 
     void* GetNativeRef() { return window_ref_; }
 
     // WindowInterface
-    virtual Bool ShowModeless();
-    virtual Bool Close();
-    virtual Bool ShowModal(void *parent);
-    virtual Bool EndModal();
-    virtual Bool SetFocus(Entity *new_focus);
+    virtual bool ShowModeless();
+    virtual bool Close();
+    virtual bool ShowModal(void *parent);
+    virtual bool EndModal();
+    virtual bool SetFocus(Entity *new_focus);
 
     typedef Diadem::Entity EntityType;
     typedef BorderedContainer LayoutType;
 
    protected:
     WindowRef window_ref_;
-    Bool is_alert_;
+    bool is_alert_;
   };
 
   class Control : public NativeCarbon {
@@ -67,7 +67,7 @@ class Carbon {
     Control() : view_ref_(NULL) {}
     virtual ~Control();
 
-    virtual Bool SetProperty(PropertyName name, const Value &value);
+    virtual bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
 
     void* GetNativeRef() { return view_ref_; }
@@ -88,7 +88,7 @@ class Carbon {
 
     virtual void InitializeProperties(const PropertyMap &properties);
 
-    virtual Bool SetProperty(PropertyName name, const Value &value);
+    virtual bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
   };
 

@@ -376,7 +376,7 @@ Cocoa::Window::~Window() {
   [delegate_ release];
 }
 
-Bool Cocoa::Window::SetProperty(PropertyName name, const Value &value) {
+bool Cocoa::Window::SetProperty(PropertyName name, const Value &value) {
   ScopedAutoreleasePool pool;
 
   if (window_ref_ == nil)
@@ -422,7 +422,7 @@ Value Cocoa::Window::GetProperty(PropertyName name) const {
     return Value(Spacing(14, 20, 20, 20));
   }
   if (strcmp(name, kPropVisible) == 0) {
-    return Value((Bool)[window_ref_ isVisible]);
+    return Value((bool)[window_ref_ isVisible]);
   }
   return Value();
 }
@@ -436,14 +436,14 @@ void Cocoa::Window::AddChild(Native *child) {
   [[window_ref_ contentView] addSubview:(NSView*)child->GetNativeRef()];
 }
 
-Bool Cocoa::Window::ShowModeless() {
+bool Cocoa::Window::ShowModeless() {
   ScopedAutoreleasePool pool;
 
   [window_ref_ makeKeyAndOrderFront:nil];
   return true;
 }
 
-Bool Cocoa::Window::Close() {
+bool Cocoa::Window::Close() {
   ScopedAutoreleasePool pool;
 
   if ([NSApp modalWindow] == window_ref_)
@@ -452,14 +452,14 @@ Bool Cocoa::Window::Close() {
   return true;
 }
 
-Bool Cocoa::Window::ShowModal(void*) {
+bool Cocoa::Window::ShowModal(void*) {
   ScopedAutoreleasePool pool;
 
   [NSApp runModalForWindow:window_ref_];
   return true;
 }
 
-Bool Cocoa::Window::EndModal() {
+bool Cocoa::Window::EndModal() {
   ScopedAutoreleasePool pool;
 
   if ([NSApp modalWindow] != window_ref_)
@@ -468,7 +468,7 @@ Bool Cocoa::Window::EndModal() {
   return true;
 }
 
-Bool Cocoa::Window::SetFocus(Entity *new_focus) {
+bool Cocoa::Window::SetFocus(Entity *new_focus) {
   if ((new_focus->GetNative() == NULL) ||
       (new_focus->GetNative()->GetNativeRef() == NULL))
     return false;
@@ -481,7 +481,7 @@ Bool Cocoa::Window::SetFocus(Entity *new_focus) {
   return true;
 }
 
-Bool Cocoa::Window::TestClose() {
+bool Cocoa::Window::TestClose() {
   ScopedAutoreleasePool pool;
 
   [window_ref_ performClose:nil];
@@ -505,7 +505,7 @@ NSPoint Cocoa::View::InvertPoint(NSPoint point) const {
   return NSMakePoint(point.x, super_bounds.size.height - point.y);
 }
 
-Bool Cocoa::View::SetProperty(PropertyName name, const Value &value) {
+bool Cocoa::View::SetProperty(PropertyName name, const Value &value) {
   ScopedAutoreleasePool pool;
 
   if (view_ref_ == NULL)
@@ -539,7 +539,7 @@ Bool Cocoa::View::SetProperty(PropertyName name, const Value &value) {
     return true;
   }
   if (strcmp(name, kPropVisible) == 0) {
-    [view_ref_ setHidden:!value.Coerce<Bool>()];
+    [view_ref_ setHidden:!value.Coerce<bool>()];
     return true;
   }
   return false;
@@ -557,7 +557,7 @@ Value Cocoa::View::GetProperty(PropertyName name) const {
     return GetViewSize() + GetInset();
   }
   if (strcmp(name, kPropVisible) == 0) {
-    return (Bool)![view_ref_ isHidden];
+    return (bool)![view_ref_ isHidden];
   }
   return Value();
 }
@@ -619,7 +619,7 @@ Location Cocoa::Box::GetSubviewAdjustment() const {
   return Location(-inset.left, -inset.top);
 }
 
-Bool Cocoa::Control::SetProperty(PropertyName name, const Value &value) {
+bool Cocoa::Control::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropText) == 0) {
     ScopedAutoreleasePool pool;
 
@@ -630,7 +630,7 @@ Bool Cocoa::Control::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropEnabled) == 0) {
     ScopedAutoreleasePool pool;
 
-    [(NSControl*)view_ref_ setEnabled:value.Coerce<Bool>()];
+    [(NSControl*)view_ref_ setEnabled:value.Coerce<bool>()];
     return true;
   }
   if (strcmp(name, kPropValue) == 0) {
@@ -661,7 +661,7 @@ Value Cocoa::Control::GetProperty(PropertyName name) const {
     return String([text UTF8String]);
   }
   if (strcmp(name, kPropEnabled) == 0) {
-    return static_cast<Bool>([(NSControl*)view_ref_ isEnabled]);
+    return static_cast<bool>([(NSControl*)view_ref_ isEnabled]);
   }
   if (strcmp(name, kPropValue) == 0) {
     return static_cast<int32_t>([(NSControl*)view_ref_ intValue]);
@@ -707,7 +707,7 @@ void Cocoa::PushButton::InitializeProperties(const PropertyMap &properties) {
   ConfigureView();
 }
 
-Bool Cocoa::PushButton::SetProperty(PropertyName name, const Value &value) {
+bool Cocoa::PushButton::SetProperty(PropertyName name, const Value &value) {
   ScopedAutoreleasePool pool;
 
   if (strcmp(name, kPropButtonType) == 0) {
@@ -792,9 +792,9 @@ void Cocoa::Checkbox::Finalize() {
   [(NSButton*)view_ref_ setState:NSOffState];
 }
 
-Bool Cocoa::Checkbox::SetProperty(PropertyName name, const Value &value) {
+bool Cocoa::Checkbox::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropValue) == 0) {
-    [(NSButton*)view_ref_ setState:value.Coerce<Bool>() ?
+    [(NSButton*)view_ref_ setState:value.Coerce<bool>() ?
         NSOnState : NSOffState];
   }
   return Control::SetProperty(name, value);
@@ -890,7 +890,7 @@ Value Cocoa::Label::GetProperty(PropertyName name) const {
   return Control::GetProperty(name);
 }
 
-Bool Cocoa::Label::SetProperty(const PropertyName name, const Value &value) {
+bool Cocoa::Label::SetProperty(const PropertyName name, const Value &value) {
   if (strcmp(name, kPropSize) == 0) {
     if (entity_->GetLayout()->GetHSizeOption() == kSizeFill) {
       const NSSize old_size = [view_ref_ bounds].size;
@@ -924,7 +924,7 @@ void Cocoa::Link::InitializeProperties(const PropertyMap &properties) {
   }
 }
 
-Bool Cocoa::Link::SetProperty(PropertyName name, const Value &value) {
+bool Cocoa::Link::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropURL) == 0) {
     SetURL(value.Coerce<String>());
     return true;
@@ -976,7 +976,7 @@ Value Cocoa::EditField::GetProperty(PropertyName name) const {
   return Control::GetProperty(name);
 }
 
-Bool Cocoa::EditField::SetProperty(PropertyName name, const Value &value) {
+bool Cocoa::EditField::SetProperty(PropertyName name, const Value &value) {
   ScopedAutoreleasePool pool;
 
   if (strcmp(name, kPropText) == 0) {
@@ -1015,7 +1015,7 @@ Value Cocoa::PathBox::GetProperty(PropertyName name) const {
   return View::GetProperty(name);
 }
 
-Bool Cocoa::PathBox::SetProperty(PropertyName name, const Value &value) {
+bool Cocoa::PathBox::SetProperty(PropertyName name, const Value &value) {
   ScopedAutoreleasePool pool;
 
   if (strcmp(name, kPropText) == 0) {
@@ -1138,11 +1138,11 @@ void Cocoa::PopupItem::InitializeProperties(const PropertyMap &properties) {
       initWithTitle:title action:NULL keyEquivalent:@""];
 }
 
-Bool Cocoa::PopupItem::SetProperty(PropertyName name, const Value &value) {
+bool Cocoa::PopupItem::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropEnabled) == 0) {
     ScopedAutoreleasePool pool;
 
-    [item_ setEnabled:value.Coerce<Bool>()];
+    [item_ setEnabled:value.Coerce<bool>()];
     return true;
   }
   return NativeCocoa::SetProperty(name, value);
@@ -1151,7 +1151,7 @@ Bool Cocoa::PopupItem::SetProperty(PropertyName name, const Value &value) {
 Value Cocoa::PopupItem::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropEnabled) == 0) {
     ScopedAutoreleasePool pool;
-    return (Bool)[item_ isEnabled];
+    return (bool)[item_ isEnabled];
   }
   return NativeCocoa::GetProperty(name);
 }

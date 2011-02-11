@@ -30,7 +30,7 @@ struct Spacing {
   Spacing()
       : top(0), left(0), bottom(0), right(0) {}
 
-  Bool operator!=(const Spacing &s) const {
+  bool operator!=(const Spacing &s) const {
     return (top != s.top) || (left != s.left) ||
         (bottom != s.bottom) || (right != s.right);
   }
@@ -54,9 +54,9 @@ struct Size {
   Size(long w, long h) : width(w), height(h) {}
   Size() : width(0), height(0) {}
 
-  Bool operator==(const Size &s) const
+  bool operator==(const Size &s) const
     { return (width == s.width) && (height == s.height); }
-  Bool operator!=(const Size &s) const
+  bool operator!=(const Size &s) const
     { return (width != s.width) || (height != s.height); }
   Size operator+(const Spacing &s) const
     { return Size(width + (s.left + s.right), height + (s.top + s.bottom)); }
@@ -71,9 +71,9 @@ struct Location {
   Location(long x1, long y1) : x(x1), y(y1) {}
   Location() : x(0), y(0) {}
 
-  Bool operator==(const Location &l) const
+  bool operator==(const Location &l) const
     { return (x == l.x) && (y == l.y); }
-  Bool operator!=(const Location &l) const
+  bool operator!=(const Location &l) const
     { return (x != l.x) || (y != l.y); }
 
   Location operator+(const Location &l) const

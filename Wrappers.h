@@ -39,10 +39,6 @@ namespace Diadem {
 // Some projects may want to use their own container classes. In that case,
 // you can create your own wrappers in a previously included header file
 // and #define the appropriate symbols.
-#ifndef DIADEM_HAVE_BOOL
-#define DIADEM_HAVE_BOOL
-typedef bool Bool;
-#endif
 
 #ifndef DIADEM_HAVE_ARRAY
 #define DIADEM_HAVE_ARRAY
@@ -69,7 +65,7 @@ class Map : std::map<K, V> {
 
   void Insert(const K &key, const V &val)
     { Inherited::insert(std::make_pair(key, val)); }
-  Bool Exists(const K &key) const
+  bool Exists(const K &key) const
     { return Inherited::find(key) != Inherited::end(); }
 
   using Inherited::operator[];
@@ -119,7 +115,7 @@ class String : public Base {
     string_ = s;
   }
 
-  Bool IsEmpty() const { return strlen(string_) == 0; }
+  bool IsEmpty() const { return strlen(string_) == 0; }
 
   const char* Get() const      { return string_; }
   operator const char*() const { return string_; }
@@ -136,8 +132,8 @@ class String : public Base {
     return *this;
   }
   String& operator=(const String &s) { return operator=(s.Get()); }
-  Bool operator==(const char *s) const { return strcmp(string_, s) == 0; }
-  Bool operator!=(const char *s) const { return strcmp(string_, s) != 0; }
+  bool operator==(const char *s) const { return strcmp(string_, s) == 0; }
+  bool operator!=(const char *s) const { return strcmp(string_, s) != 0; }
 
   int32_t ToInteger() const   { return atoi(string_); }
   int64_t ToInteger64() const {
@@ -154,7 +150,7 @@ class String : public Base {
   const char *string_;
 };
 
-inline Bool operator<(const String &a, const String &b) {
+inline bool operator<(const String &a, const String &b) {
   return strcmp(a, b) < 0;
 }
 

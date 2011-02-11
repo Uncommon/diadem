@@ -373,7 +373,7 @@ static PyObject* Window_showModal(PyademWindow *self) {
   if ((self == NULL) || (self->window == NULL))
     return NULL;
 
-  Diadem::Bool result = self->window->ShowModal(NULL);
+  bool result = self->window->ShowModal(NULL);
 
   if (PyErr_Occurred())
     return NULL;

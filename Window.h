@@ -36,18 +36,18 @@ class Window {
         (root_->GetNative()->GetWindowInterface() != NULL);
   }
 
-  Bool ShowModeless()
+  bool ShowModeless()
     { return root_->GetNative()->GetWindowInterface()->ShowModeless(); }
-  Bool Close()
+  bool Close()
     { return root_->GetNative()->GetWindowInterface()->Close(); }
-  Bool ShowModal(void *parent)
+  bool ShowModal(void *parent)
     { return root_->GetNative()->GetWindowInterface()->ShowModal(parent); }
-  Bool EndModal()
+  bool EndModal()
     { return root_->GetNative()->GetWindowInterface()->EndModal(); }
 
   // Function to be called when the user attempts to close a window. Return
   // false to disallow closing.
-  typedef Bool (*CloseCallback)(Window *window, void *data);
+  typedef bool (*CloseCallback)(Window *window, void *data);
 
   void SetCloseCallback(CloseCallback callback, void *data) {
     close_callback_ = callback;
@@ -55,7 +55,7 @@ class Window {
   }
   // Calls the close callback and returns the result. Returns true if no
   // callback is set.
-  Bool AttemptClose() {
+  bool AttemptClose() {
     return (close_callback_ == NULL) ?
         true : (*close_callback_)(this, close_data_);
   }
