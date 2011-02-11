@@ -384,4 +384,5 @@ TEST_F(CocoaTest, testCheckbox) {
   EXPECT_EQ(NSOnState, [button state]);
   [button setState:NSOffState];
   EXPECT_EQ(0, checkbox->GetProperty(Diadem::kPropValue).Coerce<int32_t>());
+  EXPECT_FALSE([button target] == nil);
 }

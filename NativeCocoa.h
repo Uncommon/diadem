@@ -143,10 +143,21 @@ class Cocoa {
     virtual Value GetProperty(PropertyName name) const;
   };
 
+  // Base class for pushbutton, checkbox, etc.
   class Button : public Control {
    public:
-    Button() : target_(NULL) {}
+    Button();
     ~Button();
+
+   protected:
+    ButtonTarget *target_;
+
+    void MakeTarget();
+  };
+
+  class PushButton : public Button {
+   public:
+    PushButton() {}
 
     virtual void InitializeProperties(const PropertyMap &properties);
 
@@ -156,12 +167,9 @@ class Cocoa {
     virtual Value GetProperty(PropertyName name) const;
 
     virtual Spacing GetInset() const;
-
-   protected:
-    ButtonTarget *target_;
   };
 
-  class Checkbox : public Control {
+  class Checkbox : public Button {
    public:
     Checkbox() {}
 

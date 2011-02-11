@@ -213,7 +213,7 @@ void Cocoa::SetUpFactory(Factory *factory) {
   factory->RegisterNative<Link>(kTypeNameLink);
   factory->RegisterNative<Window>(kTypeNameWindow);
   factory->RegisterNative<Box>(kTypeNameBox);
-  factory->RegisterNative<Button>(kTypeNameButton);
+  factory->RegisterNative<PushButton>(kTypeNameButton);
   factory->RegisterNative<Checkbox>(kTypeNameCheck);
   factory->RegisterNative<EditField>(kTypeNameEdit);
   factory->RegisterNative<PasswordField>(kTypeNamePassword);
@@ -669,7 +669,19 @@ Value Cocoa::Control::GetProperty(PropertyName name) const {
   return View::GetProperty(name);
 }
 
-void Cocoa::Button::InitializeProperties(const PropertyMap &properties) {
+Cocoa::Button::Button() : target_(nil) {}
+
+Cocoa::Button::~Button() {
+  ScopedAutoreleasePool pool;
+
+  [target_ release];
+}
+
+void Cocoa::Button::MakeTarget() {
+  target_ = [[ButtonTarget alloc] initWithButton:this];
+}
+
+void Cocoa::PushButton::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
   NSButton *button = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
 
@@ -691,17 +703,11 @@ void Cocoa::Button::InitializeProperties(const PropertyMap &properties) {
               [NSFont systemFontSizeForControlSize:NSSmallControlSize]]];
     }
   }
-  target_ = [[ButtonTarget alloc] initWithButton:this];
+  MakeTarget();
   ConfigureView();
 }
 
-Cocoa::Button::~Button() {
-  ScopedAutoreleasePool pool;
-
-  [target_ release];
-}
-
-Bool Cocoa::Button::SetProperty(PropertyName name, const Value &value) {
+Bool Cocoa::PushButton::SetProperty(PropertyName name, const Value &value) {
   ScopedAutoreleasePool pool;
 
   if (strcmp(name, kPropButtonType) == 0) {
@@ -719,7 +725,7 @@ Bool Cocoa::Button::SetProperty(PropertyName name, const Value &value) {
 
 #define kButtonWidthAdjustment 12
 
-Value Cocoa::Button::GetProperty(PropertyName name) const {
+Value Cocoa::PushButton::GetProperty(PropertyName name) const {
   ScopedAutoreleasePool pool;
 
   if (strcmp(name, kPropMinimumSize) == 0) {
@@ -760,7 +766,7 @@ Value Cocoa::Button::GetProperty(PropertyName name) const {
   return Control::GetProperty(name);
 }
 
-Spacing Cocoa::Button::GetInset() const {
+Spacing Cocoa::PushButton::GetInset() const {
   // Extra space on botom for the shadow, apparently.
   // The need for the left/right inset is mysterious.
   if ([[(NSButton*)view_ref_ cell] controlSize] == NSSmallControlSize)
@@ -777,6 +783,7 @@ void Cocoa::Checkbox::InitializeProperties(const PropertyMap &properties) {
   if (properties.Exists(kPropText))
     [(NSButton*)view_ref_ setTitle:
         NSStringWithString(properties[kPropText].Coerce<String>())];
+  MakeTarget();
   ConfigureView();
 }
 
