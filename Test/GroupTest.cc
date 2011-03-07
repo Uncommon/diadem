@@ -225,7 +225,7 @@ TEST_F(GroupTest, testBox) {
 TEST_F(GroupTest, testColumnLabelGroupSimple) {
   ReadWindowData(
       "<window text='testColumnLabelGroupSimple'>"
-        "<labelgroup text='Exit:'>"
+        "<labelgroup text='Exit:' width='fill'>"
           "<label text='Stage left'/>"
         "</labelgroup>"
       "</window>");
@@ -241,6 +241,8 @@ TEST_F(GroupTest, testColumnLabelGroupSimple) {
   ASSERT_FALSE(layout == NULL);
   ASSERT_FALSE(label == NULL);
   ASSERT_FALSE(content == NULL);
+
+  EXPECT_EQ(Diadem::kSizeFill, label_group->GetLayout()->GetHSizeOption());
 
   EXPECT_STREQ(Diadem::kTypeNameLabel, label->GetTypeName());
   EXPECT_STREQ(
@@ -319,4 +321,82 @@ TEST_F(GroupTest, testColumnLabelGroupDouble) {
       label1->GetProperty(Diadem::kPropSize).Coerce<Diadem::Size>();
 
   EXPECT_EQ(l1_size.width, l2_size.width);
+}
+
+// A group within a group.
+TEST_F(GroupTest, testNestedGroups) {
+  ReadWindowData(
+      "<window text='testNestedGroups'>"
+        "<group name='g1'>"
+          "<group name='g2'>"
+            "<button name='b1' text='Top'/>"
+          "</group>"
+        "</group>"
+        "<group name='g3'>"
+          "<button name='b2' text='Bottom'/>"
+        "</group>"
+      "</window>");
+
+  Diadem::Entity* const g1 = windowRoot_->ChildAt(0);
+  ASSERT_FALSE(g1 == NULL);
+  Diadem::Entity* const g2 = g1->ChildAt(0);
+  ASSERT_FALSE(g2 == NULL);
+  Diadem::Entity* const g3 = windowRoot_->ChildAt(1);
+  ASSERT_FALSE(g3 == NULL);
+
+  Diadem::Entity* const b1 = g2->ChildAt(0);
+  ASSERT_FALSE(b1 == NULL);
+  Diadem::Entity* const b2 = g3->ChildAt(0);
+  ASSERT_FALSE(b2 == NULL);
+
+  const Diadem::Spacing pad_b1 = b1->GetLayout()->GetPadding();
+  const Diadem::Spacing pad_g1 = g1->GetLayout()->GetPadding();
+  const Diadem::Spacing pad_g2 = g2->GetLayout()->GetPadding();
+  const Diadem::Spacing pad_g3 = g3->GetLayout()->GetPadding();
+  const Diadem::Size size_b1 = b1->GetLayout()->GetSize();
+  const Diadem::Size size_g1 = g1->GetLayout()->GetSize();
+  const Diadem::Location loc_g1 = g1->GetLayout()->GetLocation();
+  const Diadem::Location loc_g2 = g2->GetLayout()->GetLocation();
+  const Diadem::Location loc_g3 = g3->GetLayout()->GetLocation();
+  const Diadem::Location loc_b1 = b1->GetLayout()->GetLocation();
+  const Diadem::Location loc_b2 = b2->GetLayout()->GetLocation();
+
+  // The first item in a container should be at 0, 0
+  EXPECT_EQ(0, loc_g2.x);
+  EXPECT_EQ(0, loc_g2.y);
+  EXPECT_EQ(0, loc_b1.x);
+  EXPECT_EQ(0, loc_b1.y);
+  EXPECT_EQ(0, loc_b2.x);
+  EXPECT_EQ(0, loc_b2.y);
+
+  // The button and its enclosing groups should all have the same padding.
+  EXPECT_EQ(pad_b1.bottom, pad_g2.bottom);
+  EXPECT_EQ(pad_b1.bottom, pad_g1.bottom);
+
+  EXPECT_EQ(size_b1.height, size_g1.height);
+  EXPECT_EQ(
+      loc_g3.y,
+      loc_g1.y + size_g1.height + std::max(pad_g1.bottom, pad_g3.top));
+}
+
+// A group's baseline is the same as its first child
+TEST_F(GroupTest, testGroupBaseline) {
+  ReadWindowData(
+      "<window text='testGroupBaseline'>"
+        "<label text='Sky'/>"
+        "<group>"
+          "<label text='Blue'/>"
+        "</group>"
+      "</window>");
+
+  const Diadem::Entity* const l1 = windowRoot_->ChildAt(0);
+  const Diadem::Entity* const g = windowRoot_->ChildAt(1);
+  const Diadem::Entity* const l2 = g->ChildAt(0);
+
+  const int32_t b1 = l1->GetLayout()->GetBaseline();
+  const int32_t b2 = l2->GetLayout()->GetBaseline();
+  const int32_t bg = g->GetLayout()->GetBaseline();
+
+  EXPECT_EQ(b1, bg);
+  EXPECT_EQ(b2, bg);
 }

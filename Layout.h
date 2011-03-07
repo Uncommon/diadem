@@ -216,6 +216,7 @@ class LayoutContainer : public Layout {
   // Returns the space between this object's edges and the edges of any
   // children. Margins and padding will overlap.
   virtual Spacing GetMargins() const;
+  virtual long GetBaseline() const;
 
   // Signals the layout code to continue with another iteration because
   // something affecting layout has changed.
@@ -340,11 +341,6 @@ class Group : public LayoutContainer {
 
   void SetSizeImp(const Size &size)        { size_ = size; }
   void SetLocationImp(const Location &loc) { location_ = loc; }
-
-  virtual void ParentLocationChanged(const Location &offset) {
-    location_ += offset;
-    LayoutContainer::ParentLocationChanged(offset);
-  }
 };
 
 // A layout entity that overrides the default space between entities.

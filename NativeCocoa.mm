@@ -1124,6 +1124,8 @@ Spacing Cocoa::Popup::GetInset() const {
 }
 
 void Cocoa::Popup::AddChild(Native *child) {
+  ScopedAutoreleasePool pool;
+
   if ([(id)child->GetNativeRef() isKindOfClass:[NSMenuItem class]])
     [[view_ref_ menu] addItem:(NSMenuItem*)child->GetNativeRef()];
 }

@@ -394,6 +394,12 @@ Spacing LayoutContainer::GetMargins() const {
   return Spacing();
 }
 
+long LayoutContainer::GetBaseline() const {
+  if (entity_->ChildrenCount() > 0)
+    return entity_->ChildAt(0)->GetProperty(kPropBaseline).Coerce<int32_t>();
+  return Layout::GetBaseline();
+}
+
 void LayoutContainer::InvalidateLayout() {
   cached_min_size_ = Size();
   Layout::InvalidateLayout();
@@ -817,7 +823,7 @@ void Group::SetSize(const Size &new_size) {
       const Size size    = child->GetSize();
 
       before = std::max(before, CrossBefore(pad) - CrossLoc(loc));
-      after  = std::max(before, CrossAfter(pad) -
+      after  = std::max(after, CrossAfter(pad) -
            (CrossDim(new_size) - (CrossLoc(loc) + CrossDim(size))));
     }
 

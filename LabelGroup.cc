@@ -39,6 +39,21 @@ void LabelGroup::InitializeProperties(
   content_ = new Entity();
   content_->SetLayout(new Group());
   content_->GetLayout()->SetProperty(kPropDirection, Layout::kLayoutColumn);
+  content_->GetLayout()->SetHSizeOption(kSizeFill);
+
+  // Layout must be set up now so it can get its initial properties
+  if (properties.Exists(kPropLabelGroupType)) {
+    const String type = properties[kPropLabelGroupType].Coerce<String>();
+
+    if (type == kLabelGroupTypeColumn)
+      SetLayout(new ColumnLabelLayout(this));
+    else if (type == kLabelGroupTypeIndent)
+      SetLayout(new IndentLabelLayout(this));
+  } else {
+    SetLayout(new ColumnLabelLayout(this));
+  }
+  layout_->ChildAdded(label_);
+  layout_->ChildAdded(content_);
 
   Entity::InitializeProperties(properties, factory);
 }
@@ -48,22 +63,10 @@ bool LabelGroup::SetProperty(PropertyName name, const Value &value) {
     label_->SetProperty(kPropText, value);
     return true;
   }
-  if (strcmp(name, kPropLabelGroupType) == 0) {
-    DASSERT(layout_ == NULL);
-    const String type = value.Coerce<String>();
-
-    if (type == kLabelGroupTypeColumn)
-      InitializeLayout(new ColumnLabelLayout(this));
-    else if (type == kLabelGroupTypeIndent)
-      InitializeLayout(new IndentLabelLayout(this));
-    return true;
-  }
   return Entity::SetProperty(name, value);
 }
 
 void LabelGroup::AddChild(Entity *child) {
-  if (layout_ == NULL)
-    InitializeLayout(new ColumnLabelLayout(this));
   DASSERT(content_ != NULL);
   content_->AddChild(child);
 }
@@ -73,19 +76,10 @@ void LabelGroup::Finalize() {
   Entity::AddChild(label_);
   Entity::AddChild(content_);
   label_->GetLayout()->SetWidthName(GetParent()->GetPath());
-
-  if (GetLayout() == NULL)
-    InitializeLayout(new ColumnLabelLayout(this));
-}
-
-void LabelGroup::InitializeLayout(Layout *layout) {
-  SetLayout(layout);
-  layout->ChildAdded(label_);
-  layout->ChildAdded(content_);
 }
 
 bool ColumnLabelLayout::SetProperty(PropertyName name, const Value &value) {
-  if (strcmp(name, kPropColumnWidthName)) {
+  if (strcmp(name, kPropColumnWidthName) == 0) {
     label_group_->GetLabel()->SetProperty(kPropWidthName, value);
     return true;
   }

@@ -19,7 +19,9 @@
 
 namespace Diadem {
 
-extern const PropertyName kPropLabelGroupType, kPropColumnWidthName;
+extern const PropertyName
+    kPropLabelGroupType,   // Layout type: column or indent; column is default.
+    kPropColumnWidthName;  // Explicit width name for label column.
 extern const TypeName kTypeNameLabelGroup;
 extern const StringConstant kLabelGroupTypeColumn, kLabelGroupTypeIndent;
 
@@ -51,8 +53,6 @@ class LabelGroup : public Entity {
  protected:
   Entity *label_;    // The text label.
   Entity *content_;  // The content group.
-
-  void InitializeLayout(Layout *layout);
 };
 
 // Abstract superclass for the implementations of various label group styles.
