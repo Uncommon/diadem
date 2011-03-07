@@ -186,14 +186,21 @@ class Cocoa {
 
   class Label : public Control {
    public:
-    Label() {}
+    Label();
 
     virtual void InitializeProperties(const PropertyMap &properties);
     virtual String GetTypeName() const { return kTypeNameLabel; }
     virtual Value GetProperty(PropertyName name) const;
     virtual bool SetProperty(PropertyName name, const Value &value);
+    virtual void Finalize();
 
     virtual Spacing GetInset() const;
+
+   protected:
+    uint32_t ui_size_;
+    bool heading_;
+
+    void UpdateFont();
   };
 
   class Link : public Label {

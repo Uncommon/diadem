@@ -384,3 +384,49 @@ TEST_F(CocoaTest, testCheckbox) {
   EXPECT_EQ(0, checkbox->GetProperty(Diadem::kPropValue).Coerce<int32_t>());
   EXPECT_FALSE([button target] == nil);
 }
+
+TEST_F(CocoaTest, testLabelStyle) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='testLabelStyle'>"
+        "<label text='Normal'/>"
+        "<label text='Bold' style='head'/>"
+        "<label text='Small' uisize='small'/>"
+        "<label text='Small bold' uisize='small' style='head'/>"
+        "<label text='Small bold' style='head' uisize='small'/>"
+      "</window>"));
+
+  Diadem::Entity *label = window_root_->ChildAt(0);
+  NSTextField *text = (NSTextField*)label->GetNative()->GetNativeRef();
+  NSFont *font = [text font];
+  NSFont *expected_font = [NSFont systemFontOfSize:
+      [NSFont systemFontSizeForControlSize:NSRegularControlSize]];
+
+  EXPECT_TRUE([font isEqual:expected_font]);
+
+  label = window_root_->ChildAt(1);
+  text = (NSTextField*)label->GetNative()->GetNativeRef();
+  font = [text font];
+  expected_font = [NSFont boldSystemFontOfSize:
+      [NSFont systemFontSizeForControlSize:NSRegularControlSize]];
+  EXPECT_TRUE([font isEqual:expected_font]);
+
+  label = window_root_->ChildAt(2);
+  text = (NSTextField*)label->GetNative()->GetNativeRef();
+  font = [text font];
+  expected_font = [NSFont systemFontOfSize:
+      [NSFont systemFontSizeForControlSize:NSSmallControlSize]];
+  EXPECT_TRUE([font isEqual:expected_font]);
+
+  label = window_root_->ChildAt(3);
+  text = (NSTextField*)label->GetNative()->GetNativeRef();
+  font = [text font];
+  expected_font = [NSFont boldSystemFontOfSize:
+      [NSFont systemFontSizeForControlSize:NSSmallControlSize]];
+  EXPECT_TRUE([font isEqual:expected_font]);
+
+  label = window_root_->ChildAt(4);
+  text = (NSTextField*)label->GetNative()->GetNativeRef();
+  font = [text font];
+  // same expected font
+  EXPECT_TRUE([font isEqual:expected_font]);
+}

@@ -40,6 +40,8 @@ extern const StringConstant
     kWindowStyleNameClosable, kWindowStyleNameResizable,
     kWindowStyleNameMinimizable;
 
+extern const StringConstant kLabelStyleNameHead;
+
 // Style mask bits for window attributes
 enum WindowStyleBit {
   kStyleClosable    = 0x01,

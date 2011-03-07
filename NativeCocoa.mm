@@ -816,6 +816,8 @@ Value Cocoa::Checkbox::GetProperty(PropertyName name) const {
   return Control::GetProperty(name);
 }
 
+Cocoa::Label::Label() : ui_size_(NSRegularControlSize), heading_(false) {}
+
 void Cocoa::Label::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
@@ -841,6 +843,41 @@ void Cocoa::Label::InitializeProperties(const PropertyMap &properties) {
   ConfigureView();
 }
 
+// The label control is a bit bigger than its text.
+const uint32_t kLabelWidthFudge  = 4;
+const uint32_t kLabelHeightFudge = 1;
+
+static float WidthForText(NSString *text, NSFont *font) {
+  NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+      font, NSFontAttributeName, nil];
+
+  return [text sizeWithAttributes:attributes].width + kLabelWidthFudge;
+}
+
+// Adapted from Text Layout Programming Guide sample code.
+static float HeightForText(NSString *text, NSFont *font, float width) {
+  NSTextStorage *storage = [[[NSTextStorage alloc]
+      initWithString:text] autorelease];
+  NSTextContainer *container = [[[NSTextContainer alloc]
+      initWithContainerSize:NSMakeSize(width, FLT_MAX)] autorelease];
+  NSLayoutManager *layout = [[[NSLayoutManager alloc] init] autorelease];
+
+  // The sample doesn't have this line, but elsewhere the documentation states
+  // that NSCells use this behavior. Without it, the line height is off.
+  [layout setTypesetterBehavior:NSTypesetterBehavior_10_2_WithCompatibility];
+  [layout addTextContainer:container];
+  [storage addLayoutManager:layout];
+  [storage addAttribute:NSFontAttributeName
+                  value:font
+                  range:NSMakeRange(0, [storage length])];
+  [container setLineFragmentPadding:0.0];
+  [layout glyphRangeForTextContainer:container];
+
+  const NSRect rect = [layout usedRectForTextContainer:container];
+
+  return rect.size.height;
+}
+
 Value Cocoa::Label::GetProperty(PropertyName name) const {
   ScopedAutoreleasePool pool;
 
@@ -862,30 +899,28 @@ Value Cocoa::Label::GetProperty(PropertyName name) const {
 
     if (layout == NULL)
       return Size();
+
+    NSString *text = [(NSTextField*)view_ref_ stringValue];
+    NSFont *font = [(NSTextField*)view_ref_ font];
+
     if (layout->GetHSizeOption() == kSizeFill) {
-      NSString *text = [(NSTextField*)view_ref_ stringValue];
-      CGFloat width = 0.0f, height = 0.0f, baseline = 0.0f;
-      HIThemeTextInfo info = { 1,
-          kThemeStateActive,
-          kThemeSystemFont,
-          kHIThemeTextHorizontalFlushDefault,
-          kHIThemeTextVerticalFlushDefault,
-          0, 0, 0, false, 0, NULL };
+      const CGFloat view_width = [view_ref_ bounds].size.width;
 
-      HIThemeGetTextDimensions(
-          (CFTypeRef)text, [view_ref_ bounds].size.width,
-          &info, &width, &height, &baseline);
-      if (height != [view_ref_ bounds].size.height)
-        entity_->GetLayout()->GetLayoutParent()->InvalidateLayout();
-      return Size(width, height);
+      return Size(view_width, HeightForText(text, font, view_width));
     } else {
-      const NSSize cell_size = [[(NSControl*)view_ref_ cell] cellSize];
-
-      return Size(cell_size.width+1, cell_size.height);
+      return Size(
+          WidthForText(text, font),
+          [[[[NSLayoutManager alloc] init] autorelease]
+              defaultLineHeightForFont:font] + kLabelHeightFudge);
     }
   }
   if (strcmp(name, kPropBaseline) == 0) {
-    return 13;  // depending on UI size
+    switch (ui_size_) {
+      case NSSmallControlSize:   return 11;
+      case NSMiniControlSize:    return 9;
+      default:
+      case NSRegularControlSize: return 14;
+    }
   }
   return Control::GetProperty(name);
 }
@@ -908,11 +943,43 @@ bool Cocoa::Label::SetProperty(const PropertyName name, const Value &value) {
       return Control::SetProperty(name, value);
     }
   }
+  if (strcmp(name, kPropUISize) == 0) {
+    const String size = value.Coerce<String>();
+
+    if (size == kUISizeSmall)
+      ui_size_ = NSSmallControlSize;
+    else if (size == kUISizeMini)
+      ui_size_ = NSMiniControlSize;
+    UpdateFont();
+    return true;
+  }
+  if (strcmp(name, kPropStyle) == 0) {
+    heading_ = (value.Coerce<String>() == kLabelStyleNameHead);
+    UpdateFont();
+    return true;
+  }
   return Control::SetProperty(name, value);
 }
 
 Spacing Cocoa::Label::GetInset() const {
   return Spacing(0, -1, 0, 0);
+}
+
+void Cocoa::Label::Finalize() {
+  // Even if no style has been specified, we need to set the font because
+  // NSTextField defaults to the wrong size (12 vs 13).
+  UpdateFont();
+}
+
+void Cocoa::Label::UpdateFont() {
+  ScopedAutoreleasePool pool;
+
+  if (heading_)
+    [(NSTextField*)view_ref_ setFont:[NSFont boldSystemFontOfSize:
+        [NSFont systemFontSizeForControlSize:ui_size_]]];
+  else
+    [(NSTextField*)view_ref_ setFont:[NSFont systemFontOfSize:
+        [NSFont systemFontSizeForControlSize:ui_size_]]];
 }
 
 void Cocoa::Link::InitializeProperties(const PropertyMap &properties) {

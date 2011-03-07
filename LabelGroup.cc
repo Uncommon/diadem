@@ -95,10 +95,8 @@ void ColumnLabelLayout::Finalize() {
   Layout* const label_layout = label->GetLayout();
   DASSERT(label_layout != NULL);
 
-  if (label_layout->GetWidthName().IsEmpty()) {
-    DASSERT(label->GetParent() != NULL);
-    label_layout->SetWidthName(label->GetParent()->GetPath());
-  }
+  if (label_layout->GetWidthName().IsEmpty())
+    label_layout->SetWidthName(label_group_->GetPath());
 }
 
 }  // namespace Diadem

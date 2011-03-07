@@ -61,6 +61,9 @@ const StringConstant
     kWindowStyleNameResizable   = "size",
     kWindowStyleNameMinimizable = "min";
 
+const StringConstant
+    kLabelStyleNameHead = "head";
+
 Location Native::GetViewOffset() const {
   Location view_location;
 

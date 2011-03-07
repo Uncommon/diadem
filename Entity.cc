@@ -125,11 +125,8 @@ const Window* Entity::GetWindow() const {
 }
 
 void Entity::FactoryFinalize() {
-  for (uint32_t i = 0; i < children_.size(); ++i) {
-    if (children_[i]->GetNative() != NULL)
-      children_[i]->GetNative()->Finalize();
-    children_[i]->Finalize();
-  }
+  for (uint32_t i = 0; i < children_.size(); ++i)
+    children_[i]->FactoryFinalize();
   if (layout_ != NULL)
     layout_->Finalize();
   if (native_ != NULL)
