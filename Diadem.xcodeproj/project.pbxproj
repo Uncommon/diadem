@@ -62,6 +62,7 @@
 		DD6803F2127763AD00CB9EF5 /* XMLTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DDC32B33120E08DE0098E044 /* XMLTest.cc */; };
 		DD68043E12776ABA00CB9EF5 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD68043A12776A5700CB9EF5 /* Python.framework */; };
 		DD9E0D8112946CFA0088F160 /* test.dem in Resources */ = {isa = PBXBuildFile; fileRef = DD9E0D8012946CFA0088F160 /* test.dem */; };
+		DD9ED6F513020BD700E920D6 /* Metrics.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD9ED6F413020BD700E920D6 /* Metrics.cc */; };
 		DDC1C10A128B52A900D63161 /* Entity.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806D5911F12B73005E4C56 /* Entity.cc */; };
 		DDC1C10B128B52A900D63161 /* Factory.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806E8611F91565005E4C56 /* Factory.cc */; };
 		DDC1C10C128B52AA00D63161 /* Layout.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806E2C11F7C7D6005E4C56 /* Layout.cc */; };
@@ -189,6 +190,7 @@
 		DD806EA311F919A4005E4C56 /* FactoryTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FactoryTest.cc; sourceTree = "<group>"; };
 		DD806ED711FA2F9A005E4C56 /* Metrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Metrics.h; sourceTree = "<group>"; };
 		DD9E0D8012946CFA0088F160 /* test.dem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = test.dem; path = Test/test.dem; sourceTree = "<group>"; };
+		DD9ED6F413020BD700E920D6 /* Metrics.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Metrics.cc; sourceTree = "<group>"; };
 		DDB3DCEE123077B9006C742F /* LayoutTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayoutTest.cc; sourceTree = "<group>"; };
 		DDC1C106128B526600D63161 /* libDiadem.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDiadem.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		DDC32ABA120B63C20098E044 /* LibXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibXMLParser.h; sourceTree = "<group>"; };
@@ -251,6 +253,7 @@
 				DD806D5C11F12B73005E4C56 /* Layout.h */,
 				DDC32ABC120B64310098E044 /* LibXMLParser.cc */,
 				DDC32ABA120B63C20098E044 /* LibXMLParser.h */,
+				DD9ED6F413020BD700E920D6 /* Metrics.cc */,
 				DD806ED711FA2F9A005E4C56 /* Metrics.h */,
 				DD3C9FA81248FF0200F536B7 /* Native.cc */,
 				DD806D5D11F12B73005E4C56 /* Native.h */,
@@ -531,6 +534,7 @@
 				DDF2C4B012777B67008DBFDB /* CocoaTest.mm in Sources */,
 				DDF2C668127898F8008DBFDB /* DiademDocument.mm in Sources */,
 				89DDD75912CD2F77007FCD6D /* LabelGroup.cc in Sources */,
+				DD9ED6F513020BD700E920D6 /* Metrics.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

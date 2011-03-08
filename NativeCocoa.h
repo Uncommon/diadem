@@ -18,10 +18,12 @@
 #ifdef __OBJC__
 #include <Cocoa/Cocoa.h>
 @class ButtonTarget;
+@class TableDelegate;
 @class WindowDelegate;
 #else
-typedef void NSWindow, NSView, NSMenuItem, NSAlert, *Class;
-typedef void ButtonTarget, WindowDelegate;
+typedef void
+    NSWindow, NSView, NSMenuItem, NSAlert, NSTableView, NSTableColumn, *Class;
+typedef void ButtonTarget, TableDelegate, WindowDelegate;
 struct NSPoint { CGFloat x, y; };
 #endif
 
@@ -47,6 +49,7 @@ class Cocoa {
 
   static ButtonType ShowMessage(MessageData *message);
 
+  // Abstract superclass for all Cocoa native classes
   class NativeCocoa : public Native {
    public:
     virtual const PlatformMetrics& GetPlatformMetrics() const
@@ -55,6 +58,7 @@ class Cocoa {
     static PlatformMetrics metrics_;
   };
 
+  // <window> implementation
   class Window : public NativeCocoa, public WindowInterface {
    public:
     Window();
@@ -87,6 +91,7 @@ class Cocoa {
     WindowDelegate *delegate_;
   };
 
+  // Base class for NSView wrappers
   class View : public NativeCocoa {
    public:
     View() : view_ref_(NULL) {}
@@ -115,7 +120,7 @@ class Cocoa {
     virtual Spacing GetInset() const { return Spacing(); }
   };
 
-  // Group box view
+  // <box> implementation
   class Box : public View {
    public:
     Box() {}
@@ -134,6 +139,7 @@ class Cocoa {
     typedef BorderedContainer LayoutType;
   };
 
+  // Base class for NSControl wrappers
   class Control : public View {
    public:
     Control() {}
@@ -155,6 +161,7 @@ class Cocoa {
     void MakeTarget();
   };
 
+  // <button> implementation
   class PushButton : public Button {
    public:
     PushButton() {}
@@ -169,6 +176,7 @@ class Cocoa {
     virtual Spacing GetInset() const;
   };
 
+  // <check> implementation
   class Checkbox : public Button {
    public:
     Checkbox() {}
@@ -184,6 +192,7 @@ class Cocoa {
     Spacing GetInset() const { return Spacing(-2, -2, -2, 0); }
   };
 
+  // <label> implementation
   class Label : public Control {
    public:
     Label();
@@ -203,6 +212,7 @@ class Cocoa {
     void UpdateFont();
   };
 
+  // <link> implementation
   class Link : public Label {
    public:
     Link() {}
@@ -214,6 +224,7 @@ class Cocoa {
     void SetURL(const String &url);
   };
 
+  // <edit> implementation
   class EditField : public Control {
    public:
     EditField() {}
@@ -227,6 +238,7 @@ class Cocoa {
     virtual Class GetTextFieldClass();
   };
 
+  // <password> implementation
   class PasswordField : public EditField {
    public:
     PasswordField() {}
@@ -237,6 +249,7 @@ class Cocoa {
     virtual Class GetTextFieldClass();
   };
 
+  // <path> implementation
   class PathBox : public View {
    public:
     PathBox() {}
@@ -247,6 +260,7 @@ class Cocoa {
     bool SetProperty(PropertyName name, const Value &value);
   };
 
+  // <separator> implementation
   class Separator : public Control {
    public:
     Separator() {}
@@ -257,6 +271,7 @@ class Cocoa {
     virtual Value GetProperty(PropertyName name) const;
   };
 
+  // <image> implementation
   class Image : public Control {
    public:
     Image() {}
@@ -266,6 +281,7 @@ class Cocoa {
     virtual Value GetProperty(PropertyName name) const;
   };
 
+  // <popup> implementation
   class Popup : public Control {
    public:
     Popup() {}
@@ -278,6 +294,7 @@ class Cocoa {
     Spacing GetInset() const;
   };
 
+  // <item> implementation
   class PopupItem : public NativeCocoa {
    public:
     PopupItem() : item_(NULL) {}
@@ -292,6 +309,46 @@ class Cocoa {
 
    protected:
     NSMenuItem *item_;
+  };
+
+  // <list> implementation
+  class List : public View {
+   public:
+    List();
+    ~List();
+
+    virtual void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameList; }
+    virtual void AddChild(Native *child);
+    virtual bool SetProperty(PropertyName name, const Value &value);
+    virtual Value GetProperty(PropertyName name) const;
+
+    ListDataInterface* GetData() { return data_; }
+    uint32_t GetRowCount() const { return row_count_; }
+
+   protected:
+    NSTableView *table_view_;
+    TableDelegate *table_delegate_;
+    ListDataInterface *data_;
+    uint32_t row_count_;
+  };
+
+  // <column> implementation
+  class ListColumn : public NativeCocoa {
+   public:
+    ListColumn();
+
+    virtual void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameColumn; }
+    virtual void* GetNativeRef() { return column_ref_; }
+    virtual bool SetProperty(PropertyName name, const Value &value);
+    virtual Value GetProperty(PropertyName name) const;
+
+    typedef Entity EntityType;
+
+   protected:
+    NSTableColumn *column_ref_;
+    ExplicitSize size_;  // Only width is used.
   };
 
  protected:

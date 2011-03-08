@@ -137,6 +137,7 @@ class Layout : public EntityDelegate {
   SizeOption GetVSizeOption() const { return v_size_; }
   void SetHSizeOption(SizeOption h_size) { h_size_ = h_size; }
   void SetVSizeOption(SizeOption v_size) { v_size_ = v_size; }
+  const ExplicitSize& GetExplicitSize() { return explicit_size_; }
 
   const PlatformMetrics& GetPlatformMetrics() const;
 
@@ -354,6 +355,9 @@ class Spacer : public SelfMeasured {
  protected:
   virtual Size CalculateMinimumSize() const;
 };
+
+// Finds the first letter (a-z) in a string.
+const char *FirstLetter(const char *s);
 
 }  // namespace Diadem
 

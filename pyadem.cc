@@ -22,10 +22,11 @@
 
 #include "Diadem/Factory.h"
 #include "Diadem/LibXMLParser.h"
-#include "Diadem/NativeCocoa.h"
+#include "Diadem/Native.h"
 #include "Diadem/Value.h"
 
 #if TARGET_OS_MAC
+#include "Diadem/NativeCocoa.h"
 #define DIADEM_PLATFORM Diadem::Cocoa
 #endif
 
@@ -40,6 +41,44 @@ class GILState {
   }
  protected:
   PyGILState_STATE state_;
+};
+
+class PyListData : public Diadem::ListDataInterface {
+ public:
+  PyListData(PyObject *data) : data_(data) {
+    Py_INCREF(data_);
+  }
+  ~PyListData() {
+    Py_DECREF(data_);
+  }
+
+  virtual Diadem::String GetCellText(uint32_t row, const char *column) const {
+    PyObject *result = PyObject_CallMethod(
+        data_, const_cast<char*>("GetCellText"), const_cast<char*>("ks"),
+        row, column);
+
+    if ((result == NULL) || !PyString_Check(result))
+      return Diadem::String();
+    return PyString_AsString(result);
+  }
+  virtual void SetRowChecked(uint32_t row, bool check) {
+    PyObject_CallMethod(
+        data_, const_cast<char*>("SetRowChecked"), const_cast<char*>("ki"),
+        row, (int)check);
+  }
+  virtual bool GetRowChecked(uint32_t row) const {
+    PyObject *result = PyObject_CallMethod(data_, const_cast<char*>("GetRowChecked"), const_cast<char*>("k"), row);
+
+    if (result == NULL)
+      return false;
+    return PyObject_IsTrue(result);
+  }
+  virtual void ListDeleted() {
+    delete this;
+  }
+
+ protected:
+  PyObject *data_;
 };
 
 // Wraps an Entity in a Python object.
@@ -257,7 +296,17 @@ static PyObject* Entity_setProperty(PyademEntity *self, PyObject *args) {
     PyErr_SetString(PyExc_KeyError, "empty property name");
     return NULL;
   }
-  if (!self->object->SetProperty(PyString_AsString(name), value)) {
+  if (strcmp(PyString_AsString(name), Diadem::kPropData) == 0) {
+    // Special case: data is a callback object, and must be wrapped
+    PyListData *data = new PyListData(value);
+
+    if (!self->object->SetProperty(
+        Diadem::kPropData, static_cast<Diadem::ListDataInterface*>(data))) {
+      PyErr_SetString(PyExc_KeyError, "property not found");
+      delete data;
+      return NULL;
+    }
+  } else if (!self->object->SetProperty(PyString_AsString(name), value)) {
     PyErr_SetString(PyExc_KeyError, "property not found");
     return NULL;
   }
@@ -574,4 +623,8 @@ initpyadem() {
       module, "PROP_URL", Diadem::kPropURL);
   PyModule_AddStringConstant(
       module, "PROP_VALUE", Diadem::kPropValue);
+  PyModule_AddStringConstant(
+      module, "PROP_ROW_COUNT", Diadem::kPropRowCount);
+  PyModule_AddStringConstant(
+      module, "PROP_DATA", Diadem::kPropData);
 }

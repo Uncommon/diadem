@@ -23,14 +23,14 @@ namespace Diadem {
 
 extern const PropertyName
     kPropButtonType, kPropFile, kPropStyle, kPropTextAlign, kPropUISize,
-    kPropURL, kPropValue;
+    kPropURL, kPropValue, kPropRowCount, kPropData, kPropColumnType;
 
 extern const TypeName
     kTypeNameWindow, kTypeNameBox, kTypeNameButton, kTypeNameCheck,
     kTypeNameLabel, kTypeNameLink, kTypeNameEdit, kTypeNamePassword,
     kTypeNamePath, kTypeNameSeparator, kTypeNameImage, kTypeNamePopup,
     kTypeNameItem, kTypeNameCombo, kTypeNameDate, kTypeNameList,
-    kTypeNameTabs, kTypeNameTab;
+    kTypeNameColumn, kTypeNameTabs, kTypeNameTab;
 
 extern const StringConstant kTextAlignLeft, kTextAlignCenter, kTextAlignRight;
 
@@ -41,6 +41,8 @@ extern const StringConstant
     kWindowStyleNameMinimizable;
 
 extern const StringConstant kLabelStyleNameHead;
+
+extern const StringConstant kColumnTypeNameText, kColumnTypeNameCheck;
 
 // Style mask bits for window attributes
 enum WindowStyleBit {
@@ -125,6 +127,22 @@ class WindowInterface {
 
   // Methods for testing
   virtual bool TestClose() { return false; }
+};
+
+// Callback interface for supplying list data
+class ListDataInterface {
+ public:
+  virtual ~ListDataInterface() {}
+
+  // Returns the text content for the given row and column.
+  virtual String GetCellText(uint32_t row, const char *column) const = 0;
+  // The user has clicked the row's checkbox.
+  virtual void SetRowChecked(uint32_t row, bool check) = 0;
+  // Returns true if the given row should be checked.
+  virtual bool GetRowChecked(uint32_t row) const = 0;
+  // Notification that the list object has been deleted. The data object may
+  // delete itself inside this callback.
+  virtual void ListDeleted() {}
 };
 
 }  // namespace Diadem

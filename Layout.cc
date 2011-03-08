@@ -75,8 +75,7 @@ static bool ParseSizeOption(const char *c, SizeOption *size) {
   return false;
 }
 
-// Finds the first letter (a-z) in a string
-static const char *FirstLetter(const char *s) {
+const char *FirstLetter(const char *s) {
   const char *l = s;
 
   for (; !isalpha(*l); ++l) {
@@ -84,35 +83,6 @@ static const char *FirstLetter(const char *s) {
       return NULL;
   }
   return l;
-}
-
-// Parses a width value for an explicit amount and unit
-static void ParseWidth(const char *value, ExplicitSize *size) {
-  DASSERT(size != NULL);
-  if (strcmp(value, "indent") == 0) {
-    size->width_ = 1;
-    size->width_units_ = kUnitIndent;
-  } else {
-    const char *letters = FirstLetter(value);
-
-    if ((letters != NULL) && (strcmp(letters, "em") == 0))
-      size->width_units_ = kUnitEms;
-    else
-      size->width_units_ = kUnitPixels;
-    size->width_ = strtof(value, NULL);
-  }
-}
-
-// Parses a height value for an explicit amount and unit
-static void ParseHeight(const char *value, ExplicitSize *size) {
-  DASSERT(size != NULL);
-  const char *letters = FirstLetter(value);
-
-  if ((letters != NULL) && (strcmp(letters, "li") == 0))
-    size->height_units_ = kUnitLines;
-  else
-    size->height_units_ = kUnitPixels;
-  size->height_ = strtof(value, NULL);
 }
 
 // Reverses an alignment value for RTL layout
@@ -168,7 +138,7 @@ bool Layout::SetProperty(PropertyName name, const Value &value) {
     const String width_string = value.Coerce<String>();
 
     if (!ParseSizeOption(width_string, &h_size_)) {
-      ParseWidth(width_string, &explicit_size_);
+      explicit_size_.ParseWidth(width_string);
       h_size_ = kSizeExplicit;
     }
     return true;
@@ -177,7 +147,7 @@ bool Layout::SetProperty(PropertyName name, const Value &value) {
     const String height_string = value.Coerce<String>();
 
     if (!ParseSizeOption(height_string, &v_size_)) {
-      ParseHeight(height_string, &explicit_size_);
+      explicit_size_.ParseHeight(height_string);
       v_size_ = kSizeExplicit;
     }
     return true;

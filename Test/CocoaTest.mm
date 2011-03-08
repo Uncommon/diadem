@@ -430,3 +430,70 @@ TEST_F(CocoaTest, testLabelStyle) {
   // same expected font
   EXPECT_TRUE([font isEqual:expected_font]);
 }
+
+TEST_F(CocoaTest, testBasicList) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='testBasicList'>"
+        "<list>"
+          "<column name='col1' text='Work'/>"
+          "<column name='col2' text='Play'/>"
+        "</list>"
+      "</window>"));
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+
+  Diadem::Entity* const list = window_root_->ChildAt(0);
+  NSScrollView *scroll_view =
+      reinterpret_cast<NSScrollView*>(list->GetNative()->GetNativeRef());
+
+  ASSERT_TRUE([scroll_view isKindOfClass:[NSScrollView class]]);
+
+  NSTableView *table_view =
+      reinterpret_cast<NSTableView*>([scroll_view documentView]);
+
+  ASSERT_TRUE([table_view isKindOfClass:[NSTableView class]]);
+  ASSERT_EQ(2, list->ChildrenCount());
+  ASSERT_EQ(2, [[table_view tableColumns] count]);
+
+  NSTableColumn *col = [[table_view tableColumns] objectAtIndex:0];
+
+  EXPECT_STREQ("col1", [[col identifier] UTF8String]);
+  EXPECT_STREQ("Work", [[[col headerCell] stringValue] UTF8String]);
+
+  col = [[table_view tableColumns] objectAtIndex:1];
+  EXPECT_STREQ("col2", [[col identifier] UTF8String]);
+  EXPECT_STREQ("Play", [[[col headerCell] stringValue] UTF8String]);
+}
+
+TEST_F(CocoaTest, testColumnSizes) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='testBasicList'>"
+        "<list>"
+          "<column name='col1' width='40'/>"
+          "<column name='col2' width='5em'/>"
+        "</list>"
+      "</window>"));
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+
+  Diadem::Entity* const list = window_root_->ChildAt(0);
+  NSScrollView *scroll_view =
+      reinterpret_cast<NSScrollView*>(list->GetNative()->GetNativeRef());
+
+  ASSERT_TRUE([scroll_view isKindOfClass:[NSScrollView class]]);
+
+  NSTableView *table_view =
+      reinterpret_cast<NSTableView*>([scroll_view documentView]);
+
+  ASSERT_TRUE([table_view isKindOfClass:[NSTableView class]]);
+  ASSERT_EQ(2, list->ChildrenCount());
+  ASSERT_EQ(2, [[table_view tableColumns] count]);
+
+  Diadem::Entity *col = list->ChildAt(0);
+  Diadem::Size size =
+      col->GetProperty(Diadem::kPropMinimumSize).Coerce<Diadem::Size>();
+
+  EXPECT_EQ(40, size.width);
+
+  col = list->ChildAt(1);
+  size = col->GetProperty(Diadem::kPropMinimumSize).Coerce<Diadem::Size>();
+  EXPECT_EQ(col->GetNative()->GetPlatformMetrics().em_size * 5, size.width);
+}

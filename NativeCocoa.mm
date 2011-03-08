@@ -20,6 +20,16 @@
 // Interface Guidelines (AHIG), and the distances that Interface Builder (IB)
 // snaps to. Conflicts are resolved by judgment call.
 
+@interface TableDelegate : NSObject
+{
+@public
+  Diadem::Cocoa::List *list_;
+}
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView;
+- (id)tableView:(NSTableView *)tableView
+    objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row;
+@end
+
 namespace {
 
 NSString* NSStringWithString(const Diadem::String string) {
@@ -209,19 +219,21 @@ PlatformMetrics Cocoa::NativeCocoa::metrics_ = {
 
 void Cocoa::SetUpFactory(Factory *factory) {
   DASSERT(factory != NULL);
-  factory->RegisterNative<Label>(kTypeNameLabel);
-  factory->RegisterNative<Link>(kTypeNameLink);
-  factory->RegisterNative<Window>(kTypeNameWindow);
   factory->RegisterNative<Box>(kTypeNameBox);
   factory->RegisterNative<PushButton>(kTypeNameButton);
   factory->RegisterNative<Checkbox>(kTypeNameCheck);
+  factory->RegisterNative<ListColumn>(kTypeNameColumn);
   factory->RegisterNative<EditField>(kTypeNameEdit);
+  factory->RegisterNative<Image>(kTypeNameImage);
+  factory->RegisterNative<Label>(kTypeNameLabel);
+  factory->RegisterNative<Link>(kTypeNameLink);
+  factory->RegisterNative<List>(kTypeNameList);
   factory->RegisterNative<PasswordField>(kTypeNamePassword);
   factory->RegisterNative<PathBox>(kTypeNamePath);
-  factory->RegisterNative<Separator>(kTypeNameSeparator);
-  factory->RegisterNative<Image>(kTypeNameImage);
   factory->RegisterNative<Popup>(kTypeNamePopup);
   factory->RegisterNative<PopupItem>(kTypeNameItem);
+  factory->RegisterNative<Separator>(kTypeNameSeparator);
+  factory->RegisterNative<Window>(kTypeNameWindow);
 }
 
 String Cocoa::ChooseFolder(const String &initial_path) {
@@ -1225,4 +1237,212 @@ Value Cocoa::PopupItem::GetProperty(PropertyName name) const {
   return NativeCocoa::GetProperty(name);
 }
 
+Cocoa::List::List() : data_(NULL), row_count_(0) {}
+
+void Cocoa::List::InitializeProperties(const PropertyMap &properties) {
+  ScopedAutoreleasePool pool;
+  NSScrollView *scroll =
+      [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 50, 50)];
+
+  table_view_ =
+      [[NSTableView alloc] initWithFrame:NSMakeRect(0, 0, 50, 50)];
+  view_ref_ = scroll;
+  ConfigureView();
+  [scroll setDocumentView:table_view_];
+  [scroll setAutohidesScrollers:YES];
+  [scroll setBorderType:NSBezelBorder];
+  [table_view_ setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+  table_delegate_ = [[TableDelegate alloc] init];
+  table_delegate_->list_ = this;
+  [table_view_ setDelegate:table_delegate_];
+  [table_view_ setDataSource:table_delegate_];
+}
+
+Cocoa::List::~List() {
+  if (data_ != NULL)
+    data_->ListDeleted();
+  [table_view_ release];
+}
+
+void Cocoa::List::AddChild(Native *child) {
+  if (child->GetTypeName() != kTypeNameColumn)
+    return;
+  DASSERT(child->GetEntity() != NULL);
+  DASSERT(child->GetNativeRef() != NULL);
+
+  [table_view_ addTableColumn:(NSTableColumn*)child->GetNativeRef()];
+}
+
+bool Cocoa::List::SetProperty(PropertyName name, const Value &value) {
+  if (strcmp(name, kPropEnabled) == 0) {
+    ScopedAutoreleasePool pool;
+
+    [table_view_ setEnabled:value.Coerce<bool>()];
+    return true;
+  }
+  if (strcmp(name, kPropValue) == 0) {
+    ScopedAutoreleasePool pool;
+
+    [table_view_ selectRow:value.Coerce<int32_t>() byExtendingSelection:NO];
+    return true;
+  }
+  if (strcmp(name, kPropRowCount) == 0) {
+    // On Windows, the row count is stored by the control, even when data
+    // callbacks are used. We emulate that here for consistency.
+    ScopedAutoreleasePool pool;
+
+    row_count_ = value.Coerce<int32_t>();
+    [table_view_ reloadData];
+    return true;
+  }
+  if (strcmp(name, kPropData) == 0) {
+    if (value.IsValid())
+      data_ = value.Coerce<ListDataInterface*>();
+    else
+      data_ = NULL;
+    return true;
+  }
+  return View::SetProperty(name, value);
+}
+
+// rowHeight returns a value that's too small.
+const CGFloat kRowHeightFudge = 2;
+// Columns are a little wider than they're told to be.
+const CGFloat kColumnWidthFudge = 3;
+
+Value Cocoa::List::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropMinimumSize) == 0) {
+    NSScrollView *scroll = (NSScrollView*)view_ref_;
+    NSSize size = NSZeroSize;
+    ExplicitSize explicit_size = entity_->GetLayout()->GetExplicitSize();
+
+    if (explicit_size.height_units_ == kUnitLines) {
+      const CGFloat row_height = [table_view_ rowHeight] + kRowHeightFudge;
+
+      size.height = [[table_view_ headerView] frame].size.height +
+          explicit_size.height_ * row_height;
+    }
+    for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+      size.width += entity_->ChildAt(i)->GetProperty(
+          kPropMinimumSize).Coerce<Size>().width + kColumnWidthFudge;
+    }
+
+    NSSize frameSize = [NSScrollView
+        frameSizeForContentSize:size
+        hasHorizontalScroller:[scroll hasHorizontalScroller]
+        hasVerticalScroller:[scroll hasVerticalScroller]
+        borderType:[scroll borderType]];
+
+    return Size(frameSize.width, frameSize.height) + GetInset();
+  }
+  if (strcmp(name, kPropEnabled) == 0) {
+    ScopedAutoreleasePool pool;
+
+    return static_cast<bool>([table_view_ isEnabled]);
+  }
+  if (strcmp(name, kPropValue) == 0) {
+    ScopedAutoreleasePool pool;
+
+    return static_cast<int32_t>([table_view_ selectedRow]);
+  }
+  return View::GetProperty(name);
+}
+
+Cocoa::ListColumn::ListColumn() : column_ref_(nil) {}
+
+void Cocoa::ListColumn::InitializeProperties(const PropertyMap &properties) {
+  // Unlike most entity types, table columns must have a name.
+  DASSERT(properties.Exists(kPropName));
+  NSString *name =
+      [NSString stringWithUTF8String:properties[kPropName].Coerce<String>()];
+
+  column_ref_ = [[NSTableColumn alloc] initWithIdentifier:name];
+}
+
+bool Cocoa::ListColumn::SetProperty(PropertyName name, const Value &value) {
+  if (strcmp(name, kPropWidthOption) == 0) {
+    size_.ParseWidth(value.Coerce<String>());
+    [column_ref_ setWidth:size_.CalculateWidth(GetPlatformMetrics())];
+    return true;
+  }
+  if (strcmp(name, kPropText) == 0) {
+    [[column_ref_ headerCell]
+        setTitle:NSStringWithString(value.Coerce<String>())];
+    return true;
+  }
+  if (strcmp(name, kPropColumnType) == 0) {
+    // Default is text.
+    if (value.Coerce<String>() == kColumnTypeNameCheck) {
+      NSButtonCell *cell = [[[NSButtonCell alloc] init] autorelease];
+
+      [cell setButtonType:NSSwitchButton];
+      // By default, checkbox cells have a smaller font size than text cells.
+      [cell setFont:[[column_ref_ dataCell] font]];
+      [column_ref_ setDataCell:cell];
+    }
+  }
+  return NativeCocoa::SetProperty(name, value);
+}
+
+Value Cocoa::ListColumn::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropText) == 0) {
+    ScopedAutoreleasePool pool;
+
+    return String([[[column_ref_ headerCell] stringValue] UTF8String]);
+  }
+  if (strcmp(name, kPropMinimumSize) == 0) {
+    return Size(size_.CalculateWidth(GetPlatformMetrics()), 0);
+  }
+  return NativeCocoa::GetProperty(name);
+}
+
 } // Diadem
+
+@implementation TableDelegate
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
+  return list_->GetRowCount();
+}
+
+- (id)tableView:(NSTableView *)tableView
+    objectValueForTableColumn:(NSTableColumn *)tableColumn
+    row:(NSInteger)row {
+  Diadem::ListDataInterface *data = list_->GetData();
+
+  if (data == NULL)
+    return nil;
+
+  const Diadem::String text = data->GetCellText(
+      row, [[tableColumn identifier] UTF8String]);
+
+  return NSStringWithString(text);
+}
+
+- (void)tableView:(NSTableView*)tableView
+    setObjectValue:(id)value
+    forTableColumn:(NSTableColumn*)column
+    row:(NSInteger)row {
+  Diadem::ListDataInterface *data = list_->GetData();
+
+  if (data == NULL)
+    return;
+
+  data->SetRowChecked(row, [value intValue]);
+}
+
+- (void)tableView:(NSTableView*)tableView
+    willDisplayCell:(id)cell
+    forTableColumn:(NSTableColumn*)tableColumn
+    row:(NSInteger)row {
+  if ([cell isKindOfClass:[NSButtonCell class]]) {
+    Diadem::ListDataInterface *data = list_->GetData();
+
+    if (data == NULL)
+      return;
+    [cell setState:data->GetRowChecked(row) ? NSOnState : NSOffState];
+    [cell setTitle:NSStringWithString(
+        data->GetCellText(row, [[tableColumn identifier] UTF8String]))];
+  }
+}
+
+@end

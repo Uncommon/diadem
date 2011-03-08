@@ -24,7 +24,10 @@ const PropertyName
     kPropTextAlign  = "text-align",
     kPropUISize     = "uisize",
     kPropURL        = "url",
-    kPropValue      = "value";
+    kPropValue      = "value",
+    kPropRowCount   = "rows",
+    kPropData       = "data",
+    kPropColumnType = "type";
 
 const TypeName
     kTypeNameWindow     = "window",
@@ -43,6 +46,7 @@ const TypeName
     kTypeNameCombo      = "combo",
     kTypeNameDate       = "date",
     kTypeNameList       = "list",
+    kTypeNameColumn     = "column",
     kTypeNameTabs       = "tabs",
     kTypeNameTab        = "tab";
 
@@ -63,6 +67,10 @@ const StringConstant
 
 const StringConstant
     kLabelStyleNameHead = "head";
+
+const StringConstant
+    kColumnTypeNameText  = "text",
+    kColumnTypeNameCheck = "check";
 
 Location Native::GetViewOffset() const {
   Location view_location;

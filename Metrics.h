@@ -126,22 +126,12 @@ class ExplicitSize {
     : width_(size.width), height_(size.height),
       width_units_(kUnitPixels), height_units_(kUnitPixels) {}
 
-  int32_t CalculateWidth(const PlatformMetrics &metrics) const {
-    switch (width_units_) {
-      case kUnitIndent: return width_ * metrics.indent_size;
-      case kUnitEms:    return width_ * metrics.em_size;
-      case kUnitPixels:
-      default:          return width_;
-    }
-  }
-  int32_t CalculateHeight(const PlatformMetrics &metrics) const {
-    switch (height_units_) {
-      case kUnitLines:  return height_ * metrics.line_height;
-      case kUnitEms:    return height_ * metrics.em_size;
-      case kUnitPixels:
-      default:          return height_;
-    }
-  }
+  // Parses a width or height value for an explicit amount and unit.
+  void ParseWidth(const char *value);
+  void ParseHeight(const char *value);
+
+  int32_t CalculateWidth(const PlatformMetrics &metrics) const;
+  int32_t CalculateHeight(const PlatformMetrics &metrics) const;
 };
 
 }  // namespace Diadem

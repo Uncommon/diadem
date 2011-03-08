@@ -18,14 +18,18 @@
 #include "Diadem/LibXMLParser.h"
 #include "Diadem/NativeCocoa.h"
 
+class ListData;
+
 @interface DiademController : NSWindowController {
  @private
   Diadem::Entity *entity_;
+  ListData *listData_;
 }
 
 - (id)initWithEntity:(Diadem::Entity*)entity;
 - (Diadem::Entity*)entity;
 - (void)setEntity:(Diadem::Entity*)entity;
+- (void)attachListData:(Diadem::Entity*)entity;
 
 @end
 
@@ -124,6 +128,22 @@
 
 @end
 
+// Sample list data source: displays the column name and row number in each cell
+class ListData : public Diadem::ListDataInterface {
+ public:
+  ListData() {}
+
+  virtual Diadem::String GetCellText(uint32_t row, const char *column) const {
+    char *text = new char[strlen(column) + 8];
+
+    sprintf(text, "%s %d", column, row);
+    return Diadem::String(text, Diadem::String::kAdoptBuffer);
+  }
+
+  virtual void SetRowChecked(uint32_t row, bool check) {}
+  virtual bool GetRowChecked(uint32_t row) const { return false; }
+};
+
 @implementation DiademController
 
 - (id)initWithEntity:(Diadem::Entity*)entity {
@@ -132,18 +152,33 @@
   entity_ = entity;
   [self setWindow:(NSWindow*)entity->GetNative()->GetNativeRef()];
   [[self window] center];
+  [self attachListData:entity];
   return self;
 }
 
 - (void)dealloc {
   [self setWindow:nil];
   delete entity_;
+  delete listData_;
 
   [super dealloc];
 }
 
 - (Diadem::Entity*)entity {
   return entity_;
+}
+
+- (void)attachListData:(Diadem::Entity*)entity {
+  if (entity->GetTypeName() == Diadem::kTypeNameList) {
+    if (listData_ == NULL)
+      listData_ = new ListData;
+    entity->SetProperty(
+        Diadem::kPropData, (Diadem::ListDataInterface*)listData_);
+    entity->SetProperty(Diadem::kPropRowCount, 2);
+  } else {
+    for (uint32_t i = 0; i < entity->ChildrenCount(); ++i)
+      [self attachListData:entity->ChildAt(i)];
+  }
 }
 
 - (void)setEntity:(Diadem::Entity*)entity {
@@ -153,6 +188,7 @@
 
   [[self window] center];
   [[self window] makeKeyAndOrderFront:self];
+  [self attachListData:entity];
 }
 
 @end

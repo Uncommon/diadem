@@ -35,6 +35,8 @@ using std::type_info;
 
 namespace Diadem {
 
+class ListDataInterface;
+
 // Generic value holder based roughly on boost::any, but also with type
 // conversions using the Coerce method.
 class Value {
@@ -62,6 +64,10 @@ class Value {
 #endif
 
 #undef Value_Construct
+
+  // The macro doesn't work with pointers
+  Value(ListDataInterface *data)
+      : holder_(new ValueHolder<ListDataInterface*>(data)) {}
 
   template <class T>
   Value& operator=(const T &t) {
@@ -199,6 +205,7 @@ ValueReturnData(Location)
 CoerceToPODZero(Size)
 CoerceToPODZero(Spacing)
 CoerceToPODZero(Location)
+CoerceToPODZero(ListDataInterface*)
 
 #undef CoerceToPODZero
 #undef ValueReturnData

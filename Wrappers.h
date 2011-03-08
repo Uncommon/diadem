@@ -103,8 +103,11 @@ class String : public Base {
 
   String() : string_(NULL) { Clear(); }
   String(const char *s)   : string_(NULL) { *this = s; }
-  String(const char *s, Adopt) : string_(s) {}
   String(const String &s) : string_(NULL) { *this = s.string_; }
+  // If the pointer you pass was allocated with new char[], and you want the
+  // String object to dispose of it, pass kAdoptBuffer as the second parameter.
+  String(const char *s, Adopt) : string_(s) {}
+
   ~String() { delete[] string_; }
 
   void Clear() {
