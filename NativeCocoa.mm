@@ -53,6 +53,12 @@ SInt32 GetThemeMetric() {
   return result;
 }
 
+// NSButton's setButtonType changes several attributes, so there is no
+// buttonType getter.
+bool IsCheckOrRadio(NSButton *button) {
+  return [[button cell] showsStateBy] != NSNoCellMask;
+}
+
 } // namespace
 
 @interface WindowDelegate : NSObject {
@@ -78,7 +84,6 @@ SInt32 GetThemeMetric() {
 
 @end
 
-
 @interface ButtonTarget : NSObject {
  @private
   Diadem::Cocoa::Button *button_;
@@ -101,6 +106,12 @@ SInt32 GetThemeMetric() {
 }
 
 - (void)click:(id)sender {
+  if (IsCheckOrRadio((NSButton*)button_->GetNativeRef())) {
+    Diadem::Entity* const parent = button_->GetEntity()->GetParent();
+
+    if (parent != NULL)
+      parent->ChildValueChanged(button_->GetEntity());
+  }
   button_->GetEntity()->Clicked();
 }
 
@@ -220,18 +231,19 @@ PlatformMetrics Cocoa::NativeCocoa::metrics_ = {
 void Cocoa::SetUpFactory(Factory *factory) {
   DASSERT(factory != NULL);
   factory->RegisterNative<Box>(kTypeNameBox);
-  factory->RegisterNative<PushButton>(kTypeNameButton);
   factory->RegisterNative<Checkbox>(kTypeNameCheck);
-  factory->RegisterNative<ListColumn>(kTypeNameColumn);
   factory->RegisterNative<EditField>(kTypeNameEdit);
   factory->RegisterNative<Image>(kTypeNameImage);
   factory->RegisterNative<Label>(kTypeNameLabel);
   factory->RegisterNative<Link>(kTypeNameLink);
   factory->RegisterNative<List>(kTypeNameList);
+  factory->RegisterNative<ListColumn>(kTypeNameColumn);
   factory->RegisterNative<PasswordField>(kTypeNamePassword);
   factory->RegisterNative<PathBox>(kTypeNamePath);
   factory->RegisterNative<Popup>(kTypeNamePopup);
   factory->RegisterNative<PopupItem>(kTypeNameItem);
+  factory->RegisterNative<PushButton>(kTypeNameButton);
+  factory->RegisterNative<Radio>(kTypeNameRadio);
   factory->RegisterNative<Separator>(kTypeNameSeparator);
   factory->RegisterNative<Window>(kTypeNameWindow);
 }
@@ -689,6 +701,24 @@ Cocoa::Button::~Button() {
   [target_ release];
 }
 
+bool Cocoa::Button::SetProperty(PropertyName name, const Value &value) {
+  if (strcmp(name, kPropUISize) == 0) {
+    const String ui_size = value.Coerce<String>();
+    NSControlSize size = NSRegularControlSize;
+    NSCell *cell = [(NSButton*)view_ref_ cell];
+
+    if (ui_size == kUISizeSmall)
+      size = NSSmallControlSize;
+    else if (ui_size == kUISizeMini)
+      size = NSMiniControlSize;
+    [cell setControlSize:size];
+    [cell setFont:
+        [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:size]]];
+    return true;
+  }
+  return Control::SetProperty(name, value);
+}
+
 void Cocoa::Button::MakeTarget() {
   target_ = [[ButtonTarget alloc] initWithButton:this];
 }
@@ -705,16 +735,6 @@ void Cocoa::PushButton::InitializeProperties(const PropertyMap &properties) {
   if (properties.Exists(kPropText))
     [button setTitle:
         NSStringWithString(properties[kPropText].Coerce<String>())];
-  if (properties.Exists(kPropUISize)) {
-    const String ui_size = properties[kPropUISize].Coerce<String>();
-
-    if (ui_size == kUISizeSmall) {
-      [[button cell] setControlSize:NSSmallControlSize];
-      [[button cell] setFont:
-          [NSFont systemFontOfSize:
-              [NSFont systemFontSizeForControlSize:NSSmallControlSize]]];
-    }
-  }
   MakeTarget();
   ConfigureView();
 }
@@ -732,7 +752,7 @@ bool Cocoa::PushButton::SetProperty(PropertyName name, const Value &value) {
     return true;
   }
 
-  return Control::SetProperty(name, value);
+  return Button::SetProperty(name, value);
 }
 
 #define kButtonWidthAdjustment 12
@@ -775,7 +795,7 @@ Value Cocoa::PushButton::GetProperty(PropertyName name) const {
     else
       return 14;
   }
-  return Control::GetProperty(name);
+  return Button::GetProperty(name);
 }
 
 Spacing Cocoa::PushButton::GetInset() const {
@@ -787,11 +807,11 @@ Spacing Cocoa::PushButton::GetInset() const {
     return Spacing(0, -6, -4, -6);
 }
 
-void Cocoa::Checkbox::InitializeProperties(const PropertyMap &properties) {
+void Cocoa::ValueButton::InitializeProperties(const PropertyMap &properties) {
   ScopedAutoreleasePool pool;
 
   view_ref_ = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 50, 20)];
-  [(NSButton*)view_ref_ setButtonType:NSSwitchButton];
+  [(NSButton*)view_ref_ setButtonType:GetButtonType()];
   if (properties.Exists(kPropText))
     [(NSButton*)view_ref_ setTitle:
         NSStringWithString(properties[kPropText].Coerce<String>())];
@@ -799,17 +819,26 @@ void Cocoa::Checkbox::InitializeProperties(const PropertyMap &properties) {
   ConfigureView();
 }
 
-void Cocoa::Checkbox::Finalize() {
+void Cocoa::ValueButton::Finalize() {
   // Setting this in InitializeProperties doesn't work.
   [(NSButton*)view_ref_ setState:NSOffState];
 }
 
-bool Cocoa::Checkbox::SetProperty(PropertyName name, const Value &value) {
+bool Cocoa::ValueButton::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropValue) == 0) {
     [(NSButton*)view_ref_ setState:value.Coerce<bool>() ?
         NSOnState : NSOffState];
   }
-  return Control::SetProperty(name, value);
+  return Button::SetProperty(name, value);
+}
+
+Value Cocoa::ValueButton::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropValue) == 0) {
+    ScopedAutoreleasePool pool;
+
+    return static_cast<int32_t>([(NSButton*)view_ref_ state]);
+  }
+  return Button::GetProperty(name);
 }
 
 Value Cocoa::Checkbox::GetProperty(PropertyName name) const {
@@ -822,10 +851,51 @@ Value Cocoa::Checkbox::GetProperty(PropertyName name) const {
     else  // regular and small
       return Spacing(6, 6, 6, 6);
   }
-  if (strcmp(name, kPropValue) == 0) {
-    return static_cast<int32_t>([(NSButton*)view_ref_ state]);
+  return ValueButton::GetProperty(name);
+}
+
+NSButtonType Cocoa::Checkbox::GetButtonType() const {
+  return NSSwitchButton;
+}
+
+Value Cocoa::Radio::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropPadding) == 0) {
+    ScopedAutoreleasePool pool;
+
+    // AHIG and IB agree on 6 and 5.
+    if ([[(NSButton*)view_ref_ cell] controlSize] == NSMiniControlSize)
+      return Spacing(5, 5, 5, 5);
+    else  // regular and small
+      return Spacing(6, 6, 6, 6);
   }
-  return Control::GetProperty(name);
+  if (strcmp(name, kPropBaseline) == 0) {
+    switch ([[(NSButton*)view_ref_ cell] controlSize]) {
+      case NSMiniControlSize:
+        return 9;
+      case NSSmallControlSize:
+        return 11;
+      case NSRegularControlSize:
+      default:
+        return 12;
+    }
+  }
+  return ValueButton::GetProperty(name);
+}
+
+Spacing Cocoa::Radio::GetInset() const {
+  switch ([[(NSButton*)view_ref_ cell] controlSize]) {
+    case NSMiniControlSize:
+      return Spacing(-4, -5, -4, -4);
+    case NSSmallControlSize:
+      return Spacing(-2, -3, -3, -2);
+    case NSRegularControlSize:
+    default:
+      return Spacing(-1, -2, -1, -2);
+  }
+}
+
+NSButtonType Cocoa::Radio::GetButtonType() const {
+  return NSRadioButton;
 }
 
 Cocoa::Label::Label() : ui_size_(NSRegularControlSize), heading_(false) {}

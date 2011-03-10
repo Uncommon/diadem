@@ -428,3 +428,62 @@ TEST_F(GroupTest, testNestedGroupFill) {
   EXPECT_EQ(width, label1->GetLayout()->GetSize().width);
   EXPECT_EQ(width, label2->GetLayout()->GetSize().width);
 }
+
+// Basic radio group case
+TEST_F(GroupTest, testRadio) {
+  ReadWindowData(
+      "<window text='testRadio'>"
+        "<radiogroup>"
+          "<radio text='A'/>"
+          "<radio text='B'/>"
+        "</radiogroup>"
+      "</window>");
+
+  Diadem::Entity* const group = windowRoot_->ChildAt(0);
+  const Diadem::Entity* const radio1 = group->ChildAt(0);
+  const Diadem::Entity* const radio2 = group->ChildAt(1);
+
+  EXPECT_EQ(Diadem::Layout::kLayoutColumn, group->GetLayout()->GetDirection());
+  EXPECT_EQ(
+      radio1->GetLayout()->GetLocation().x,
+      radio2->GetLayout()->GetLocation().x);
+
+  EXPECT_EQ(0, group->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  EXPECT_EQ(1, radio1->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  EXPECT_EQ(0, radio2->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  ASSERT_TRUE(group->SetProperty(Diadem::kPropValue, 1));
+  EXPECT_EQ(0, radio1->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  EXPECT_EQ(1, radio2->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  ASSERT_TRUE(group->SetProperty(Diadem::kPropValue, 0));
+  EXPECT_EQ(1, radio1->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  EXPECT_EQ(0, radio2->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+}
+
+// Radio group where one of the buttons is nested inside a group
+TEST_F(GroupTest, testNestedRadio) {
+  ReadWindowData(
+      "<window text='testNestedRadio'>"
+        "<radiogroup>"
+          "<radio text='A'/>"
+          "<group>"
+            "<radio text='B'/>"
+            "<label text='C'/>"
+          "</group>"
+        "</radiogroup>"
+      "</window>");
+
+  Diadem::Entity* const group = windowRoot_->ChildAt(0);
+  const Diadem::Entity* const radio1 = group->ChildAt(0);
+  const Diadem::Entity* const group2 = group->ChildAt(1);
+  const Diadem::Entity* const radio2 = group2->ChildAt(0);
+
+  EXPECT_EQ(0, group->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  EXPECT_EQ(1, radio1->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  EXPECT_EQ(0, radio2->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  ASSERT_TRUE(group->SetProperty(Diadem::kPropValue, 1));
+  EXPECT_EQ(0, radio1->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  EXPECT_EQ(1, radio2->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  ASSERT_TRUE(group->SetProperty(Diadem::kPropValue, 0));
+  EXPECT_EQ(1, radio1->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  EXPECT_EQ(0, radio2->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+}

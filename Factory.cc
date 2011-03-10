@@ -45,6 +45,10 @@ void Factory::RegisterBasicClasses() {
       kTypeNameLabelGroup,
       &Creator<LabelGroup, Entity>::Create,
       NULL, NULL);
+  RegisterCreator(
+      kTypeNameRadioGroup,
+      &Creator<RadioGroup, Entity>::Create,
+      NULL, NULL);
 }
 
 Entity* Factory::CreateEntity(

@@ -30,25 +30,27 @@ const PropertyName
     kPropColumnType = "type";
 
 const TypeName
-    kTypeNameWindow     = "window",
     kTypeNameBox        = "box",
     kTypeNameButton     = "button",
     kTypeNameCheck      = "check",
-    kTypeNameLabel      = "label",
-    kTypeNameLink       = "link",
-    kTypeNameEdit       = "edit",
-    kTypeNamePassword   = "password",
-    kTypeNamePath       = "path",
-    kTypeNameSeparator  = "separator",
-    kTypeNameImage      = "image",
-    kTypeNamePopup      = "popup",
-    kTypeNameItem       = "item",
+    kTypeNameColumn     = "column",
     kTypeNameCombo      = "combo",
     kTypeNameDate       = "date",
+    kTypeNameEdit       = "edit",
+    kTypeNameImage      = "image",
+    kTypeNameItem       = "item",
+    kTypeNameLabel      = "label",
+    kTypeNameLink       = "link",
     kTypeNameList       = "list",
-    kTypeNameColumn     = "column",
+    kTypeNamePassword   = "password",
+    kTypeNamePath       = "path",
+    kTypeNamePopup      = "popup",
+    kTypeNameRadio      = "radio",
+    kTypeNameRadioGroup = "radiogroup",
+    kTypeNameSeparator  = "separator",
+    kTypeNameTab        = "tab",
     kTypeNameTabs       = "tabs",
-    kTypeNameTab        = "tab";
+    kTypeNameWindow     = "window";
 
 const StringConstant
     kTextAlignLeft   = "left",
@@ -111,6 +113,60 @@ uint32_t Native::ParseWindowStyle(const char *style) {
   }
   free(style_copy);
   return result;
+}
+
+void RadioGroup::InitializeProperties(
+      const PropertyMap &properties,
+      const Factory &factory) {
+  SetLayout(new Group());
+  layout_->SetProperty(kPropDirection, Layout::kLayoutColumn);
+  Entity::InitializeProperties(properties, factory);
+}
+
+void RadioGroup::Finalize() {
+  // Select the first option by default.
+  SetSelectedIndex(0);
+}
+
+bool RadioGroup::SetProperty(PropertyName name, const Value &value) {
+  if (strcmp(name, kPropValue) == 0) {
+    SetSelectedIndex(value.Coerce<uint32_t>());
+    return true;
+  }
+  return Entity::SetProperty(name, value);
+}
+
+Value RadioGroup::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropPadding) == 0) {
+    return Spacing::Union(
+        layout_->GetProperty(kPropPadding).Coerce<Spacing>(),
+        layout_->GetPlatformMetrics().radio_group_padding);
+  }
+  if (strcmp(name, kPropValue) == 0) {
+    for (uint32_t i = 0; i < ChildrenCount(); ++i) {
+      const Value value = ChildAt(i)->GetProperty(kPropValue);
+
+      if (value.IsValid() && (value.Coerce<uint32_t>() != 0))
+        return i;
+    }
+    return Value();
+  }
+  return Entity::GetProperty(name);
+}
+
+void RadioGroup::ChildValueChanged(Entity *child) {
+  DASSERT(child != NULL);
+  const Value value = child->GetProperty(kPropValue);
+
+  if (value.IsValid() && (value.Coerce<int32_t>() != 0))
+    for (uint32_t i = 0; i < ChildrenCount(); ++i)
+      if (child == ChildAt(i))
+        SetSelectedIndex(i);
+}
+
+void RadioGroup::SetSelectedIndex(uint32_t index) {
+  for (uint32_t i = 0; i < ChildrenCount(); ++i)
+    ChildAt(i)->SetProperty(kPropValue, (i == index) ? 1 : 0);
 }
 
 }  // namespace Diadem

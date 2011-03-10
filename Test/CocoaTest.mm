@@ -497,3 +497,36 @@ TEST_F(CocoaTest, testColumnSizes) {
   size = col->GetProperty(Diadem::kPropMinimumSize).Coerce<Diadem::Size>();
   EXPECT_EQ(col->GetNative()->GetPlatformMetrics().em_size * 5, size.width);
 }
+
+TEST_F(CocoaTest, testRadio) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='testRadio'>"
+        "<radiogroup>"
+          "<radio text='A'/>"
+          "<radio text='B'/>"
+        "</radiogroup>"
+      "</window>"));
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+
+  Diadem::Entity* const group = window_root_->ChildAt(0);
+  ASSERT_EQ(2, group->ChildrenCount());
+  Diadem::Entity* const radio1 = group->ChildAt(0);
+  Diadem::Entity* const radio2 = group->ChildAt(1);
+
+  ASSERT_FALSE(radio1->GetNative() == NULL);
+  ASSERT_FALSE(radio2->GetNative() == NULL);
+  NSButton *button1 =
+      reinterpret_cast<NSButton*>(radio1->GetNative()->GetNativeRef());
+  NSButton *button2 =
+      reinterpret_cast<NSButton*>(radio2->GetNative()->GetNativeRef());
+
+  EXPECT_EQ(0, [button1 bezelStyle]);
+  EXPECT_EQ(NSOnState, [button1 state]);
+  EXPECT_EQ(NSOffState, [button2 state]);
+  [button2 performClick:nil];
+  EXPECT_EQ(NSOffState, [button1 state]);
+  EXPECT_EQ(NSOnState, [button2 state]);
+  [button1 performClick:nil];
+  EXPECT_EQ(NSOnState, [button1 state]);
+  EXPECT_EQ(NSOffState, [button2 state]);
+}

@@ -72,7 +72,7 @@ class Entity : public Base {
 
   // Returns the type name that would be used for the entity in a resource file.
   // Delegates to the Native or Layout object.
-  String GetTypeName() const;
+  virtual String GetTypeName() const;
 
   /// Gets/sets the Layout helper object which handles all dialog layout.
   void SetLayout(Layout *layout);

@@ -25,6 +25,7 @@ typedef void
     NSWindow, NSView, NSMenuItem, NSAlert, NSTableView, NSTableColumn, *Class;
 typedef void ButtonTarget, TableDelegate, WindowDelegate;
 struct NSPoint { CGFloat x, y; };
+typedef unsigned int NSButtonType;
 #endif
 
 class CocoaTest;
@@ -155,10 +156,12 @@ class Cocoa {
     Button();
     ~Button();
 
-   protected:
+    virtual bool SetProperty(PropertyName name, const Value &value);
+
+ protected:
     ButtonTarget *target_;
 
-    void MakeTarget();
+    virtual void MakeTarget();
   };
 
   // <button> implementation
@@ -176,20 +179,47 @@ class Cocoa {
     virtual Spacing GetInset() const;
   };
 
-  // <check> implementation
-  class Checkbox : public Button {
+  // Base class for checkboxes and radio buttons
+  class ValueButton : public Button {
    public:
-    Checkbox() {}
+    ValueButton() {}
+    virtual ~ValueButton() {}
 
     virtual void InitializeProperties(const PropertyMap &properties);
     virtual void Finalize();
     virtual bool SetProperty(PropertyName name, const Value &value);
     virtual Value GetProperty(PropertyName name) const;
 
+   protected:
+    virtual NSButtonType GetButtonType() const = 0;
+  };
+
+  // <check> implementation
+  class Checkbox : public ValueButton {
+   public:
+    Checkbox() {}
+
+    virtual Value GetProperty(PropertyName name) const;
+
     virtual String GetTypeName() const { return kTypeNameCheck; }
 
    protected:
     Spacing GetInset() const { return Spacing(-2, -2, -2, 0); }
+    NSButtonType GetButtonType() const;
+  };
+
+  // <radio> implementation
+  class Radio : public ValueButton {
+   public:
+    Radio() {}
+
+    virtual Value GetProperty(PropertyName name) const;
+
+    virtual String GetTypeName() const { return kTypeNameRadio; }
+
+   protected:
+    Spacing GetInset() const;
+    NSButtonType GetButtonType() const;
   };
 
   // <label> implementation

@@ -26,11 +26,12 @@ extern const PropertyName
     kPropURL, kPropValue, kPropRowCount, kPropData, kPropColumnType;
 
 extern const TypeName
-    kTypeNameWindow, kTypeNameBox, kTypeNameButton, kTypeNameCheck,
-    kTypeNameLabel, kTypeNameLink, kTypeNameEdit, kTypeNamePassword,
-    kTypeNamePath, kTypeNameSeparator, kTypeNameImage, kTypeNamePopup,
-    kTypeNameItem, kTypeNameCombo, kTypeNameDate, kTypeNameList,
-    kTypeNameColumn, kTypeNameTabs, kTypeNameTab;
+    kTypeNameBox, kTypeNameButton, kTypeNameCheck, kTypeNameColumn,
+    kTypeNameCombo, kTypeNameDate, kTypeNameEdit, kTypeNameImage,
+    kTypeNameItem, kTypeNameLabel, kTypeNameLink, kTypeNameList,
+    kTypeNamePassword, kTypeNamePath, kTypeNamePopup, kTypeNameRadio,
+    kTypeNameRadioGroup, kTypeNameSeparator, kTypeNameTab, kTypeNameTabs,
+    kTypeNameWindow;
 
 extern const StringConstant kTextAlignLeft, kTextAlignCenter, kTextAlignRight;
 
@@ -83,6 +84,29 @@ class Native : public EntityDelegate {
   // Location must be gotten and set relative to the parent container. This
   // convenience function helps with the coordinate conversion.
   Location GetViewOffset() const;
+};
+
+// A radio group's value is the index of its child whose value is non-zero.
+// Children are usually radio buttons, or they could be groups whose first child
+// is a radio button.
+class RadioGroup : public Entity {
+ public:
+  RadioGroup() {}
+
+  virtual void InitializeProperties(
+      const PropertyMap &properties,
+      const Factory &factory);
+  virtual void Finalize();
+
+  virtual bool SetProperty(PropertyName name, const Value &value);
+  virtual Value GetProperty(PropertyName name) const;
+
+  virtual void ChildValueChanged(Entity *child);
+
+  virtual String GetTypeName() const { return kTypeNameRadioGroup; }
+
+ protected:
+  void SetSelectedIndex(uint32_t index);
 };
 
 enum ButtonType { kAcceptButton, kCancelButton, kOtherButton };
