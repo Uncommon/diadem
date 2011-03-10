@@ -17,6 +17,12 @@
 
 namespace Diadem {
 
+Spacing Spacing::Union(const Spacing &a, const Spacing &b) {
+  return Spacing(
+      std::max(a.top, b.top), std::max(a.left, b.left),
+      std::max(a.bottom, b.bottom), std::max(a.right, b.right));
+}
+
 void ExplicitSize::ParseWidth(const char *value) {
   if (strcmp(value, "indent") == 0) {
     width_ = 1;

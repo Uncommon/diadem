@@ -45,6 +45,10 @@ struct Spacing {
     right += s.right;
     return *this;
   }
+
+  // Returns a Spacing object with the largest value of each component
+  // between a and b.
+  static Spacing Union(const Spacing &a, const Spacing &b);
 };
 
 // The size of a layout object, in pixels.
