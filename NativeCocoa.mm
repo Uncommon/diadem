@@ -856,7 +856,7 @@ void Cocoa::Label::InitializeProperties(const PropertyMap &properties) {
 }
 
 // The label control is a bit bigger than its text.
-const uint32_t kLabelWidthFudge  = 4;
+const uint32_t kLabelWidthFudge  = 5;
 const uint32_t kLabelHeightFudge = 1;
 
 static float WidthForText(NSString *text, NSFont *font) {
@@ -914,17 +914,19 @@ Value Cocoa::Label::GetProperty(PropertyName name) const {
 
     NSString *text = [(NSTextField*)view_ref_ stringValue];
     NSFont *font = [(NSTextField*)view_ref_ font];
+    Size text_size;
 
     if (layout->GetHSizeOption() == kSizeFill) {
       const CGFloat view_width = [view_ref_ bounds].size.width;
 
-      return Size(view_width, HeightForText(text, font, view_width));
+      text_size = Size(view_width, HeightForText(text, font, view_width));
     } else {
-      return Size(
+      text_size = Size(
           WidthForText(text, font),
           [[[[NSLayoutManager alloc] init] autorelease]
               defaultLineHeightForFont:font] + kLabelHeightFudge);
     }
+    return text_size + GetInset();
   }
   if (strcmp(name, kPropBaseline) == 0) {
     switch (ui_size_) {
@@ -943,13 +945,8 @@ bool Cocoa::Label::SetProperty(const PropertyName name, const Value &value) {
       const NSSize old_size = [view_ref_ bounds].size;
 
       Control::SetProperty(name, value);
-      if (!NSEqualSizes([view_ref_ bounds].size, old_size)) {
-        LayoutContainer *lp =
-            dynamic_cast<LayoutContainer*>(entity_->GetParent());
-
-        if (lp != NULL)
-          lp->InvalidateLayout();
-      }
+      if (!NSEqualSizes([view_ref_ bounds].size, old_size))
+        entity_->GetLayout()->InvalidateLayout();
       return true;
     } else {
       return Control::SetProperty(name, value);

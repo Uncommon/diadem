@@ -400,3 +400,31 @@ TEST_F(GroupTest, testGroupBaseline) {
   EXPECT_EQ(b1, bg);
   EXPECT_EQ(b2, bg);
 }
+
+TEST_F(GroupTest, testNestedGroupFill) {
+  ReadWindowData(
+      "<window width='20em'>"
+        "<group width='fill'><group width='fill'>"
+          "<label width='fill'/>"
+        "</group></group>"
+        "<group width='fill'>"
+          "<label width='fill'/>"
+        "</group>"
+        "<label width='fill'/>"
+      "</window>");
+
+  const Diadem::Entity* const group1 = windowRoot_->ChildAt(0);
+  const Diadem::Entity* const group11 = group1->ChildAt(0);
+  const Diadem::Entity* const label1 = group1->ChildAt(0);
+  const Diadem::Entity* const group2 = windowRoot_->ChildAt(1);
+  const Diadem::Entity* const label2 = group2->ChildAt(0);
+  const Diadem::Entity* const label3 = windowRoot_->ChildAt(2);
+
+  const int32_t width = label3->GetLayout()->GetSize().width;
+
+  EXPECT_EQ(width, group1->GetLayout()->GetSize().width);
+  EXPECT_EQ(width, group11->GetLayout()->GetSize().width);
+  EXPECT_EQ(width, group2->GetLayout()->GetSize().width);
+  EXPECT_EQ(width, label1->GetLayout()->GetSize().width);
+  EXPECT_EQ(width, label2->GetLayout()->GetSize().width);
+}
