@@ -812,6 +812,12 @@ bool Group::SetProperty(PropertyName name, const Value &value) {
     SetLocation(value.Coerce<Location>());
     return true;
   }
+  if (strcmp(name, kPropValue) == 0) {
+    if (entity_->ChildrenCount() > 0)
+      return entity_->ChildAt(0)->SetProperty(kPropValue, value);
+    else
+      return true;
+  }
   return LayoutContainer::SetProperty(name, value);
 }
 
@@ -820,7 +826,19 @@ Value Group::GetProperty(PropertyName name) const {
     return GetLocation();
   if (strcmp(name, kPropSize) == 0)
     return GetSize();
+  if (strcmp(name, kPropValue) == 0) {
+    if (entity_->ChildrenCount() > 0)
+      return entity_->ChildAt(0)->GetProperty(kPropValue);
+    else
+      return Value();
+  }
   return LayoutContainer::GetProperty(name);
+}
+
+void Group::ChildValueChanged(Entity *child) {
+  DASSERT(entity_->ChildrenCount() > 0);
+  if ((child == entity_->ChildAt(0)) && (entity_->GetParent() != NULL))
+    entity_->GetParent()->ChildValueChanged(entity_);
 }
 
 Size Spacer::CalculateMinimumSize() const {

@@ -240,6 +240,13 @@ String Entity::GetText() const {
   return text.IsValid() ? text.Coerce<String>() : String();
 }
 
+void Entity::ChildValueChanged(Entity *child) {
+  if (layout_ != NULL)
+    layout_->ChildValueChanged(child);
+  if (native_ != NULL)
+    native_->ChildValueChanged(child);
+}
+
 void Entity::Clicked(Entity *target) {
   if (button_callback_ != NULL)
     (*button_callback_)(target, button_data_);

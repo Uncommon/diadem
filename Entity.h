@@ -116,6 +116,9 @@ class Entity : public Base {
   void SetText(const char *text);
   String GetText() const;
 
+  // One of the entity's children changed its kPropValue.
+  virtual void ChildValueChanged(Entity *child);
+
   // Notification that the control for the given entity was clicked. The
   // message is passed up the hierarchy until an entity has a button callback.
   virtual void Clicked(Entity *target);
@@ -179,6 +182,8 @@ class EntityDelegate : public Base {
 
   virtual bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
+
+  virtual void ChildValueChanged(Entity *child) {}
 
  protected:
   Entity *entity_;

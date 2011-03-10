@@ -333,6 +333,10 @@ class Group : public LayoutContainer {
   virtual bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
 
+  // The group's value is the value of the first child, so changes may need
+  // to be propagated.
+  virtual void ChildValueChanged(Entity *child);
+
  protected:
   Size size_;
   Location location_;
