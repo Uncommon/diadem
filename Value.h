@@ -122,6 +122,7 @@ class Value {
     // Each type variant must be declared explicitly because method templates
     // cannot be virtual.
     virtual int32_t Coerce(const type<int32_t>&) const = 0;
+    virtual uint32_t Coerce(const type<uint32_t>&) const = 0;
     virtual int64_t Coerce(const type<int64_t>&) const = 0;
     virtual bool Coerce(const type<bool>&) const = 0;
     virtual String Coerce(const type<String>&) const = 0;
@@ -151,6 +152,7 @@ class Value {
     // For types where simple casts are not enough, these are overridden
     // by specializations below.
     int32_t Coerce(const type<int32_t>&) const { return (int32_t)data; }
+    uint32_t Coerce(const type<uint32_t>&) const { return (uint32_t)data; }
     int64_t Coerce(const type<int64_t>&) const { return (int64_t)data; }
     bool    Coerce(const type<bool>&) const    { return data ? true : false; }
     String  Coerce(const type<String>&) const
@@ -172,6 +174,8 @@ class Value {
 
 template<> inline int32_t Value::ValueHolder<String>::Coerce(
     const Value::type<int32_t>&) const { return data.ToInteger(); }
+template<> inline uint32_t Value::ValueHolder<String>::Coerce(
+    const Value::type<uint32_t>&) const { return data.ToInteger(); }
 template<> inline int64_t Value::ValueHolder<String>::Coerce(
     const Value::type<int64_t>&) const { return data.ToInteger64(); }
 template<> inline bool Value::ValueHolder<String>::Coerce(
@@ -193,6 +197,8 @@ ValueReturnData(Location)
 #define CoerceToPODZero(T) \
   template<> inline int32_t Value::ValueHolder<T>::Coerce( \
       const Value::type<int32_t>&) const { return 0; } \
+  template<> inline uint32_t Value::ValueHolder<T>::Coerce( \
+      const Value::type<uint32_t>&) const { return 0; } \
   template<> inline int64_t Value::ValueHolder<T>::Coerce( \
       const Value::type<int64_t>&) const { return 0; } \
   template<> inline bool Value::ValueHolder<T>::Coerce( \
