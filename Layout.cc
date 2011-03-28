@@ -49,6 +49,11 @@ const TypeName
     kTypeNameSpacer = "spacer";
 
 const StringConstant
+    kSizeNameDefault = "default",
+    kSizeNameFit     = "fit",
+    kSizeNameFill    = "fill";
+
+const StringConstant
     kAlignNameStart  = "start",
     kAlignNameCenter = "center",
     kAlignNameEnd    = "end";
@@ -63,7 +68,7 @@ const StringConstant
 // vary depending on the object type.
 static bool ParseSizeOption(const char *c, SizeOption *size) {
   const char* strings[3] = {
-      "default", "fit", "fill" };
+      kSizeNameDefault, kSizeNameFit, kSizeNameFill };
   const SizeOption options[3] = { kSizeDefault, kSizeFit, kSizeFill };
 
   DASSERT(size != NULL);
@@ -132,6 +137,8 @@ Layout::LayoutDirection Layout::GetDirection() const {
 bool Layout::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropInLayout) == 0) {
     in_layout_ = value.Coerce<bool>();
+    entity_->SetProperty(kPropVisible, in_layout_);
+    InvalidateLayout();
     return true;
   }
   if (strcmp(name, kPropWidthOption) == 0) {
@@ -817,6 +824,10 @@ bool Group::SetProperty(PropertyName name, const Value &value) {
       return entity_->ChildAt(0)->SetProperty(kPropValue, value);
     else
       return true;
+  }
+  if (strcmp(name, kPropVisible) == 0) {
+    for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i)
+      entity_->ChildAt(i)->SetProperty(kPropVisible, value);
   }
   return LayoutContainer::SetProperty(name, value);
 }

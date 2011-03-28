@@ -45,6 +45,8 @@ extern const PropertyName
 
 extern const TypeName kTypeNameGroup, kTypeNameSpacer;
 
+extern const StringConstant kSizeNameDefault, kSizeNameFit, kSizeNameFill;
+
 extern const StringConstant kAlignNameStart, kAlignNameCenter, kAlignNameEnd;
 
 extern const StringConstant kDirectionNameRow, kDirectionNameColumn;
