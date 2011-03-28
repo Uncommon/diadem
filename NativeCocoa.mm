@@ -711,6 +711,10 @@ Cocoa::Button::~Button() {
 }
 
 bool Cocoa::Button::SetProperty(PropertyName name, const Value &value) {
+  if (strcmp(name, kPropText) == 0) {
+    [(NSButton*)view_ref_ setTitle:NSStringWithString(value.Coerce<String>())];
+    return true;
+  }
   if (strcmp(name, kPropUISize) == 0) {
     const String ui_size = value.Coerce<String>();
     NSControlSize size = NSRegularControlSize;
@@ -741,9 +745,6 @@ void Cocoa::PushButton::InitializeProperties(const PropertyMap &properties) {
   [button setButtonType:NSMomentaryPushInButton];
   [button setImagePosition:NSNoImage];
   [button setBordered:YES];
-  if (properties.Exists(kPropText))
-    [button setTitle:
-        NSStringWithString(properties[kPropText].Coerce<String>())];
   MakeTarget();
   ConfigureView();
 }
