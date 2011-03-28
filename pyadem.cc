@@ -45,7 +45,7 @@ class GILState {
 
 class PyListData : public Diadem::ListDataInterface {
  public:
-  PyListData(PyObject *data) : data_(data) {
+  explicit PyListData(PyObject *data) : data_(data) {
     Py_INCREF(data_);
   }
   ~PyListData() {
@@ -53,21 +53,30 @@ class PyListData : public Diadem::ListDataInterface {
   }
 
   virtual Diadem::String GetCellText(uint32_t row, const char *column) const {
-    PyObject *result = PyObject_CallMethod(
-        data_, const_cast<char*>("GetCellText"), const_cast<char*>("ks"),
-        row, column);
+    GILState gil;
+    PyObject *result = PyObject_CallMethodObjArgs(
+        data_, PyString_FromString("GetCellText"),
+        PyLong_FromUnsignedLong(row), PyString_FromString(column), NULL);
 
+    if ((result == NULL) && PyErr_Occurred()) {
+      PyErr_Print();
+      PyErr_Clear();
+    }
     if ((result == NULL) || !PyString_Check(result))
       return Diadem::String();
     return PyString_AsString(result);
   }
   virtual void SetRowChecked(uint32_t row, bool check) {
-    PyObject_CallMethod(
-        data_, const_cast<char*>("SetRowChecked"), const_cast<char*>("ki"),
-        row, (int)check);
+    GILState gil;
+    PyObject_CallMethodObjArgs(
+        data_, PyString_FromString("SetRowChecked"),
+        PyLong_FromUnsignedLong(row), PyBool_FromLong(check), NULL);
   }
   virtual bool GetRowChecked(uint32_t row) const {
-    PyObject *result = PyObject_CallMethod(data_, const_cast<char*>("GetRowChecked"), const_cast<char*>("k"), row);
+    GILState gil;
+    PyObject *result = PyObject_CallMethodObjArgs(
+        data_, PyString_FromString("GetRowChecked"),
+        PyLong_FromUnsignedLong(row), NULL);
 
     if (result == NULL)
       return false;
@@ -412,6 +421,13 @@ static PyObject* Window_showModeless(PyademWindow *self) {
   return PyBool_FromLong(self->window->ShowModeless());
 }
 
+static PyObject* Window_resizeToMinimum(PyademWindow *self) {
+  if ((self == NULL) || (self->window == NULL))
+    return NULL;
+  self->window->GetRoot()->GetLayout()->ResizeToMinimum();
+  Py_RETURN_NONE;
+}
+
 static PyObject* Window_close(PyademWindow *self) {
   if ((self == NULL) || (self->window == NULL))
     return NULL;
@@ -438,6 +454,8 @@ static PyObject* Window_endModal(PyademWindow *self) {
 
 static PyMethodDef Window_methods[] = {
     { "ShowModeless", (PyCFunction)Window_showModeless, METH_NOARGS, NULL },
+    { "ResizeToMinimum", (PyCFunction)Window_resizeToMinimum,
+      METH_NOARGS, NULL },
     { "Close",        (PyCFunction)Window_close,        METH_NOARGS, NULL },
     { "ShowModal",    (PyCFunction)Window_showModal,    METH_NOARGS, NULL },
     { "EndModal",     (PyCFunction)Window_endModal,     METH_NOARGS, NULL },
