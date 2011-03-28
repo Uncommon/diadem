@@ -276,12 +276,9 @@ static PyGetSetDef Entity_getsetters[] = {
     { NULL },
     };
 
-static PyObject* Entity_getProperty(PyademEntity *self, PyObject *name) {
-  if (self->object == NULL)
-    return NULL;
-
-  const Diadem::Value value =
-      self->object->GetProperty(PyString_AsString(name));
+// Helper used in Entity_getProperty and Entity_getPropertyByName
+static PyObject* GetProperty(Diadem::Entity *entity, PyObject *name) {
+  const Diadem::Value value = entity->GetProperty(PyString_AsString(name));
 
   if (!value.IsValid()) {
     PyErr_SetString(PyExc_KeyError, "property not found");
@@ -291,6 +288,50 @@ static PyObject* Entity_getProperty(PyademEntity *self, PyObject *name) {
   // Sometimes PyString_AsString sets the error indicator even when it succeeds.
   PyErr_Clear();
   return value.Coerce<PyObject*>();
+}
+
+// Helper used in Entity_setProperty and Entity_setPropertyByName
+static PyObject* SetProperty(
+    Diadem::Entity *entity, PyObject *name, PyObject *value) {
+  if (strcmp(PyString_AsString(name), Diadem::kPropData) == 0) {
+    // Special case: data is a callback object, and must be wrapped
+    PyListData *data = new PyListData(value);
+
+    if (!entity->SetProperty(
+        Diadem::kPropData, static_cast<Diadem::ListDataInterface*>(data))) {
+      PyErr_SetString(PyExc_KeyError, "property not found");
+      delete data;
+      return NULL;
+    }
+  } else if (!entity->SetProperty(PyString_AsString(name), value)) {
+    PyErr_SetString(PyExc_KeyError, "property not found");
+    return NULL;
+  }
+  PyErr_Clear();
+  Py_RETURN_NONE;
+}
+
+// Helper used in Entity_get/setPropertyByName
+static Diadem::Entity* GetEntityByName(PyademEntity *self, PyObject *name) {
+  const char *name_chars = PyString_AsString(name);
+
+  if (name_chars == NULL)
+    return NULL;
+
+  Diadem::Entity* const entity = self->object->FindByName(name_chars);
+
+  if (entity == NULL) {
+    PyErr_SetString(PyExc_KeyError, "entity not found");
+    return NULL;
+  }
+  return entity;
+}
+
+static PyObject* Entity_getProperty(PyademEntity *self, PyObject *name) {
+  if (self->object == NULL)
+    return NULL;
+
+  return GetProperty(self->object, name);
 }
 
 static PyObject* Entity_setProperty(PyademEntity *self, PyObject *args) {
@@ -305,22 +346,7 @@ static PyObject* Entity_setProperty(PyademEntity *self, PyObject *args) {
     PyErr_SetString(PyExc_KeyError, "empty property name");
     return NULL;
   }
-  if (strcmp(PyString_AsString(name), Diadem::kPropData) == 0) {
-    // Special case: data is a callback object, and must be wrapped
-    PyListData *data = new PyListData(value);
-
-    if (!self->object->SetProperty(
-        Diadem::kPropData, static_cast<Diadem::ListDataInterface*>(data))) {
-      PyErr_SetString(PyExc_KeyError, "property not found");
-      delete data;
-      return NULL;
-    }
-  } else if (!self->object->SetProperty(PyString_AsString(name), value)) {
-    PyErr_SetString(PyExc_KeyError, "property not found");
-    return NULL;
-  }
-  PyErr_Clear();
-  Py_RETURN_NONE;
+  return SetProperty(self->object, name, value);
 }
 
 static PyObject* Entity_findByName(PyademEntity *self, PyObject *name) {
@@ -336,10 +362,46 @@ static PyObject* Entity_findByName(PyademEntity *self, PyObject *name) {
   return reinterpret_cast<PyObject*>(WrapEntity(entity));
 }
 
+static PyObject* Entity_getPropertyByName(PyademEntity *self, PyObject *args) {
+  if (self->object == NULL)
+    return NULL;
+
+  PyObject *entity_name, *prop_name;
+
+  if (!PyArg_ParseTuple(args, "SS", &entity_name, &prop_name))
+    return NULL;
+
+  Diadem::Entity* const entity = GetEntityByName(self, entity_name);
+
+  if (entity == NULL)
+    return NULL;
+  return GetProperty(entity, prop_name);
+}
+
+static PyObject* Entity_setPropertyByName(PyademEntity *self, PyObject *args) {
+  if (self->object == NULL)
+    return NULL;
+
+  PyObject *entity_name, *prop_name, *value;
+
+  if (!PyArg_ParseTuple(args, "SSO", &entity_name, &prop_name, &value))
+    return NULL;
+
+  Diadem::Entity* const entity = GetEntityByName(self, entity_name);
+
+  if (entity == NULL)
+    return NULL;
+  return SetProperty(entity, prop_name, value);
+}
+
 static PyMethodDef Entity_methods[] = {
     { "GetProperty", (PyCFunction)Entity_getProperty, METH_O, NULL },
     { "SetProperty", (PyCFunction)Entity_setProperty, METH_VARARGS, NULL },
     { "FindByName",  (PyCFunction)Entity_findByName,  METH_O, NULL },
+    { "SetPropertyByName", (PyCFunction)Entity_setPropertyByName,
+      METH_VARARGS, NULL },
+    { "GetPropertyByName", (PyCFunction)Entity_getPropertyByName,
+      METH_VARARGS, NULL },
     { NULL },
     };
 

@@ -186,6 +186,53 @@ TEST_F(PythonTest, FindByName) {
   EXPECT_STREQ("B", entityB->GetName());
 }
 
+// Tests the Get/SetPropertyByName convenience functions.
+TEST_F(PythonTest, GetSetByName) {
+  PyObject *result = PyRun_String(
+      "window = pyadem.Window(data=\""
+        "<window>"
+          "<button name='A' text='A'/>"
+          "<button name='B' text='B'/>"
+        "</window>\")\n"
+      "textA = window.GetPropertyByName(\"A\", pyadem.PROP_TEXT)\n"
+      "window.SetPropertyByName(\"B\", pyadem.PROP_TEXT, \"BBB\")\n",
+      Py_file_input, globals_, locals_);
+  PyObject *error = PyErr_Occurred();
+
+  if (error != NULL) {
+    PyErr_Print();
+    PyErr_Clear();
+    FAIL();
+  }
+  ASSERT_FALSE(result == NULL);
+
+  // Check that the right button was found by GetPropertyByName
+  PyObject *textA = PyDict_GetItemString(locals_, "textA");
+
+  ASSERT_FALSE(textA == NULL);
+  ASSERT_TRUE(PyString_Check(textA));
+  EXPECT_STREQ("A", PyString_AsString(textA));
+
+  // Check that SetPropertyByName set the right button
+  PyademEntity *window = (PyademEntity*)PyDict_GetItemString(locals_, "window");
+
+  ASSERT_FALSE(window == NULL);
+  ASSERT_TRUE(PyObject_TypeCheck(window, &EntityType));
+
+  Diadem::Entity* const buttonB = window->object->FindByName("B");
+
+  ASSERT_FALSE(buttonB == NULL);
+
+  const Diadem::Value value = buttonB->GetProperty(Diadem::kPropText);
+
+  ASSERT_TRUE(value.IsValid());
+
+  const Diadem::String textB = value.Coerce<Diadem::String>();
+
+  ASSERT_TRUE(!textB.IsEmpty());
+  EXPECT_STREQ("BBB", textB.Get());
+}
+
 // Tests the button callback calling a Python function.
 TEST_F(PythonTest, ButtonCallback) {
   PyObject *result = PyRun_String(
