@@ -410,10 +410,20 @@ bool Cocoa::Window::SetProperty(PropertyName name, const Value &value) {
     return true;
   }
   if (strcmp(name, kPropSize) == 0) {
+    NSRect content = [NSWindow
+        contentRectForFrameRect:[window_ref_ frame]
+        styleMask:[window_ref_ styleMask]];
+    const NSSize old_size = content.size;
     const Size size = value.Coerce<Size>();
 
-    [window_ref_ setContentSize:NSMakeSize(size.width, size.height)];
-    // TODO: reposition?
+    content.size.width = size.width;
+    content.size.height = size.height;
+
+    NSRect frame = [NSWindow frameRectForContentRect:content
+                                           styleMask:[window_ref_ styleMask]];
+
+    frame.origin.y += old_size.height - size.height;
+    [window_ref_ setFrame:frame display:YES];
     return true;
   }
   if (strcmp(name, kPropLocation) == 0) {
@@ -437,8 +447,7 @@ Value Cocoa::Window::GetProperty(PropertyName name) const {
     return String([title UTF8String]);
   }
   if (strcmp(name, kPropSize) == 0) {
-    NSRect content_rect =
-        [window_ref_ contentRectForFrameRect:[window_ref_ frame]];
+    NSRect content_rect = [[window_ref_ contentView] frame];
 
     return Size(content_rect.size.width, content_rect.size.height);
   }

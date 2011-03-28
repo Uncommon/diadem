@@ -174,3 +174,24 @@ TEST_F(BasicWindowTest, CheckboxValue) {
   EXPECT_EQ(1, checkbox->GetProperty(Diadem::kPropValue).Coerce<int32_t>());
 }
 
+// Changing a window's size shouldn't change its location
+TEST_F(BasicWindowTest, ResizeWithoutMoving) {
+  ReadWindowData(
+      "<window text='ResizeWithoutMoving' height='50'>"
+        "<label text='Resize'/>"
+      "</window>");
+
+  const Diadem::Location old_loc = windowRoot_->GetProperty(
+      Diadem::kPropLocation).Coerce<Diadem::Location>();
+  const Diadem::Size old_size = windowRoot_->GetProperty(
+      Diadem::kPropSize).Coerce<Diadem::Size>();
+
+  windowRoot_->SetProperty(
+      Diadem::kPropSize, Diadem::Size(old_size.width, 100));
+
+  const Diadem::Location new_loc = windowRoot_->GetProperty(
+      Diadem::kPropLocation).Coerce<Diadem::Location>();
+
+  EXPECT_EQ(old_loc.x, new_loc.x);
+  EXPECT_EQ(old_loc.y, new_loc.y);
+}
