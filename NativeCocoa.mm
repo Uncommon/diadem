@@ -1448,6 +1448,20 @@ bool Cocoa::ListColumn::SetProperty(PropertyName name, const Value &value) {
       [column_ref_ setDataCell:cell];
     }
   }
+  if (strcmp(name, kPropAlign) == 0) {
+    const String align_string = value.Coerce<String>();
+    NSTextAlignment alignment = NSNaturalTextAlignment;
+
+    if (align_string == kAlignNameStart)
+      alignment = NSLeftTextAlignment;
+    else if (align_string == kAlignNameCenter)
+      alignment = NSCenterTextAlignment;
+    else if (align_string == kAlignNameEnd)
+      alignment = NSRightTextAlignment;
+    [[column_ref_ headerCell] setAlignment:alignment];
+    [[column_ref_ dataCell] setAlignment:alignment];
+    return true;
+  }
   return NativeCocoa::SetProperty(name, value);
 }
 
