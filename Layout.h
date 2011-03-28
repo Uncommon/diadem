@@ -43,7 +43,7 @@ extern const PropertyName
     kPropLocation, kPropAlign, kPropVisible, kPropInLayout,
     kPropPadding, kPropMargins, kPropBaseline;
 
-extern const TypeName kTypeNameGroup, kTypeNameSpacer;
+extern const TypeName kTypeNameGroup, kTypeNameMulti, kTypeNameSpacer;
 
 extern const StringConstant kSizeNameDefault, kSizeNameFit, kSizeNameFill;
 
@@ -102,7 +102,7 @@ class Layout : public EntityDelegate {
   virtual Spacing GetPadding() const
     { return entity_->GetNativeProperty(kPropPadding).Coerce<Spacing>(); }
   // Baseline is the distance from the top to the baseline of the text.
-  virtual long GetBaseline() const
+  virtual int32_t GetBaseline() const
     { return entity_->GetProperty(kPropBaseline).Coerce<int32_t>(); }
 
   AlignOption GetAlignment() const { return align_; }
@@ -219,7 +219,7 @@ class LayoutContainer : public Layout {
   // Returns the space between this object's edges and the edges of any
   // children. Margins and padding will overlap.
   virtual Spacing GetMargins() const;
-  virtual long GetBaseline() const;
+  virtual int32_t GetBaseline() const;
 
   // Signals the layout code to continue with another iteration because
   // something affecting layout has changed.
@@ -233,8 +233,8 @@ class LayoutContainer : public Layout {
   mutable Size max_size_;
 
   // Layout is done in two main phases: setting sizes, and setting locations.
-  void SetObjectSizes(const Size &s, Size *new_size, long *extra);
-  void ArrangeObjects(const Size &new_size, long extra);
+  void SetObjectSizes(const Size &s, Size *new_size, uint32_t *extra);
+  virtual void ArrangeObjects(const Size &new_size, uint32_t extra);
 
   // Pass size changes to the native implementation.
   virtual void SetSizeImp(const Size &size);
@@ -245,7 +245,7 @@ class LayoutContainer : public Layout {
 
   // Returns the extra space available to child objects that may want to expand
   // to fill it.
-  virtual long ExtraSpace(long new_size)
+  virtual uint32_t ExtraSpace(int32_t new_size)
     { return new_size - StreamDim(CalculateMinimumSize()); }
 
   // Adjusts children vertically so their baselines line up.
@@ -259,37 +259,37 @@ class LayoutContainer : public Layout {
 
   // Convenience functions to make layout code more readable.  For rows,
   // "stream" is horizontal and "cross" is vertical.  Opposite for columns.
-  long& StreamDim(Size &s) const
+  int32_t& StreamDim(Size &s) const
     { return (direction_ == kLayoutRow)    ? s.width : s.height; }
-  long StreamDim(const Size &s) const
+  int32_t StreamDim(const Size &s) const
     { return (direction_ == kLayoutRow)    ? s.width : s.height; }
-  long& CrossDim(Size &s) const
+  int32_t& CrossDim(Size &s) const
     { return (direction_ == kLayoutColumn) ? s.width : s.height; }
-  long CrossDim(const Size &s) const
+  int32_t CrossDim(const Size &s) const
     { return (direction_ == kLayoutColumn) ? s.width : s.height; }
-  long& StreamLoc(Location &l) const
+  int32_t& StreamLoc(Location &l) const
     { return (direction_ == kLayoutRow)    ? l.x : l.y; }
-  long StreamLoc(const Location &l) const
+  int32_t StreamLoc(const Location &l) const
     { return (direction_ == kLayoutRow)    ? l.x : l.y; }
-  long& CrossLoc(Location &l) const
+  int32_t& CrossLoc(Location &l) const
     { return (direction_ == kLayoutColumn) ? l.x : l.y; }
-  long CrossLoc(const Location &l) const
+  int32_t CrossLoc(const Location &l) const
     { return (direction_ == kLayoutColumn) ? l.x : l.y; }
-  long& StreamBefore(Spacing &s) const
+  int32_t& StreamBefore(Spacing &s) const
     { return (direction_ == kLayoutRow) ? s.left : s.top; }
-  long StreamBefore(const Spacing &s) const
+  int32_t StreamBefore(const Spacing &s) const
     { return (direction_ == kLayoutRow) ? s.left : s.top; }
-  long& StreamAfter(Spacing &s) const
+  int32_t& StreamAfter(Spacing &s) const
     { return (direction_ == kLayoutRow) ? s.right : s.bottom; }
-  long StreamAfter(const Spacing &s) const
+  int32_t StreamAfter(const Spacing &s) const
     { return (direction_ == kLayoutRow) ? s.right : s.bottom; }
-  long& CrossBefore(Spacing &s) const
+  int32_t& CrossBefore(Spacing &s) const
     { return (direction_ == kLayoutColumn) ? s.left : s.top; }
-  long CrossBefore(const Spacing &s) const
+  int32_t CrossBefore(const Spacing &s) const
     { return (direction_ == kLayoutColumn) ? s.left : s.top; }
-  long& CrossAfter(Spacing &s) const
+  int32_t& CrossAfter(Spacing &s) const
     { return (direction_ == kLayoutColumn) ? s.right : s.bottom; }
-  long CrossAfter(const Spacing &s) const
+  int32_t CrossAfter(const Spacing &s) const
     { return (direction_ == kLayoutColumn) ? s.right : s.bottom; }
   SizeOption StreamSizeOption(const Layout &entity) const {
     return (direction_ == kLayoutRow) ?
@@ -344,10 +344,39 @@ class Group : public LayoutContainer {
   Location location_;
   Spacing min_padding_;
 
-  void CalculatePadding();
+  // Recalculates min_padding_ when layout changes.
+  virtual void CalculatePadding();
 
   void SetSizeImp(const Size &size)        { size_ = size; }
   void SetLocationImp(const Location &loc) { location_ = loc; }
+};
+
+// A container that only shows one of its children at a time.
+class Multipanel : public Group {
+ public:
+  Multipanel() : value_(0) {}
+
+  // Makes sure only the first child is visible.
+  virtual void Finalize();
+
+  virtual String GetTypeName() const { return kTypeNameMulti; }
+
+  virtual bool SetProperty(PropertyName name, const Value &value);
+  virtual Value GetProperty(PropertyName name) const;
+
+ protected:
+  uint32_t value_;
+
+  // All children are at 0, 0.
+  virtual void ArrangeObjects(const Size &new_size, uint32_t extra);
+  // In each direction, the maximum of each child's minimum size.
+  virtual Size CalculateMinimumSize() const;
+
+  // Different calculation from Group because children are at 0, 0.
+  virtual void CalculatePadding();
+
+  // Shows the panel (child) at the given index.
+  void ShowPanel(uint32_t index);
 };
 
 // A layout entity that overrides the default space between entities.

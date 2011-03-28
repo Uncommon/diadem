@@ -219,6 +219,8 @@ CoerceToPODZero(ListDataInterface*)
 #if DIADEM_PYTHON
 template<> inline int32_t Value::ValueHolder<PyObjectPtr>::Coerce(
     const Value::type<int32_t>&) const { return PyInt_AsLong(data); }
+template<> inline uint32_t Value::ValueHolder<PyObjectPtr>::Coerce(
+    const Value::type<uint32_t>&) const { return PyLong_AsUnsignedLong(data); }
 // there is no PyInt_AsLongLong
 template<> inline bool Value::ValueHolder<PyObjectPtr>::Coerce(
     const Value::type<bool>&) const { return PyObject_IsTrue(data); }

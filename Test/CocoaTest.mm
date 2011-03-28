@@ -521,12 +521,12 @@ TEST_F(CocoaTest, testRadio) {
       reinterpret_cast<NSButton*>(radio2->GetNative()->GetNativeRef());
 
   EXPECT_EQ(0, [button1 bezelStyle]);
-  EXPECT_EQ(NSOnState, [button1 state]);
-  EXPECT_EQ(NSOffState, [button2 state]);
+  EXPECT_EQ(static_cast<NSInteger>(NSOnState), [button1 state]);
+  EXPECT_EQ(static_cast<NSInteger>(NSOffState), [button2 state]);
   [button2 performClick:nil];
-  EXPECT_EQ(NSOffState, [button1 state]);
-  EXPECT_EQ(NSOnState, [button2 state]);
+  EXPECT_EQ(static_cast<NSInteger>(NSOffState), [button1 state]);
+  EXPECT_EQ(static_cast<NSInteger>(NSOnState), [button2 state]);
   [button1 performClick:nil];
-  EXPECT_EQ(NSOnState, [button1 state]);
-  EXPECT_EQ(NSOffState, [button2 state]);
+  EXPECT_EQ(static_cast<NSInteger>(NSOnState), [button1 state]);
+  EXPECT_EQ(static_cast<NSInteger>(NSOffState), [button2 state]);
 }

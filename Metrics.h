@@ -23,9 +23,9 @@ namespace Diadem {
 // measurements on the inside of a frame (such as margins) or the outside
 // (such as padding).
 struct Spacing {
-  long top, left, bottom, right;
+  int32_t top, left, bottom, right;
 
-  Spacing(long t, long l, long b, long r)
+  Spacing(int32_t t, int32_t l, int32_t b, int32_t r)
       : top(t), left(l), bottom(b), right(r) {}
   Spacing()
       : top(0), left(0), bottom(0), right(0) {}
@@ -53,9 +53,9 @@ struct Spacing {
 
 // The size of a layout object, in pixels.
 struct Size {
-  long width, height;
+  int32_t width, height;
 
-  Size(long w, long h) : width(w), height(h) {}
+  Size(int32_t w, int32_t h) : width(w), height(h) {}
   Size() : width(0), height(0) {}
 
   bool operator==(const Size &s) const
@@ -70,9 +70,9 @@ struct Size {
 
 // The location of a layout object relative to its parent.
 struct Location {
-  long x, y;
+  int32_t x, y;
 
-  Location(long x1, long y1) : x(x1), y(y1) {}
+  Location(int32_t x1, int32_t y1) : x(x1), y(y1) {}
   Location() : x(0), y(0) {}
 
   bool operator==(const Location &l) const

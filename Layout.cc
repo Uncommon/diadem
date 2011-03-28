@@ -46,6 +46,7 @@ const PropertyName
 
 const TypeName
     kTypeNameGroup  = "group",
+    kTypeNameMulti  = "multi",
     kTypeNameSpacer = "spacer";
 
 const StringConstant
@@ -239,7 +240,7 @@ Size Layout::EnforceExplicitSize(const Size &size) const {
         break;
     }
     result.width =
-        std::max<long>(size.width, explicit_size_.width_ * h_multiplier);
+        std::max<int32_t>(size.width, explicit_size_.width_ * h_multiplier);
   }
   if (!height_name_.IsEmpty()) {
     result.height = FindHeightForName();
@@ -259,7 +260,7 @@ Size Layout::EnforceExplicitSize(const Size &size) const {
         break;
     }
     result.height =
-        std::max<long>(size.height, explicit_size_.height_ * v_multiplier);
+        std::max<int32_t>(size.height, explicit_size_.height_ * v_multiplier);
   }
   return result;
 }
@@ -371,7 +372,7 @@ Spacing LayoutContainer::GetMargins() const {
   return Spacing();
 }
 
-long LayoutContainer::GetBaseline() const {
+int32_t LayoutContainer::GetBaseline() const {
   if (entity_->ChildrenCount() > 0)
     return entity_->ChildAt(0)->GetProperty(kPropBaseline).Coerce<int32_t>();
   return Layout::GetBaseline();
@@ -387,7 +388,7 @@ void LayoutContainer::SetSize(const Size &s) {
     return;
 
   Size new_size;
-  long extra;
+  uint32_t extra;
 
   // Resizing a container is done in two phases: setting the sizes of the
   // children, and then setting their locations.
@@ -439,7 +440,7 @@ uint32_t LayoutContainer::FillChildCount() const {
 static const uint32_t kMaxLayoutIterations = 3;
 
 void LayoutContainer::SetObjectSizes(
-    const Size &s, Size *new_size, long *extra) {
+    const Size &s, Size *new_size, uint32_t *extra) {
   const Spacing margins = GetMargins();
   const unsigned int fill_count = FillChildCount();
   bool layout_valid = false;
@@ -459,8 +460,8 @@ void LayoutContainer::SetObjectSizes(
 
     SetSizeImp(*new_size);
 
-    const long fill = (fill_count == 0) ? 0 : (*extra / fill_count);
-    long remainder  = (fill_count == 0) ? 0 : (*extra % fill_count);
+    const uint32_t fill = (fill_count == 0) ? 0 : (*extra / fill_count);
+    uint32_t remainder  = (fill_count == 0) ? 0 : (*extra % fill_count);
 
     for (uint32_t j = 0; j < entity_->ChildrenCount(); ++j) {
       Layout* const child = entity_->ChildAt(j)->GetLayout();
@@ -485,7 +486,7 @@ void LayoutContainer::SetObjectSizes(
       } else {  // Distribute the extra space among the fill objects
         if ((StreamSizeOption(*child) == kSizeFill) ||
             (StreamDim(max) == kSizeFill)) {
-          long item_fill = fill + StreamDim(min);
+          int32_t item_fill = fill + StreamDim(min);
 
           if (remainder > 0) {
             ++item_fill;
@@ -510,13 +511,13 @@ void LayoutContainer::SetObjectSizes(
     *extra = 0;
 }
 
-void LayoutContainer::ArrangeObjects(const Size &new_size, long extra) {
+void LayoutContainer::ArrangeObjects(const Size &new_size, uint32_t extra) {
   if (entity_->ChildrenCount() == 0)
     return;
 
   const Spacing margins = GetMargins();
-  long prev_pad = StreamBefore(margins);
-  long last_edge = 0;
+  int32_t prev_pad = StreamBefore(margins);
+  int32_t last_edge = 0;
   const bool reverse_row = (direction_ == kLayoutRow) && IsRTL();
   const bool reverse_col = (direction_ == kLayoutColumn) && IsRTL();
 
@@ -531,7 +532,7 @@ void LayoutContainer::ArrangeObjects(const Size &new_size, long extra) {
       break;
   }
 
-  long cross_extra;
+  int32_t cross_extra;
   bool first = true;
   const uint32_t end = reverse_row ? UINT32_MAX : entity_->ChildrenCount();
   const uint8_t inc = reverse_row ? -1 : 1;
@@ -546,7 +547,7 @@ void LayoutContainer::ArrangeObjects(const Size &new_size, long extra) {
     const Spacing padding = child->GetPadding();
     const Size child_size(child->GetSize());
     Location loc;
-    long before = 0;
+    int32_t before = 0;
 
     if (first)
       before = StreamBefore(margins);
@@ -583,8 +584,8 @@ void LayoutContainer::AlignBaselines() {
     return;
 
   Layout *best_items[3] = { NULL, NULL, NULL };
-  long baselines[3] = { 0, 0, GetSize().height };
-  long center_height = 0;
+  int32_t baselines[3] = { 0, 0, GetSize().height };
+  int32_t center_height = 0;
   uint32_t i;
   Layout *child = NULL;
 
@@ -593,7 +594,7 @@ void LayoutContainer::AlignBaselines() {
     if ((child == NULL) || !child->IsInLayout())
       continue;
 
-    const long baseline = child->GetBaseline();
+    const int32_t baseline = child->GetBaseline();
 
     switch (child->GetAlignment()) {
       case kAlignStart:
@@ -627,7 +628,7 @@ void LayoutContainer::AlignBaselines() {
     if (child == best_items[a])
       continue;
 
-    const long baseline = child->GetBaseline();
+    const int32_t baseline = child->GetBaseline();
 
     if (baseline != 0) {
       Location loc(child->GetLocation());
@@ -647,7 +648,7 @@ Size LayoutContainer::CalculateMinimumSize() const {
   max_size_ = Size();
   if (entity_->ChildrenCount() != 0) {
     const Spacing margins = GetMargins();
-    long prev_padding = 0;
+    int32_t prev_padding = 0;
     const Layout* const first_child = entity_->ChildAt(0)->GetLayout();
 
     const int32_t first_padding = StreamBefore(first_child->GetPadding());
@@ -674,8 +675,8 @@ Size LayoutContainer::CalculateMinimumSize() const {
       CrossDim(min_size) = std::max(
           CrossDim(min_size),
           CrossDim(child_min) +
-              std::max<long>(0, CrossBefore(margins)) +
-              std::max<long>(0, CrossAfter(margins)));
+              std::max<int32_t>(0, CrossBefore(margins)) +
+              std::max<int32_t>(0, CrossAfter(margins)));
 
       const Size child_max = child->GetMaximumSize();
 
@@ -698,8 +699,8 @@ Size LayoutContainer::CalculateMinimumSize() const {
         CrossDim(max_size_) = std::max(
             CrossDim(max_size_),
             CrossDim(child_max) +
-              std::max<long>(0, CrossBefore(margins)) +
-              std::max<long>(0, CrossAfter(margins)));
+              std::max<int32_t>(0, CrossBefore(margins)) +
+              std::max<int32_t>(0, CrossAfter(margins)));
       }
 
       prev_padding = StreamAfter(child->GetPadding());
@@ -763,7 +764,10 @@ void Group::ChildAdded(Entity *child) {
 
 void Group::SetSize(const Size &new_size) {
   LayoutContainer::SetSize(new_size);
+  CalculatePadding();
+}
 
+void Group::CalculatePadding() {
   // Recalculate the container's padding, which is determined by the children's
   // padding extending outside the container's bounds.
   if (entity_->ChildrenCount() != 0) {
@@ -787,8 +791,8 @@ void Group::SetSize(const Size &new_size) {
     StreamBefore(new_min_padding) = StreamBefore(front->GetPadding());
     StreamAfter(new_min_padding)  = StreamAfter(back->GetPadding());
 
-    long &before = CrossBefore(new_min_padding);
-    long &after = CrossAfter(new_min_padding);
+    int32_t &before = CrossBefore(new_min_padding);
+    int32_t &after = CrossAfter(new_min_padding);
 
     for (i = 0; i < entity_->ChildrenCount(); ++i) {
       child = entity_->ChildAt(i)->GetLayout();
@@ -801,7 +805,7 @@ void Group::SetSize(const Size &new_size) {
 
       before = std::max(before, CrossBefore(pad) - CrossLoc(loc));
       after  = std::max(after, CrossAfter(pad) -
-           (CrossDim(new_size) - (CrossLoc(loc) + CrossDim(size))));
+           (CrossDim(size_) - (CrossLoc(loc) + CrossDim(size))));
     }
 
     if (new_min_padding != min_padding_) {
@@ -850,6 +854,103 @@ void Group::ChildValueChanged(Entity *child) {
   DASSERT(entity_->ChildrenCount() > 0);
   if ((child == entity_->ChildAt(0)) && (entity_->GetParent() != NULL))
     entity_->GetParent()->ChildValueChanged(entity_);
+}
+
+void Multipanel::Finalize() {
+  ShowPanel(0);
+}
+
+void Multipanel::CalculatePadding() {
+  Spacing new_min_padding;
+
+  for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+    Entity* const child = entity_->ChildAt(i);
+
+    if (child->GetLayout() == NULL)
+      continue;
+
+    const Spacing child_pad = child->GetLayout()->GetPadding();
+    const Size child_size = child->GetLayout()->GetSize();
+
+    if (child_pad.left > new_min_padding.left)
+      new_min_padding.left = child_pad.left;
+    if (child_pad.top > new_min_padding.top)
+      new_min_padding.top = child_pad.top;
+
+    // The child may be smaller in either direction, so check how far the
+    // padding actually extends.
+    if ((child_size.width + child_pad.right) >
+        (size_.width + new_min_padding.right))
+      new_min_padding.right = child_size.width + child_pad.right - size_.width;
+    if ((child_size.height + child_pad.bottom) >
+        (size_.height + new_min_padding.bottom))
+      new_min_padding.bottom =
+          child_size.height + child_pad.bottom - size_.height;
+  }
+
+  if (new_min_padding != min_padding_) {
+    Layout *parent = GetLayoutParent();
+
+    min_padding_ = new_min_padding;
+    if (parent != NULL)
+      parent->InvalidateLayout();
+  }
+}
+
+bool Multipanel::SetProperty(PropertyName name, const Value &value) {
+  if (strcmp(name, kPropValue) == 0) {
+    ShowPanel(value.Coerce<uint32_t>());
+    return true;
+  }
+  if (strcmp(name, kPropVisible) == 0) {
+    const bool visible = value.Coerce<bool>();
+
+    if (visible)
+      ShowPanel(value_);
+    else
+      Group::SetProperty(name, value);
+    return true;
+  }
+  return Group::SetProperty(name, value);
+}
+
+Value Multipanel::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropValue) == 0)
+    return value_;
+  return Group::GetProperty(name);
+}
+
+void Multipanel::ArrangeObjects(const Size &new_size, uint32_t extra) {
+  // Extra parens so this isn't parsed as a function
+  const Value location_value((Location()));
+
+  for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i)
+    entity_->ChildAt(i)->SetProperty(kPropLocation, location_value);
+}
+
+Size Multipanel::CalculateMinimumSize() const {
+  Size min;
+
+  for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+    Value min_value = entity_->ChildAt(i)->GetProperty(kPropMinimumSize);
+
+    if (!min_value.IsValid())
+      continue;
+
+    Size child_min = min_value.Coerce<Size>();
+
+    if (child_min.width > min.width)
+      min.width = child_min.width;
+    if (child_min.height > min.height)
+      min.height = child_min.height;
+  }
+  return min;
+}
+
+void Multipanel::ShowPanel(uint32_t index) {
+  value_ = index;
+  for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i)
+    entity_->ChildAt(i)->SetProperty(kPropVisible, i == value_);
 }
 
 Size Spacer::CalculateMinimumSize() const {

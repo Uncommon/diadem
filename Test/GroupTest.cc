@@ -487,3 +487,88 @@ TEST_F(GroupTest, testNestedRadio) {
   EXPECT_EQ(1, radio1->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
   EXPECT_EQ(0, radio2->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
 }
+
+TEST_F(GroupTest, testMultipanel) {
+  ReadWindowData(
+      "<window text='testMultipanel'>"
+        "<multi>"
+          "<label text='Text'/>"
+          "<button text='Button'/>"
+          "<label text='Some Much Longer Text'/>"
+        "</multi>"
+      "</window>");
+  ASSERT_EQ(1, windowRoot_->ChildrenCount());
+
+  Diadem::Entity* const multi = windowRoot_->ChildAt(0);
+  const Diadem::Entity* const label1 = multi->ChildAt(0);
+  const Diadem::Entity* const button = multi->ChildAt(1);
+  const Diadem::Entity* const label2 = multi->ChildAt(2);
+
+  Diadem::Location loc = label1->GetLayout()->GetLocation();
+
+  EXPECT_EQ(0, loc.x);
+  EXPECT_EQ(0, loc.y);
+  loc = button->GetLayout()->GetLocation();
+  EXPECT_EQ(0, loc.x);
+  EXPECT_EQ(0, loc.y);
+  loc = label2->GetLayout()->GetLocation();
+  EXPECT_EQ(0, loc.x);
+  EXPECT_EQ(0, loc.y);
+
+  EXPECT_TRUE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+
+  multi->SetProperty(Diadem::kPropValue, 1);
+  EXPECT_FALSE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+
+  multi->SetProperty(Diadem::kPropValue, 2);
+  EXPECT_FALSE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+}
+
+TEST_F(GroupTest, testMultipanelVisibility) {
+  ReadWindowData(
+      "<window text='testMultipanel'>"
+        "<multi>"
+          "<label text='Text'/>"
+          "<button text='Button'/>"
+          "<label text='Some Much Longer Text'/>"
+        "</multi>"
+      "</window>");
+  ASSERT_EQ(1, windowRoot_->ChildrenCount());
+
+  Diadem::Entity* const multi = windowRoot_->ChildAt(0);
+  const Diadem::Entity* const label1 = multi->ChildAt(0);
+  const Diadem::Entity* const button = multi->ChildAt(1);
+  const Diadem::Entity* const label2 = multi->ChildAt(2);
+
+  EXPECT_TRUE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+
+  multi->SetProperty(Diadem::kPropVisible, false);
+  EXPECT_FALSE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  multi->SetProperty(Diadem::kPropVisible, true);
+  EXPECT_TRUE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+
+  multi->SetProperty(Diadem::kPropValue, 1);
+  EXPECT_FALSE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  multi->SetProperty(Diadem::kPropVisible, false);
+  EXPECT_FALSE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  multi->SetProperty(Diadem::kPropVisible, true);
+  EXPECT_FALSE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+}

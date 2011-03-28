@@ -37,6 +37,11 @@ void Factory::RegisterBasicClasses() {
       &Creator<Group, Layout>::Create,
       NULL);
   RegisterCreator(
+      kTypeNameMulti,
+      &Creator<Entity, Entity>::Create,
+      &Creator<Multipanel, Layout>::Create,
+      NULL);
+  RegisterCreator(
       kTypeNameSpacer,
       &Creator<Entity, Entity>::Create,
       &Creator<Spacer, Layout>::Create,
