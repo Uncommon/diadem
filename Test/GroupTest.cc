@@ -530,6 +530,7 @@ TEST_F(GroupTest, testMultipanel) {
   EXPECT_TRUE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
 }
 
+// When a multipanel is shown/hidden, it should correctly show/hide its children
 TEST_F(GroupTest, testMultipanelVisibility) {
   ReadWindowData(
       "<window text='testMultipanel'>"
@@ -571,4 +572,60 @@ TEST_F(GroupTest, testMultipanelVisibility) {
   EXPECT_FALSE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
   EXPECT_TRUE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
   EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+}
+
+// Non-layout children should not be counted in the panel index
+TEST_F(GroupTest, testMultipanelSkipChild) {
+  ReadWindowData(
+      "<window text='testMultipanelSkipChild'>"
+        "<multi>"
+          "<bind source='nothing'/>"
+          "<label text='A' name='a'/>"
+          "<label text='B' name='b'/>"
+        "</multi>"
+      "</window>");
+  ASSERT_EQ(1, windowRoot_->ChildrenCount());
+
+  Diadem::Entity* const multi = windowRoot_->ChildAt(0);
+  Diadem::Entity* const labelA = windowRoot_->FindByName("a");
+  Diadem::Entity* const labelB = windowRoot_->FindByName("b");
+
+  ASSERT_FALSE(labelA == NULL);
+  ASSERT_FALSE(labelB == NULL);
+  EXPECT_EQ(3, multi->ChildrenCount());
+  EXPECT_EQ(0, multi->GetProperty(Diadem::kPropValue).Coerce<uint32_t>());
+  EXPECT_TRUE(labelA->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(labelB->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+
+  multi->SetProperty(Diadem::kPropValue, 1);
+  EXPECT_FALSE(labelA->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(labelB->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+}
+
+// Panels that fill should fill the entire space.
+TEST_F(GroupTest, testMultipanelFill) {
+  ReadWindowData(
+      "<window text='Preferences - Google Drive'>"
+        "<multi name='multi'>"
+          "<label text='Fill text that wraps within the width of the panel'"
+          " width='fill'/>"
+          "<label text='Text to determine the width'/>"
+        "</multi>"
+      "</window>");
+  ASSERT_EQ(1, windowRoot_->ChildrenCount());
+
+  const Diadem::Entity* const multi = windowRoot_->ChildAt(0);
+  const Diadem::Entity* const label1 = multi->ChildAt(0);
+  const Diadem::Entity* const label2 = multi->ChildAt(1);
+
+  ASSERT_FALSE(multi->GetLayout() == NULL);
+  ASSERT_FALSE(label1->GetLayout() == NULL);
+  ASSERT_FALSE(label2->GetLayout() == NULL);
+
+  const Diadem::Size multi_size = multi->GetLayout()->GetSize();
+  const Diadem::Size label1_size = label1->GetLayout()->GetSize();
+  const Diadem::Size label2_size = label2->GetLayout()->GetSize();
+
+  EXPECT_EQ(multi_size.width, label1_size.width);
+  EXPECT_EQ(multi_size.width, label2_size.width);
 }

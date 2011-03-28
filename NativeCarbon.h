@@ -54,7 +54,7 @@ class Carbon {
     virtual bool EndModal();
     virtual bool SetFocus(Entity *new_focus);
 
-    typedef Diadem::Entity EntityType;
+    typedef Diadem::RootEntity EntityType;
     typedef BorderedContainer LayoutType;
 
    protected:

@@ -132,6 +132,9 @@ void Entity::FactoryFinalize() {
   if (native_ != NULL)
     native_->Finalize();
   Finalize();
+
+  // Broadcast initial value in case there are bindings.
+  PropertyChanged(kPropValue);
 }
 
 void Entity::AddNativeChild(Entity *child) {
@@ -142,6 +145,18 @@ void Entity::AddNativeChild(Entity *child) {
   } else {
     AddNative(child->GetNative());
   }
+}
+
+ChangeMessenger* Entity::GetChangeMessenger() {
+  if (GetParent() != NULL)
+    return GetParent()->GetChangeMessenger();
+  return NULL;
+}
+
+ChangeMessenger const* Entity::GetChangeMessenger() const {
+  if (GetParent() != NULL)
+    return GetParent()->GetChangeMessenger();
+  return NULL;
 }
 
 void Entity::AddChild(Entity *child) {
@@ -228,6 +243,20 @@ Value Entity::GetNativeProperty(const char *name) const {
   if (native_ != NULL)
     return native_->GetProperty(name);
   return Value();
+}
+
+void Entity::PropertyChanged(PropertyName name) const {
+  DASSERT((name != NULL) && (name[0] != '\0'));
+  if ((name == NULL) || (name[0] == '\0'))
+    return;
+  if (name_.IsEmpty())
+    return;
+
+  const ChangeMessenger* const messenger = GetChangeMessenger();
+
+  if (messenger != NULL)
+    messenger->NotifyChange(
+        ChangeMessenger::GetPropertyPath(name_, name), GetProperty(name));
 }
 
 void Entity::SetText(const char *text) {

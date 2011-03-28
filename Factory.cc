@@ -13,6 +13,7 @@
 // the License.
 
 #include "Diadem/Factory.h"
+#include "Diadem/Binding.h"
 #include "Diadem/LabelGroup.h"
 #include "Diadem/Layout.h"
 #include "Diadem/Native.h"
@@ -31,6 +32,10 @@
 namespace Diadem {
 
 void Factory::RegisterBasicClasses() {
+  RegisterCreator(
+      kTypeNameBinding,
+      &Creator<Binding, Entity>::Create,
+      NULL, NULL);
   RegisterCreator(
       kTypeNameGroup,
       &Creator<Entity, Entity>::Create,

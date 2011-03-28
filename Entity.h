@@ -15,6 +15,7 @@
 #ifndef DIADEM_ENTITY_H_
 #define DIADEM_ENTITY_H_
 
+#include "Diadem/ChangeMessenger.h"
 #include "Diadem/Wrappers.h"
 
 namespace Diadem {
@@ -24,11 +25,8 @@ class Layout;
 class Native;
 class Value;
 class Window;
+class Value;
 
-// Having this makes it easier to declare lots of const char* const variables.
-typedef const char* StringConstant;
-typedef StringConstant PropertyName;
-typedef StringConstant TypeName;
 typedef Map<String, Value> PropertyMap;
 
 extern const PropertyName kPropName, kPropText, kPropEnabled;
@@ -85,6 +83,9 @@ class Entity : public Base {
   const Native* GetNative() const { return native_; }
   virtual void AddNative(Native *n);
 
+  virtual ChangeMessenger* GetChangeMessenger();
+  virtual ChangeMessenger const* GetChangeMessenger() const;
+
   // SetWindow should only be called on the root entity.
   void SetWindow(Window *window) {
     DASSERT(parent_ == NULL);
@@ -104,6 +105,10 @@ class Entity : public Base {
   // Shortcuts for when the caller knows Native will handle the property.
   virtual bool SetNativeProperty(PropertyName name, const Value &value);
   virtual Value GetNativeProperty(PropertyName name) const;
+
+  // Notification that a property value has changed. If the entity's name is
+  // set, this calls GetChangeMessenger()->NotifyChange().
+  virtual void PropertyChanged(PropertyName name) const;
 
   // Every Entity can have a name, which should be unique within the hierarchy
   // if it is not empty.
@@ -146,12 +151,16 @@ class Entity : public Base {
   // been finalized.
   virtual void Finalize() {}
 
-  void SetParent(Entity *parent) { parent_ = parent; }
+  void SetParent(Entity *parent) {
+    parent_ = parent;
+    ParentAdded();
+  }
 
   // Called by AddChild and RemoveChild in case subclasses need to take
   // special action
   virtual void ChildAdded(Entity *child) {}
   virtual void ChildRemoved(Entity *child) {}
+  virtual void ParentAdded() {}
 
   // Add a new child recursively in case it has children
   void AddNativeChild(Entity *child);
@@ -160,6 +169,18 @@ class Entity : public Base {
   // Disallow copy and assign
   Entity(const Entity&);
   void operator=(const Entity*);
+};
+
+// The entity at the top of the hierarchy, containing any window-global objects
+class RootEntity : public Entity {
+ public:
+  RootEntity() {}
+
+  ChangeMessenger* GetChangeMessenger()             { return &messenger_; }
+  ChangeMessenger const* GetChangeMessenger() const { return &messenger_; }
+
+ protected:
+  ChangeMessenger messenger_;
 };
 
 // Superclass for Layout and Native. In a previous incarnation, these features
@@ -192,15 +213,6 @@ class EntityDelegate : public Base {
   // Disallow copy and assign.
   EntityDelegate(const EntityDelegate&);
   void operator=(const EntityDelegate*);
-};
-
-// A connection between two entity values.
-class Binding : public Entity {
- public:
-  Binding() {}
-
-  static const PropertyName
-      kPropSource, kPropTarget, kPropFormat, kPropList, kPropTransform;
 };
 
 }  // namespace Diadem

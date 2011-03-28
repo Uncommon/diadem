@@ -24,6 +24,10 @@
 #include <map>
 #endif
 
+#ifndef DIADEM_HAVE_SET
+#include <set>
+#endif
+
 #ifndef DIADEM_HAVE_STACK
 #include <stack>
 #endif
@@ -86,6 +90,44 @@ class Map : std::map<K, V> {
     return result;
   }
 };
+#endif
+
+#ifndef DIADEM_HAVE_MULTIMAP
+#define DIADEM_HAVE_MULTIMAP
+template <class K, class V>
+class MultiMap : public std::multimap<K, V> {
+  typedef std::multimap<K, V> Inherited;
+ public:
+  void insert(const K &key, const V &value) {
+    Inherited::insert(std::make_pair(key, value));
+  }
+  bool exists(const K &key, const V &value) const {
+    for (typename Inherited::const_iterator i = lower_bound(key);
+        i != upper_bound(key); ++i)
+      if (i->second == value)
+        return true;
+    return false;
+  }
+  // Erases all entries matching the given value.
+  void erase_value(const V &value) {
+    typename Inherited::iterator i = Inherited::begin();
+
+    while (i != Inherited::end()) {
+      if (i->second == value) {
+        erase(i);
+        i = Inherited::begin();
+      } else {
+        ++i;
+      }
+    }
+  }
+};
+#endif
+
+#ifndef DIADEM_HAVE_SET
+#define DIADEM_HAVE_SET
+template <class T>
+class Set : public std::set<T> {};
 #endif
 
 #ifndef DIADEM_HAVE_STACK
@@ -156,6 +198,11 @@ class String : public Base {
 inline bool operator<(const String &a, const String &b) {
   return strcmp(a, b) < 0;
 }
+
+// Having this makes it easier to declare lots of const char* const variables.
+typedef const char* StringConstant;
+typedef StringConstant PropertyName;
+typedef StringConstant TypeName;
 
 }  // namespace Diadem
 

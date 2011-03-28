@@ -36,6 +36,10 @@
 /* Begin PBXBuildFile section */
 		89DDD75912CD2F77007FCD6D /* LabelGroup.cc in Sources */ = {isa = PBXBuildFile; fileRef = 89DDD75812CD2F77007FCD6D /* LabelGroup.cc */; };
 		89DDD75A12CD2F77007FCD6D /* LabelGroup.cc in Sources */ = {isa = PBXBuildFile; fileRef = 89DDD75812CD2F77007FCD6D /* LabelGroup.cc */; };
+		DD01299312E9027800C0F00A /* Binding.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD01299112E9027800C0F00A /* Binding.cc */; };
+		DD1E1F7612BADAB4002F4358 /* ChangeMessenger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DD1E1F7512BADAB4002F4358 /* ChangeMessenger.cpp */; };
+		DD1E1F7712BADAB4002F4358 /* ChangeMessenger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DD1E1F7512BADAB4002F4358 /* ChangeMessenger.cpp */; };
+		DD1E1FCA12C2A126002F4358 /* BindingTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD1E1FC912C2A126002F4358 /* BindingTest.cc */; };
 		DD6801D81277426300CB9EF5 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.cc */; };
 		DD6801D91277426300CB9EF5 /* Entity.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806D5911F12B73005E4C56 /* Entity.cc */; };
 		DD6801DA1277426300CB9EF5 /* Value.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806D5E11F12B73005E4C56 /* Value.cc */; };
@@ -152,12 +156,17 @@
 		08FB7796FE84155DC02AAC07 /* main.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		89DDD75812CD2F77007FCD6D /* LabelGroup.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LabelGroup.cc; sourceTree = "<group>"; };
 		89DDD75F12CD2F91007FCD6D /* LabelGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelGroup.h; sourceTree = "<group>"; };
+		DD01299112E9027800C0F00A /* Binding.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Binding.cc; sourceTree = "<group>"; };
+		DD01299212E9027800C0F00A /* Binding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Binding.h; sourceTree = "<group>"; };
 		DD18340B124A542100FF34FB /* NativeCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeCocoa.h; sourceTree = "<group>"; };
 		DD18340D124A54B400FF34FB /* NativeCocoa.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NativeCocoa.mm; sourceTree = "<group>"; };
 		DD18348D124C2AD900FF34FB /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		DD18348E124C2AD900FF34FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		DD18348F124C2AD900FF34FB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		DD18369C1253EDF900FF34FB /* gtest.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = gtest.xcodeproj; path = ../gtest/xcode/gtest.xcodeproj; sourceTree = SOURCE_ROOT; };
+		DD1E1F7412BADAAA002F4358 /* ChangeMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeMessenger.h; sourceTree = "<group>"; };
+		DD1E1F7512BADAB4002F4358 /* ChangeMessenger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ChangeMessenger.cpp; sourceTree = "<group>"; };
+		DD1E1FC912C2A126002F4358 /* BindingTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BindingTest.cc; sourceTree = "<group>"; };
 		DD3C9E761247AE1500F536B7 /* GroupTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GroupTest.cc; sourceTree = "<group>"; };
 		DD3C9FA81248FF0200F536B7 /* Native.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Native.cc; sourceTree = "<group>"; };
 		DD5848E712274A6800C66683 /* NativeCarbon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeCarbon.h; sourceTree = "<group>"; };
@@ -242,7 +251,11 @@
 			isa = PBXGroup;
 			children = (
 				DD680360127743E500CB9EF5 /* Diadem.pch */,
+				DD1E1F7512BADAB4002F4358 /* ChangeMessenger.cpp */,
+				DD1E1F7412BADAAA002F4358 /* ChangeMessenger.h */,
 				DD806D8611F12F5E005E4C56 /* Base.h */,
+				DD01299112E9027800C0F00A /* Binding.cc */,
+				DD01299212E9027800C0F00A /* Binding.h */,
 				DD806D5911F12B73005E4C56 /* Entity.cc */,
 				DD806D5A11F12B73005E4C56 /* Entity.h */,
 				DD806E8611F91565005E4C56 /* Factory.cc */,
@@ -323,6 +336,7 @@
 			isa = PBXGroup;
 			children = (
 				DD584AD4122A01C300C66683 /* BasicWindowTest.cc */,
+				DD1E1FC912C2A126002F4358 /* BindingTest.cc */,
 				DDF2C4AF12777B67008DBFDB /* CocoaTest.mm */,
 				DD806E6211F8F238005E4C56 /* EntityTest.cc */,
 				DD806EA311F919A4005E4C56 /* FactoryTest.cc */,
@@ -535,6 +549,9 @@
 				DDF2C668127898F8008DBFDB /* DiademDocument.mm in Sources */,
 				89DDD75912CD2F77007FCD6D /* LabelGroup.cc in Sources */,
 				DD9ED6F513020BD700E920D6 /* Metrics.cc in Sources */,
+				DD1E1F7612BADAB4002F4358 /* ChangeMessenger.cpp in Sources */,
+				DD1E1FCA12C2A126002F4358 /* BindingTest.cc in Sources */,
+				DD01299312E9027800C0F00A /* Binding.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -550,6 +567,7 @@
 				DDC1C10F128B52B200D63161 /* NativeCocoa.mm in Sources */,
 				DDC1C110128B52B700D63161 /* Value.cc in Sources */,
 				89DDD75A12CD2F77007FCD6D /* LabelGroup.cc in Sources */,
+				DD1E1F7712BADAB4002F4358 /* ChangeMessenger.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

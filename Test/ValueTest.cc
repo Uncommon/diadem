@@ -14,7 +14,6 @@
 
 #include <gtest/gtest.h>
 
-#include "Diadem/Metrics.h"
 #include "Diadem/Value.h"
 
 TEST(ValueTest, TemplateCoerce) {

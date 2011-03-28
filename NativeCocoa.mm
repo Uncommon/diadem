@@ -53,10 +53,14 @@ SInt32 GetThemeMetric() {
   return result;
 }
 
-// NSButton's setButtonType changes several attributes, so there is no
-// buttonType getter.
-bool IsCheckOrRadio(NSButton *button) {
-  return [[button cell] showsStateBy] != NSNoCellMask;
+// Is this the kind of button that has a value? (popup, check, radio)
+bool IsValueButton(NSButton *button) {
+  if ([button isKindOfClass:[NSPopUpButton class]])
+    return true;
+  else
+    // NSButton's setButtonType changes several attributes, so there is no
+    // buttonType getter.
+    return [[button cell] showsStateBy] != NSNoCellMask;
 }
 
 } // namespace
@@ -106,11 +110,12 @@ bool IsCheckOrRadio(NSButton *button) {
 }
 
 - (void)click:(id)sender {
-  if (IsCheckOrRadio((NSButton*)button_->GetNativeRef())) {
+  if (IsValueButton((NSButton*)button_->GetNativeRef())) {
     Diadem::Entity* const parent = button_->GetEntity()->GetParent();
 
     if (parent != NULL)
       parent->ChildValueChanged(button_->GetEntity());
+    button_->GetEntity()->PropertyChanged(Diadem::kPropValue);
   }
   button_->GetEntity()->Clicked();
 }
@@ -462,11 +467,12 @@ Value Cocoa::Window::GetProperty(PropertyName name) const {
 
 void Cocoa::Window::AddChild(Native *child) {
   ScopedAutoreleasePool pool;
+  NSView *child_view = (NSView*)child->GetNativeRef();
 
-  if (![(id)child->GetNativeRef() isKindOfClass:[NSView class]])
+  if (![child_view isKindOfClass:[NSView class]])
     return;
 
-  [[window_ref_ contentView] addSubview:(NSView*)child->GetNativeRef()];
+  [[window_ref_ contentView] addSubview:child_view];
 }
 
 bool Cocoa::Window::ShowModeless() {
@@ -573,6 +579,7 @@ bool Cocoa::View::SetProperty(PropertyName name, const Value &value) {
   }
   if (strcmp(name, kPropVisible) == 0) {
     [view_ref_ setHidden:!value.Coerce<bool>()];
+    [[view_ref_ superview] setNeedsDisplayInRect:[view_ref_ frame]];
     return true;
   }
   return false;
@@ -832,12 +839,18 @@ void Cocoa::ValueButton::InitializeProperties(const PropertyMap &properties) {
 void Cocoa::ValueButton::Finalize() {
   // Setting this in InitializeProperties doesn't work.
   [(NSButton*)view_ref_ setState:NSOffState];
+  entity_->PropertyChanged(kPropValue);
 }
 
 bool Cocoa::ValueButton::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropValue) == 0) {
-    [(NSButton*)view_ref_ setState:value.Coerce<bool>() ?
-        NSOnState : NSOffState];
+    const NSCellStateValue new_state = value.Coerce<bool>() ?
+        NSOnState : NSOffState;
+    const NSCellStateValue old_state = [(NSButton*)view_ref_ state];
+
+    [(NSButton*)view_ref_ setState:new_state];
+    if (new_state != old_state)
+      entity_->PropertyChanged(kPropValue);
   }
   return Button::SetProperty(name, value);
 }
@@ -1252,7 +1265,22 @@ void Cocoa::Popup::InitializeProperties(const PropertyMap &properties) {
   view_ref_ = [[NSPopUpButton alloc]
       initWithFrame:NSMakeRect(0, 0, 50, 20)
           pullsDown:NO];
+  MakeTarget();
   ConfigureView();
+}
+
+bool Cocoa::Popup::SetProperty(PropertyName name, const Value &value) {
+  if (strcmp(name, kPropValue) == 0) {
+    const NSInteger
+        old_selection = [(NSPopUpButton*)view_ref_ indexOfSelectedItem],
+        new_selection = value.Coerce<int32_t>();
+
+    [(NSPopUpButton*)view_ref_ selectItemAtIndex:new_selection];
+    if (old_selection != new_selection)
+      entity_->PropertyChanged(kPropValue);
+    return true;
+  }
+  return Button::SetProperty(name, value);
 }
 
 Value Cocoa::Popup::GetProperty(PropertyName name) const {
@@ -1272,7 +1300,10 @@ Value Cocoa::Popup::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropBaseline) == 0) {
     return 15;  // depending on UI size
   }
-  return Control::GetProperty(name);
+  if (strcmp(name, kPropValue) == 0) {
+    return [(NSPopUpButton*)view_ref_ indexOfSelectedItem];
+  }
+  return Button::GetProperty(name);
 }
 
 Spacing Cocoa::Popup::GetInset() const {

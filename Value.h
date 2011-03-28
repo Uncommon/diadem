@@ -22,7 +22,7 @@ class PyObject;
 typedef PyObject *PyObjectPtr;
 #endif
 
-#if Windows_
+#if TARGET_OS_WIN32
 #include <typeinfo.h>
 #else
 #include <typeinfo>

@@ -233,7 +233,7 @@ class LayoutContainer : public Layout {
   mutable Size max_size_;
 
   // Layout is done in two main phases: setting sizes, and setting locations.
-  void SetObjectSizes(const Size &s, Size *new_size, uint32_t *extra);
+  virtual void SetObjectSizes(const Size &s, Size *new_size, uint32_t *extra);
   virtual void ArrangeObjects(const Size &new_size, uint32_t extra);
 
   // Pass size changes to the native implementation.
@@ -367,6 +367,8 @@ class Multipanel : public Group {
  protected:
   uint32_t value_;
 
+  // Fillers get to fill the entire space.
+  virtual void SetObjectSizes(const Size &s, Size *new_size, uint32_t *extra);
   // All children are at 0, 0.
   virtual void ArrangeObjects(const Size &new_size, uint32_t extra);
   // In each direction, the maximum of each child's minimum size.

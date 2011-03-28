@@ -920,6 +920,44 @@ Value Multipanel::GetProperty(PropertyName name) const {
   return Group::GetProperty(name);
 }
 
+void Multipanel::SetObjectSizes(
+    const Size &s, Size *new_size, uint32_t *extra) {
+  bool layout_valid = false;
+
+  for (uint32_t i = 0; !layout_valid && (i < kMaxLayoutIterations); ++i) {
+    layout_valid = true;
+    if (cached_min_size_ == Size())
+      cached_min_size_ = GetMinimumSize();
+    *new_size = Size(
+        std::max(s.width, cached_min_size_.width),
+        std::max(s.height, cached_min_size_.height));
+    SetSizeImp(*new_size);
+
+    for (uint32_t j = 0; j < entity_->ChildrenCount(); ++j) {
+      Layout *child = entity_->ChildAt(j)->GetLayout();
+
+      if ((child == NULL) || !child->IsInLayout())
+        continue;
+
+      const Size min = child->GetMinimumSize();
+      Size child_size = min;
+
+      if (child->GetHSizeOption() == kSizeFill)
+        child_size.width = s.width;
+      if (child->GetVSizeOption() == kSizeFill)
+        child_size.height = s.height;
+
+      child->SetSize(child_size);
+      if (child->GetMinimumSize() != min)
+        layout_valid = false;
+    }
+    if (!layout_valid) {
+      cached_min_size_ = Size();
+      CalculateMinimumSize();
+    }
+  }
+}
+
 void Multipanel::ArrangeObjects(const Size &new_size, uint32_t extra) {
   // Extra parens so this isn't parsed as a function
   const Value location_value((Location()));
@@ -932,12 +970,12 @@ Size Multipanel::CalculateMinimumSize() const {
   Size min;
 
   for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
-    Value min_value = entity_->ChildAt(i)->GetProperty(kPropMinimumSize);
+    Layout *child_layout = entity_->ChildAt(i)->GetLayout();
 
-    if (!min_value.IsValid())
+    if (child_layout == NULL)
       continue;
 
-    Size child_min = min_value.Coerce<Size>();
+    const Size child_min = child_layout->GetMinimumSize();
 
     if (child_min.width > min.width)
       min.width = child_min.width;
@@ -949,8 +987,14 @@ Size Multipanel::CalculateMinimumSize() const {
 
 void Multipanel::ShowPanel(uint32_t index) {
   value_ = index;
-  for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i)
-    entity_->ChildAt(i)->SetProperty(kPropVisible, i == value_);
+  for (uint32_t child_index = 0, panel_index = 0;
+       child_index < entity_->ChildrenCount(); ++child_index) {
+    if (entity_->ChildAt(child_index)->GetLayout() == NULL)
+      continue;
+    entity_->ChildAt(child_index)->SetProperty(
+        kPropVisible, panel_index == value_);
+    ++panel_index;
+  }
 }
 
 Size Spacer::CalculateMinimumSize() const {

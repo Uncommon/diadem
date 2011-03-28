@@ -84,7 +84,7 @@ class Cocoa {
     virtual bool SetFocus(Entity *new_focus);
     virtual bool TestClose();
 
-    typedef Diadem::Entity EntityType;
+    typedef Diadem::RootEntity EntityType;
     typedef BorderedContainer LayoutType;
 
    protected:
@@ -312,7 +312,7 @@ class Cocoa {
   };
 
   // <popup> implementation
-  class Popup : public Control {
+  class Popup : public Button {
    public:
     Popup() {}
 
@@ -320,6 +320,7 @@ class Cocoa {
     virtual String GetTypeName() const { return kTypeNamePopup; }
     void AddChild(Native *child);
     Value GetProperty(PropertyName name) const;
+    bool SetProperty(PropertyName name, const Value &value);
 
     Spacing GetInset() const;
   };
