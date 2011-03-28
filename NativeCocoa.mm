@@ -1474,6 +1474,14 @@ Value Cocoa::ListColumn::GetProperty(PropertyName name) const {
 - (id)tableView:(NSTableView *)tableView
     objectValueForTableColumn:(NSTableColumn *)tableColumn
     row:(NSInteger)row {
+#if DIADEM_PYTHON
+  // This method may be called on Cocoa's UI heartbeat thread, which can cause
+  // a conflict between Cocoa's view lock and Python's global lock. Returning
+  // nil in this case doesn't seem to cause any problems.
+  if (![[NSThread currentThread] isMainThread])
+    return nil;
+#endif
+
   Diadem::ListDataInterface *data = list_->GetData();
 
   if (data == NULL)
