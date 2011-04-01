@@ -822,9 +822,9 @@ bool Cocoa::PushButton::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropButtonType) == 0) {
     const String type = value.Coerce<String>();
 
-    if (type == "default")
+    if (type == kButtonTypeNameDefault)
       [(NSButton*)view_ref_ setKeyEquivalent:@"\r"];
-    else if (type == "cancel")
+    else if (type == kButtonTypeNameCancel)
       [(NSButton*)view_ref_ setKeyEquivalent:@"\E"];
     return true;
   }

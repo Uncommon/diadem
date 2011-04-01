@@ -41,6 +41,9 @@ extern const StringConstant
     kWindowStyleNameClosable, kWindowStyleNameResizable,
     kWindowStyleNameMinimizable;
 
+extern const StringConstant
+    kButtonTypeNameDefault, kButtonTypeNameCancel;
+
 extern const StringConstant kLabelStyleNameHead;
 
 extern const StringConstant kColumnTypeNameText, kColumnTypeNameCheck;

@@ -68,6 +68,10 @@ const StringConstant
     kWindowStyleNameMinimizable = "min";
 
 const StringConstant
+    kButtonTypeNameDefault = "default",
+    kButtonTypeNameCancel  = "cancel";
+
+const StringConstant
     kLabelStyleNameHead = "head";
 
 const StringConstant
