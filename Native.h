@@ -116,7 +116,12 @@ struct MessageData {
   explicit MessageData(const String &message)
       : message_(message),
         show_cancel_(false), show_other_(false), show_suppress_(false),
-        suppressed_(false), default_button_(kAcceptButton) {}
+        suppressed_(false), default_button_(kAcceptButton),
+        callback_(NULL), callback_data_(NULL) {}
+
+  // If provided, the callback will be called after the message is dismissed.
+  // The callback may not be called on the same thread that called ShowMessage.
+  typedef void (*Callback)(ButtonType button, void *data);
 
   // The message displayed in the window.
   String message_;
@@ -129,6 +134,10 @@ struct MessageData {
   bool suppressed_;
   // Which button should be activated by the enter/return key.
   ButtonType default_button_;
+  // Function to be called when the dialog is dismissed.
+  Callback callback_;
+  // Data to be passed to the callback.
+  void *callback_data_;
 };
 
 class WindowInterface {

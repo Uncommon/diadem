@@ -43,6 +43,24 @@ class GILState {
   PyGILState_STATE state_;
 };
 
+// Button names returned from ShowMessage
+Diadem::StringConstant
+    kButtonNameAccept = "accept",
+    kButtonNameCancel = "cancel",
+    kButtonNameOther  = "other";
+
+Diadem::StringConstant ButtonNameFromButtonType(Diadem::ButtonType button) {
+  switch (button) {
+    case Diadem::kAcceptButton:
+      return kButtonNameAccept;
+    case Diadem::kOtherButton:
+      return kButtonNameOther;
+    case Diadem::kCancelButton:
+    default:
+      return kButtonNameCancel;
+  }
+}
+
 class PyListData : public Diadem::ListDataInterface {
  public:
   explicit PyListData(PyObject *data) : data_(data) {
@@ -608,16 +626,32 @@ static bool IsValidButtonData(PyObject *data) {
   return (data != NULL) && (PyString_Check(data) || PyObject_IsTrue(data));
 }
 
+static void MessageCallback(Diadem::ButtonType button, void *data) {
+  GILState gil;
+  PyObject *callback = reinterpret_cast<PyObject*>(data);
+  const char *button_name = ButtonNameFromButtonType(button);
+  PyObject *args = PyTuple_Pack(1, PyString_FromString(button_name));
+
+  PyObject_CallObject(callback, args);
+  if (PyErr_Occurred()) {
+    // Can't propagate an exception from this callback, so just log it.
+    PyErr_Print();
+    PyErr_Clear();
+  }
+  Py_DECREF(callback);
+  Py_DECREF(args);
+}
+
 static PyObject* ShowMessage(
     PyObject *self, PyObject *args, PyObject *keywords) {
   static const char *keys[] = {
-      "message", "accept", "cancel", "other", "suppress", NULL };
+      "message", "accept", "cancel", "other", "suppress", "callback", NULL };
   PyObject *message = NULL, *accept = NULL, *cancel = NULL, *other = NULL,
-      *suppress = NULL;
+      *suppress = NULL, *callback = NULL;
 
   if (!PyArg_ParseTupleAndKeywords(
-      args, keywords, "S|SOOO", const_cast<char**>(keys),
-      &message, &accept, &cancel, &other, &suppress))
+      args, keywords, "S|SOOOO", const_cast<char**>(keys),
+      &message, &accept, &cancel, &other, &suppress, &callback))
     return NULL;
 
   Diadem::MessageData data(PyString_AsString(message));
@@ -639,22 +673,18 @@ static PyObject* ShowMessage(
     if (PyString_Check(suppress))
       data.suppress_text_ = PyString_AsString(suppress);
   }
+  if (callback != NULL) {
+    if (!PyCallable_Check(callback)) {
+      PyErr_SetString(PyExc_TypeError, "callback is not callable");
+      return NULL;
+    }
+    Py_INCREF(callback);
+    data.callback_ = MessageCallback;
+    data.callback_data_ = callback;
+  }
 
   const Diadem::ButtonType button = DIADEM_PLATFORM::ShowMessage(&data);
-  const char *button_name;
-
-  switch (button) {
-    case Diadem::kAcceptButton:
-      button_name = "accept";
-      break;
-    case Diadem::kOtherButton:
-      button_name = "other";
-      break;
-    case Diadem::kCancelButton:
-    default:
-      button_name = "cancel";
-      break;
-  }
+  const char *button_name = ButtonNameFromButtonType(button);
 
   if (data.show_suppress_)
     return Py_BuildValue("si", button_name, data.suppressed_);
@@ -707,4 +737,8 @@ initpyadem() {
       module, "PROP_ROW_COUNT", Diadem::kPropRowCount);
   PyModule_AddStringConstant(
       module, "PROP_DATA", Diadem::kPropData);
+
+  PyModule_AddStringConstant(module, "BUTTON_ACCEPT", kButtonNameAccept);
+  PyModule_AddStringConstant(module, "BUTTON_CANCEL", kButtonNameCancel);
+  PyModule_AddStringConstant(module, "BUTTON_OTHER", kButtonNameOther);
 }

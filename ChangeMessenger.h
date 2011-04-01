@@ -62,7 +62,7 @@ class ValueTransformer : public Base {
 class ValueObserver : public Base {
  public:
   // Object assumes ownership of the transformer.
-  ValueObserver(ValueTransformer *t = NULL) : transformer_(t) {}
+  explicit ValueObserver(ValueTransformer *t = NULL) : transformer_(t) {}
   virtual ~ValueObserver() {}
 
   // Called by ChangeMessenger::NotifyChange.

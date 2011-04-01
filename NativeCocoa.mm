@@ -63,6 +63,21 @@ bool IsValueButton(NSButton *button) {
     return [[button cell] showsStateBy] != NSNoCellMask;
 }
 
+Diadem::ButtonType ButtonTypeFromNSAlertButton(NSInteger button) {
+  switch (button) {
+    case NSAlertFirstButtonReturn:
+    case NSAlertDefaultReturn:
+      return Diadem::kAcceptButton;
+    case NSAlertThirdButtonReturn:
+    case NSAlertAlternateReturn:
+      return Diadem::kOtherButton;
+    case NSAlertSecondButtonReturn:
+    case NSAlertOtherReturn:
+    default:
+      return Diadem::kCancelButton;
+  }
+}
+
 } // namespace
 
 @interface WindowDelegate : NSObject {
@@ -226,6 +241,53 @@ bool IsValueButton(NSButton *button) {
 
 @end
 
+// When ShowMessage is called from another thread, we need to show the alert
+// on the main thread and then use the provided callback to return the result.
+// Waiting on performSelectorOnMainThread doesn't work because it can lead to
+// deadlock, particularly when called from Python.
+@interface NSAlert(Threading)
+
+- (void)
+    runModalOnMainThreadWithCallback:(Diadem::MessageData::Callback)callback
+                                data:(void*)data;
+
+@end
+
+@implementation NSAlert(Threading)
+
+- (void)mainThreadRunCallback:(NSDictionary*)param {
+  const NSInteger result = [self runModal];
+  NSValue *callback_value = [param objectForKey:@"callback"];
+
+  if (callback_value != nil) {
+    Diadem::MessageData::Callback callback =
+        reinterpret_cast<Diadem::MessageData::Callback>(
+            [callback_value pointerValue]);
+    NSValue *data_value = [param objectForKey:@"data"];
+    void *data = [data_value pointerValue];
+
+    (*callback)(ButtonTypeFromNSAlertButton(result), data);
+  }
+}
+
+- (void)
+    runModalOnMainThreadWithCallback:(Diadem::MessageData::Callback)callback
+                                data:(void*)data {
+  NSDictionary *param = nil;
+
+  if (callback != NULL)
+    param = [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSValue valueWithPointer:reinterpret_cast<void*>(callback)],
+            @"callback",
+        [NSValue valueWithPointer:data], @"data",
+        nil];
+  [self performSelectorOnMainThread:@selector(mainThreadRunCallback:)
+                         withObject:param
+                      waitUntilDone:NO];
+}
+
+@end
+
 
 namespace Diadem {
 
@@ -342,21 +404,19 @@ ButtonType Cocoa::ShowMessage(MessageData *message) {
   if (alert == nil)
     return kCancelButton;
 
-  const NSInteger result = [alert runModal];
+  if ([[NSThread currentThread] isMainThread]) {
+    const NSInteger result = [alert runModal];
+    const ButtonType button_type = ButtonTypeFromNSAlertButton(result);
 
-  if (message->show_suppress_)
-    message->suppressed_ = [[alert suppressionButton] state] == NSOnState;
-  switch (result) {
-    case NSAlertFirstButtonReturn:
-    case NSAlertDefaultReturn:
-      return kAcceptButton;
-    case NSAlertThirdButtonReturn:
-    case NSAlertAlternateReturn:
-      return kOtherButton;
-    case NSAlertSecondButtonReturn:
-    case NSAlertOtherReturn:
-    default:
-      return kCancelButton;
+    if (message->show_suppress_)
+      message->suppressed_ = [[alert suppressionButton] state] == NSOnState;
+    if (message->callback_ != NULL)
+      (*message->callback_)(button_type, message->callback_data_);
+    return button_type;
+  } else {
+    [alert runModalOnMainThreadWithCallback:message->callback_
+                                       data:message->callback_data_];
+    return kOtherButton;
   }
 }
 
