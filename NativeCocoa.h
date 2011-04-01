@@ -291,7 +291,7 @@ class Cocoa {
   };
 
   // <separator> implementation
-  class Separator : public Control {
+  class Separator : public View {
    public:
     Separator() {}
 

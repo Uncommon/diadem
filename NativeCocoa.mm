@@ -1228,7 +1228,7 @@ Value Cocoa::Separator::GetProperty(PropertyName name) const {
     else  // kLayoutColumn
       return Spacing(10, 2, 10, 2);
   }
-  return Control::GetProperty(name);
+  return View::GetProperty(name);
 }
 
 void Cocoa::Image::InitializeProperties(const PropertyMap &properties) {
