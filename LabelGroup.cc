@@ -52,8 +52,9 @@ void LabelGroup::InitializeProperties(
   } else {
     SetLayout(new ColumnLabelLayout(this));
   }
-  layout_->ChildAdded(label_);
-  layout_->ChildAdded(content_);
+  // Bypass the override, which would add it to the content group
+  Entity::AddChild(label_);
+  Entity::AddChild(content_);
 
   Entity::InitializeProperties(properties, factory);
 }
@@ -72,9 +73,6 @@ void LabelGroup::AddChild(Entity *child) {
 }
 
 void LabelGroup::Finalize() {
-  // Bypass the override, which would add it to the content group
-  Entity::AddChild(label_);
-  Entity::AddChild(content_);
   label_->GetLayout()->SetWidthName(GetParent()->GetPath());
 }
 

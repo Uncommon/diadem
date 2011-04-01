@@ -1361,7 +1361,8 @@ Value Cocoa::Popup::GetProperty(PropertyName name) const {
     return 15;  // depending on UI size
   }
   if (strcmp(name, kPropValue) == 0) {
-    return [(NSPopUpButton*)view_ref_ indexOfSelectedItem];
+    return Value(static_cast<uint32_t>(
+        [(NSPopUpButton*)view_ref_ indexOfSelectedItem]));
   }
   return Button::GetProperty(name);
 }

@@ -40,7 +40,7 @@ extern const PropertyName
     kPropSize, kPropMinimumSize, kPropMaxWidth, kPropMaxHeight,
     kPropWidthOption, kPropHeightOption, kPropDirection,
     kPropWidthName, kPropHeightName,
-    kPropLocation, kPropAlign, kPropVisible, kPropInLayout,
+    kPropLocation, kPropAlign, kPropVisible, kPropFullyVisible, kPropInLayout,
     kPropPadding, kPropMargins, kPropBaseline;
 
 extern const TypeName kTypeNameGroup, kTypeNameMulti, kTypeNameSpacer;
@@ -57,7 +57,7 @@ class Layout : public EntityDelegate {
   enum LayoutDirection { kLayoutRow, kLayoutColumn };
 
   Layout()
-      : in_layout_(true),
+      : in_layout_(true), latent_visibility_(true),
         h_size_(kSizeDefault), v_size_(kSizeDefault),
         align_(kAlignStart) {}
   virtual ~Layout() {}
@@ -75,6 +75,10 @@ class Layout : public EntityDelegate {
 
   virtual bool SetProperty(PropertyName name, const Value &value);
   virtual Value GetProperty(PropertyName name) const;
+
+  // True if all the entity's ancestors are visible.
+  bool AreAncestorsVisible() const;
+  bool GetLatentVisibility() const { return latent_visibility_; }
 
   virtual void Finalize() { ResizeToMinimum(); }
 
@@ -145,6 +149,7 @@ class Layout : public EntityDelegate {
 
  protected:
   bool in_layout_;
+  bool latent_visibility_;
   SizeOption h_size_, v_size_;
   ExplicitSize explicit_size_;
   String width_name_, height_name_;

@@ -530,3 +530,84 @@ TEST_F(CocoaTest, testRadio) {
   EXPECT_EQ(static_cast<NSInteger>(NSOnState), [button1 state]);
   EXPECT_EQ(static_cast<NSInteger>(NSOffState), [button2 state]);
 }
+
+// Mirrors GroupTest.testLatentVisibility, testing actual control visibility
+TEST_F(CocoaTest, testLatentVisibility) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='testLatentVisibility'>"
+        "<group>"
+          "<label text='Invisible!'/>"
+        "</group>"
+      "</window>"));
+
+  Diadem::Entity *group = window_root_->ChildAt(0);
+  Diadem::Entity *label = group->ChildAt(0);
+  NSTextField *label_ref =
+      reinterpret_cast<NSTextField*>(label->GetNative()->GetNativeRef());
+
+  EXPECT_FALSE([label_ref isHidden]);
+
+  EXPECT_TRUE(group->SetProperty(Diadem::kPropVisible, false));
+  EXPECT_TRUE([label_ref isHidden]);
+
+  EXPECT_TRUE(label->SetProperty(Diadem::kPropVisible, false));
+  EXPECT_TRUE([label_ref isHidden]);
+
+  EXPECT_TRUE(group->SetProperty(Diadem::kPropVisible, true));
+  EXPECT_TRUE([label_ref isHidden]);
+
+  EXPECT_TRUE(group->SetProperty(Diadem::kPropVisible, false));
+  EXPECT_TRUE([label_ref isHidden]);
+  EXPECT_TRUE(label->SetProperty(Diadem::kPropVisible, true));
+  EXPECT_TRUE([label_ref isHidden]);
+
+  EXPECT_TRUE(group->SetProperty(Diadem::kPropVisible, true));
+  EXPECT_FALSE([label_ref isHidden]);
+}
+
+// Label groups are special because of their special label handling
+TEST_F(CocoaTest, testLabelGroupVisibility) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='Preferences - Google Drive'>"
+        "<popup name='p'>"
+          "<item text='One'/>"
+          "<item text='Two'/>"
+        "</popup>"
+        "<multi name='multi'>"
+          "<bind source='p' prop='value'/>"
+          "<label text='One' width='fill' name='account'/>"
+          "<labelgroup text='Two:' width='fill'>"
+            "<label text='point five' width='fill' name='l2'/>"
+          "</labelgroup>"
+        "</multi>"
+      "</window>"));
+  ASSERT_EQ(2, window_root_->ChildrenCount());
+
+  Diadem::Entity* const multi = window_root_->ChildAt(1);
+  ASSERT_EQ(3, multi->ChildrenCount());
+  Diadem::Entity* const label1 = multi->ChildAt(1);
+  Diadem::LabelGroup* const label_group =
+      dynamic_cast<Diadem::LabelGroup*>(multi->ChildAt(2));
+  Diadem::Entity* const group_label = label_group->GetLabel();
+  Diadem::Entity* const label2 = window_root_->FindByName("l2");
+
+  NSView* const l1_ref =
+      reinterpret_cast<NSView*>(label1->GetNative()->GetNativeRef());
+  NSView* const l2_ref =
+      reinterpret_cast<NSView*>(label2->GetNative()->GetNativeRef());
+  NSView* const gl_ref =
+      reinterpret_cast<NSView*>(group_label->GetNative()->GetNativeRef());
+
+  ASSERT_FALSE(group_label == NULL);
+  ASSERT_FALSE(label2 == NULL);
+
+  EXPECT_EQ(0, multi->GetProperty(Diadem::kPropValue).Coerce<int32_t>());
+  EXPECT_FALSE([l1_ref isHidden]);
+  EXPECT_TRUE([l2_ref isHidden]);
+  EXPECT_TRUE([gl_ref isHidden]);
+
+  EXPECT_TRUE(multi->SetProperty(Diadem::kPropValue, 1));
+  EXPECT_TRUE([l1_ref isHidden]);
+  EXPECT_FALSE([l2_ref isHidden]);
+  EXPECT_FALSE([gl_ref isHidden]);
+}

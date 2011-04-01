@@ -37,6 +37,7 @@ const PropertyName
     kPropHeightName   = "heightName",
     kPropAlign        = "align",
     kPropVisible      = "visible",
+    kPropFullyVisible = "fullvis",  // entity and all ancestors are visible
     kPropInLayout     = "inLayout",
     kPropDirection    = "direction",
     kPropAmount       = "amount",
@@ -142,6 +143,14 @@ bool Layout::SetProperty(PropertyName name, const Value &value) {
     InvalidateLayout();
     return true;
   }
+  if (strcmp(name, kPropVisible) == 0) {
+    if (AreAncestorsVisible()) {
+      return false;  // Allow native to handle it
+    } else {
+      latent_visibility_ = value.Coerce<bool>();
+      return true;
+    }
+  }
   if (strcmp(name, kPropWidthOption) == 0) {
     const String width_string = value.Coerce<String>();
 
@@ -184,10 +193,33 @@ Value Layout::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropInLayout) == 0) {
     return Value(in_layout_);
   }
+  if (strcmp(name, kPropVisible) == 0) {
+    if (!AreAncestorsVisible())
+      return latent_visibility_;
+    return Value();  // Pass on to Native.
+  }
+  if (strcmp(name, kPropFullyVisible) == 0) {
+    const Value visible = entity_->GetProperty(kPropVisible);
+
+    if (!visible.IsValid() || !visible.Coerce<bool>())
+      return false;
+    return AreAncestorsVisible();
+  }
   if (strcmp(name, kPropWidthOption) == 0) {
     return Value(static_cast<int>(h_size_));
   }
   return Value();
+}
+
+bool Layout::AreAncestorsVisible() const {
+  for (Entity *entity = entity_->GetParent(); entity != NULL;
+       entity = entity->GetParent()) {
+    const Value visible = entity->GetProperty(kPropVisible);
+
+    if (!visible.IsValid() || !visible.Coerce<bool>())
+      return false;
+  }
+  return true;
 }
 
 Location Layout::GetViewLocation() const {
@@ -344,8 +376,27 @@ bool LayoutContainer::SetProperty(const char *name, const Value &value) {
     }
   }
   if (strcmp(name, kPropVisible) == 0) {
-    visible_ = value.Coerce<bool>();
-    // TODO(catmull): hide children
+    const bool new_visible = value.Coerce<bool>();
+
+    if (visible_ == new_visible)
+      return true;
+    // To correctly handle latent visibility, the parent's visibility is set
+    // either before or after the children, depending on the new setting.
+    if (new_visible)
+      visible_ = new_visible;
+    for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+      Entity *child = entity_->ChildAt(i);
+
+      if (new_visible) {
+        if (child->GetLayout() != NULL)
+          child->SetProperty(
+              kPropVisible, child->GetLayout()->GetLatentVisibility());
+      } else {
+        child->SetProperty(kPropVisible, false);
+      }
+    }
+    if (!new_visible)
+      visible_ = new_visible;
     return true;
   }
   return Layout::SetProperty(name, value);
@@ -828,10 +879,6 @@ bool Group::SetProperty(PropertyName name, const Value &value) {
       return entity_->ChildAt(0)->SetProperty(kPropValue, value);
     else
       return true;
-  }
-  if (strcmp(name, kPropVisible) == 0) {
-    for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i)
-      entity_->ChildAt(i)->SetProperty(kPropVisible, value);
   }
   return LayoutContainer::SetProperty(name, value);
 }

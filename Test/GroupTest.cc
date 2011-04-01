@@ -110,8 +110,7 @@ void GroupTest::VerifyButtonGrid() {
 }
 
 // A 2x2 grid of buttons as a column of two rows.
-TEST_F(GroupTest, testColumnOfRows)
-{
+TEST_F(GroupTest, testColumnOfRows) {
   ReadWindowData(
       "<window>"
         "<group direction='column'>"
@@ -552,9 +551,12 @@ TEST_F(GroupTest, testMultipanelVisibility) {
   EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
 
   multi->SetProperty(Diadem::kPropVisible, false);
-  EXPECT_FALSE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
-  EXPECT_FALSE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
-  EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label1->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
+  EXPECT_FALSE(button->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
+  EXPECT_FALSE(label2->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
   multi->SetProperty(Diadem::kPropVisible, true);
   EXPECT_TRUE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
   EXPECT_FALSE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
@@ -566,7 +568,8 @@ TEST_F(GroupTest, testMultipanelVisibility) {
   EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
   multi->SetProperty(Diadem::kPropVisible, false);
   EXPECT_FALSE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
-  EXPECT_FALSE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(button->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(button->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
   EXPECT_FALSE(label2->GetProperty(Diadem::kPropVisible).Coerce<bool>());
   multi->SetProperty(Diadem::kPropVisible, true);
   EXPECT_FALSE(label1->GetProperty(Diadem::kPropVisible).Coerce<bool>());
@@ -628,4 +631,64 @@ TEST_F(GroupTest, testMultipanelFill) {
 
   EXPECT_EQ(multi_size.width, label1_size.width);
   EXPECT_EQ(multi_size.width, label2_size.width);
+}
+
+// Objects should quietly track their visibility while the parent is hidden.
+TEST_F(GroupTest, testLatentVisibility) {
+  ReadWindowData(
+      "<window text='testLatentVisibility'>"
+        "<group>"
+          "<label text='Invisible!'/>"
+        "</group>"
+      "</window>");
+
+  Diadem::Entity *group = windowRoot_->ChildAt(0);
+  Diadem::Entity *label = group->ChildAt(0);
+
+  // Both are initially visible.
+  EXPECT_TRUE(group->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(label->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(label->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
+
+  // Hide the group.
+  EXPECT_TRUE(group->SetProperty(Diadem::kPropVisible, false));
+
+  // The label is "visible" independent of its parent.
+  EXPECT_FALSE(group->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(label->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
+
+  // Hide the label while its parent is still hidden.
+  EXPECT_TRUE(label->SetProperty(Diadem::kPropVisible, false));
+  EXPECT_FALSE(label->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
+
+  // Show the group.
+  EXPECT_TRUE(group->SetProperty(Diadem::kPropVisible, true));
+
+  // The group is visible, but not the label.
+  EXPECT_TRUE(group->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
+
+  // Hide the group again.
+  EXPECT_TRUE(group->SetProperty(Diadem::kPropVisible, false));
+
+  // Both are invisible.
+  EXPECT_FALSE(group->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
+
+  // Show the label invisibly.
+  EXPECT_TRUE(label->SetProperty(Diadem::kPropVisible, true));
+  EXPECT_TRUE(label->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_FALSE(label->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
+
+  // Show the group.
+  EXPECT_TRUE(group->SetProperty(Diadem::kPropVisible, true));
+
+  // Everything is visible.
+  EXPECT_TRUE(group->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(label->GetProperty(Diadem::kPropVisible).Coerce<bool>());
+  EXPECT_TRUE(label->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
 }
