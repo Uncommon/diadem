@@ -190,6 +190,7 @@ class String : public Base {
 #endif
     return value;
   }
+  double ToDouble() const { return strtod(string_, NULL); }
 
  protected:
   const char *string_;

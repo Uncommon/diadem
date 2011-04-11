@@ -342,6 +342,19 @@ class Cocoa {
     NSMenuItem *item_;
   };
 
+  // <slider> implementation
+  class Slider : public Control {
+   public:
+    Slider() {}
+
+    void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameSlider; }
+    Value GetProperty(PropertyName name) const;
+    bool SetProperty(PropertyName name, const Value &value);
+
+    Spacing GetInset() const;
+  };
+
   // <list> implementation
   class List : public View {
    public:

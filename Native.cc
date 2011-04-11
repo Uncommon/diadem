@@ -19,15 +19,18 @@ namespace Diadem {
 
 const PropertyName
     kPropButtonType = "type",
+    kPropColumnType = "type",
+    kPropData       = "data",
     kPropFile       = "file",
+    kPropMax        = "max",
+    kPropMin        = "min",
+    kPropRowCount   = "rows",
     kPropStyle      = "style",
     kPropTextAlign  = "text-align",
+    kPropTicks      = "ticks",
     kPropUISize     = "uisize",
     kPropURL        = "url",
-    kPropValue      = "value",
-    kPropRowCount   = "rows",
-    kPropData       = "data",
-    kPropColumnType = "type";
+    kPropValue      = "value";
 
 const TypeName
     kTypeNameBox        = "box",
@@ -48,6 +51,7 @@ const TypeName
     kTypeNameRadio      = "radio",
     kTypeNameRadioGroup = "radiogroup",
     kTypeNameSeparator  = "separator",
+    kTypeNameSlider     = "slider",
     kTypeNameTab        = "tab",
     kTypeNameTabs       = "tabs",
     kTypeNameWindow     = "window";

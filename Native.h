@@ -22,16 +22,17 @@
 namespace Diadem {
 
 extern const PropertyName
-    kPropButtonType, kPropFile, kPropStyle, kPropTextAlign, kPropUISize,
-    kPropURL, kPropValue, kPropRowCount, kPropData, kPropColumnType;
+    kPropButtonType, kPropColumnType, kPropData, kPropFile, kPropMax, kPropMin,
+    kPropRowCount, kPropStyle, kPropTextAlign, kPropTicks, kPropUISize,
+    kPropURL, kPropValue;
 
 extern const TypeName
     kTypeNameBox, kTypeNameButton, kTypeNameCheck, kTypeNameColumn,
     kTypeNameCombo, kTypeNameDate, kTypeNameEdit, kTypeNameImage,
     kTypeNameItem, kTypeNameLabel, kTypeNameLink, kTypeNameList,
     kTypeNamePassword, kTypeNamePath, kTypeNamePopup, kTypeNameRadio,
-    kTypeNameRadioGroup, kTypeNameSeparator, kTypeNameTab, kTypeNameTabs,
-    kTypeNameWindow;
+    kTypeNameRadioGroup, kTypeNameSeparator, kTypeNameSlider, kTypeNameTab,
+    kTypeNameTabs, kTypeNameWindow;
 
 extern const StringConstant kTextAlignLeft, kTextAlignCenter, kTextAlignRight;
 

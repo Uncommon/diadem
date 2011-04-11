@@ -498,6 +498,41 @@ TEST_F(CocoaTest, testColumnSizes) {
   EXPECT_EQ(col->GetNative()->GetPlatformMetrics().em_size * 5, size.width);
 }
 
+TEST_F(CocoaTest, testSlider) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='testSlider'>"
+        "<slider min='1' max='100' value='20' ticks='11'/>"
+      "</window>"));
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+
+  Diadem::Entity* const slider = window_root_->ChildAt(0);
+  id slider_ref = (id)slider->GetNative()->GetNativeRef();
+
+  ASSERT_FALSE(slider_ref == nil);
+  EXPECT_TRUE([slider_ref isKindOfClass:[NSSlider class]]);
+  EXPECT_EQ(1, slider->GetProperty(Diadem::kPropMin).Coerce<int32_t>());
+  EXPECT_EQ(100, slider->GetProperty(Diadem::kPropMax).Coerce<int32_t>());
+  EXPECT_EQ(20, slider->GetProperty(Diadem::kPropValue).Coerce<int32_t>());
+  EXPECT_EQ(11, slider->GetProperty(Diadem::kPropTicks).Coerce<int32_t>());
+}
+
+TEST_F(CocoaTest, testSliderFloat) {
+  ASSERT_TRUE(ReadWindowData(
+      "<window text='testSlider'>"
+        "<slider min='0.5' max='1.5' value='0.75'/>"
+      "</window>"));
+  ASSERT_EQ(1, window_root_->ChildrenCount());
+
+  Diadem::Entity* const slider = window_root_->ChildAt(0);
+  id slider_ref = (id)slider->GetNative()->GetNativeRef();
+
+  ASSERT_FALSE(slider_ref == nil);
+  EXPECT_TRUE([slider_ref isKindOfClass:[NSSlider class]]);
+  EXPECT_EQ(0.5, slider->GetProperty(Diadem::kPropMin).Coerce<double>());
+  EXPECT_EQ(1.5, slider->GetProperty(Diadem::kPropMax).Coerce<double>());
+  EXPECT_EQ(0.75, slider->GetProperty(Diadem::kPropValue).Coerce<double>());
+}
+
 TEST_F(CocoaTest, testRadio) {
   ASSERT_TRUE(ReadWindowData(
       "<window text='testRadio'>"

@@ -46,7 +46,6 @@
 		DD6801DB1277426300CB9EF5 /* Layout.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806E2C11F7C7D6005E4C56 /* Layout.cc */; };
 		DD6801DC1277426300CB9EF5 /* Factory.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD806E8611F91565005E4C56 /* Factory.cc */; };
 		DD6801DD1277426300CB9EF5 /* LibXMLParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = DDC32ABC120B64310098E044 /* LibXMLParser.cc */; };
-		DD6801DE1277426300CB9EF5 /* NativeCarbon.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD5848ED12274C2900C66683 /* NativeCarbon.cc */; };
 		DD6801E01277426300CB9EF5 /* Native.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD3C9FA81248FF0200F536B7 /* Native.cc */; };
 		DD6801E11277426300CB9EF5 /* NativeCocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD18340D124A54B400FF34FB /* NativeCocoa.mm */; };
 		DD6801E21277426300CB9EF5 /* pyadem.cc in Sources */ = {isa = PBXBuildFile; fileRef = DD68FA121275DAFD00CB9EF5 /* pyadem.cc */; };
@@ -398,6 +397,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "Diadem" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -531,7 +531,6 @@
 				DD6801DB1277426300CB9EF5 /* Layout.cc in Sources */,
 				DD6801DC1277426300CB9EF5 /* Factory.cc in Sources */,
 				DD6801DD1277426300CB9EF5 /* LibXMLParser.cc in Sources */,
-				DD6801DE1277426300CB9EF5 /* NativeCarbon.cc in Sources */,
 				DD6801E01277426300CB9EF5 /* Native.cc in Sources */,
 				DD6801E11277426300CB9EF5 /* NativeCocoa.mm in Sources */,
 				DD6801E21277426300CB9EF5 /* pyadem.cc in Sources */,

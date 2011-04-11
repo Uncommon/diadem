@@ -184,7 +184,7 @@ template<> inline bool Value::ValueHolder<String>::Coerce(
 template<> inline String Value::ValueHolder<String>::Coerce(
     const Value::type<String>&) const { return data; }
 template<> inline double Value::ValueHolder<String>::Coerce(
-    const Value::type<double>&) const { return 0.0f; }
+    const Value::type<double>&) const { return data.ToDouble(); }
 
 #define ValueReturnData(T) \
   template<> inline T Value::ValueHolder<T>::Coerce( \

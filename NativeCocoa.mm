@@ -312,6 +312,7 @@ void Cocoa::SetUpFactory(Factory *factory) {
   factory->RegisterNative<PushButton>(kTypeNameButton);
   factory->RegisterNative<Radio>(kTypeNameRadio);
   factory->RegisterNative<Separator>(kTypeNameSeparator);
+  factory->RegisterNative<Slider>(kTypeNameSlider);
   factory->RegisterNative<Window>(kTypeNameWindow);
 }
 
@@ -1404,6 +1405,71 @@ Value Cocoa::PopupItem::GetProperty(PropertyName name) const {
     return (bool)[item_ isEnabled];
   }
   return NativeCocoa::GetProperty(name);
+}
+
+void Cocoa::Slider::InitializeProperties(const PropertyMap &properties) {
+  ScopedAutoreleasePool pool;
+
+  view_ref_ = [[NSSlider alloc] initWithFrame:NSMakeRect(0, 0, 30, 15)];
+  ConfigureView();
+}
+
+bool Cocoa::Slider::SetProperty(PropertyName name, const Value &value) {
+  if (strcmp(name, kPropValue) == 0) {
+    [(NSSlider*)view_ref_ setFloatValue:value.Coerce<double>()];
+    return true;
+  }
+  if (strcmp(name, kPropMin) == 0) {
+    [(NSSlider*)view_ref_ setMinValue:value.Coerce<double>()];
+    return true;
+  }
+  if (strcmp(name, kPropMax) == 0) {
+    [(NSSlider*)view_ref_ setMaxValue:value.Coerce<double>()];
+    return true;
+  }
+  if (strcmp(name, kPropTicks) == 0) {
+    [(NSSlider*)view_ref_ setNumberOfTickMarks:value.Coerce<uint32_t>()];
+    return true;
+  }
+  return Control::SetProperty(name, value);
+}
+
+Value Cocoa::Slider::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropPadding) == 0) {
+    // AHIG says 12/10/8, IB uses 8
+    switch ([[(NSButton*)view_ref_ cell] controlSize]) {
+      case NSRegularControlSize:
+        return Spacing(12, 12, 12, 12);
+      case NSSmallControlSize:
+        return Spacing(10, 10, 10, 10);
+      case NSMiniControlSize:
+        return Spacing(8, 8, 8, 8);
+      default:
+        return Value();
+    }
+  }
+  if (strcmp(name, kPropValue) == 0)
+    return [(NSSlider*)view_ref_ floatValue];
+  if (strcmp(name, kPropMin) == 0)
+    return [(NSSlider*)view_ref_ minValue];
+  if (strcmp(name, kPropMax) == 0)
+    return [(NSSlider*)view_ref_ maxValue];
+  if (strcmp(name, kPropTicks) == 0)
+    return [(NSSlider*)view_ref_ numberOfTickMarks];
+  if (strcmp(name, kPropMinimumSize) == 0) {
+    // NSSlider claims its ideal width is 40000.
+    const NSSize cell_size = [[(NSControl*)view_ref_ cell] cellSize];
+
+    return Size(30, cell_size.height) + GetInset();
+  }
+  return Control::GetProperty(name);
+}
+
+Spacing Cocoa::Slider::GetInset() const {
+  if ([(NSSlider*)view_ref_ numberOfTickMarks] == 0)
+    return Spacing(-2, -2, -3, -2);
+  else
+    return Spacing(-1, -2, 0, -2);
 }
 
 Cocoa::List::List() : data_(NULL), row_count_(0) {}
