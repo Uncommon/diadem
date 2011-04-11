@@ -1484,6 +1484,7 @@ void Cocoa::List::InitializeProperties(const PropertyMap &properties) {
   view_ref_ = scroll;
   ConfigureView();
   [scroll setDocumentView:table_view_];
+  [scroll setHasVerticalScroller:YES];
   [scroll setAutohidesScrollers:YES];
   [scroll setBorderType:NSBezelBorder];
   [table_view_ setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
