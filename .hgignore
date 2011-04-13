@@ -11,3 +11,6 @@ xcuserdata
 .git*
 *.sdf
 *.vcxproj.user
+Windows/Debug
+Windows/Release
+Windows/ipch
