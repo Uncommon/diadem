@@ -15,6 +15,14 @@
 #ifndef DIADEM_WRAPPERS_H_
 #define DIADEM_WRAPPERS_H_
 
+#include <stdint.h>
+#include <stdio.h>
+#include <assert.h>
+
+#ifdef _WIN32
+#define snprintf _snprintf
+#endif
+
 #ifndef DIADEM_HAVE_ARRAY
 #include <vector>
 #include <algorithm>

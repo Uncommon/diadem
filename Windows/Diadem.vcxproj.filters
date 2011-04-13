@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Diadem">
+      <UniqueIdentifier>{6764f78f-ca54-412c-901e-5296b2b5770f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="small.ico">
@@ -35,6 +38,18 @@
     <ClInclude Include="Diadem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Base.h">
+      <Filter>Diadem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Entity.h">
+      <Filter>Diadem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Value.h">
+      <Filter>Diadem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Wrappers.h">
+      <Filter>Diadem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -42,6 +57,9 @@
     </ClCompile>
     <ClCompile Include="Diadem.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Entity.cc">
+      <Filter>Diadem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

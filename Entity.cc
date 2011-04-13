@@ -89,7 +89,7 @@ String Entity::GetPath() const {
 uint32_t Entity::ChildIndexByType(const Entity *child) const {
   DASSERT(child != NULL);
   const String child_type = child->GetTypeName();
-  uint32 count = 0;
+  uint32_t count = 0;
 
   for (uint32_t i = 0; i < ChildrenCount(); ++i) {
     if (ChildAt(i) == child)

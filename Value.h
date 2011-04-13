@@ -15,12 +15,17 @@
 #ifndef DIADEM_VALUE_H_
 #define DIADEM_VALUE_H_
 
+// TODO: this goes somewhere else
+#ifndef DIADEM_PYTHON
+#define DIADEM_PYTHON 0
+#endif
+
 #if !DIADEM_PYTHON
 class PyObject;
 #else
 #include <Python/Python.h>
-typedef PyObject *PyObjectPtr;
 #endif
+typedef PyObject *PyObjectPtr;
 
 #if TARGET_OS_WIN32
 #include <typeinfo.h>

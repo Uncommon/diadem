@@ -127,7 +127,8 @@ class ExplicitSize {
     : width_(0), height_(0),
       width_units_(kUnitPixels), height_units_(kUnitPixels) {}
   explicit ExplicitSize(const Size &size)
-    : width_(size.width), height_(size.height),
+    : width_(static_cast<float>(size.width)),
+      height_(static_cast<float>(size.height)),
       width_units_(kUnitPixels), height_units_(kUnitPixels) {}
 
   // Parses a width or height value for an explicit amount and unit.
