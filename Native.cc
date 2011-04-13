@@ -15,6 +15,34 @@
 #include "Diadem/Native.h"
 #include "Diadem/Layout.h"
 
+#ifdef _WIN32  // Windows doesn't have strsep
+
+char* strsep(char **stringp, const char *delim) {
+  char *s = *stringp;
+  const char *spanp;
+  int c, sc;
+  char *tok = s;
+
+  if (s == NULL)
+    return NULL;
+  while (true) {
+    c = *s++;
+    spanp = delim;
+    do {
+      if ((sc = *spanp++) == c) {
+        if (c == '\0')
+          s = NULL;
+        else
+          s[-1] = '\0';
+        *stringp = s;
+        return tok;
+      }
+    } while (sc != 0);
+  }
+}
+
+#endif
+
 namespace Diadem {
 
 const PropertyName

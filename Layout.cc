@@ -15,6 +15,7 @@
 #include "Diadem/Layout.h"
 
 #include <algorithm>
+#include <ctype.h>
 
 #include "Diadem/Native.h"
 #include "Diadem/Value.h"
@@ -271,8 +272,9 @@ Size Layout::EnforceExplicitSize(const Size &size) const {
       default:
         break;
     }
-    result.width =
-        std::max<int32_t>(size.width, explicit_size_.width_ * h_multiplier);
+    result.width = std::max<int32_t>(
+        size.width,
+        static_cast<int32_t>(explicit_size_.width_ * h_multiplier));
   }
   if (!height_name_.IsEmpty()) {
     result.height = FindHeightForName();
@@ -291,8 +293,9 @@ Size Layout::EnforceExplicitSize(const Size &size) const {
       default:
         break;
     }
-    result.height =
-        std::max<int32_t>(size.height, explicit_size_.height_ * v_multiplier);
+    result.height = std::max<int32_t>(
+        size.height,
+        static_cast<uint32_t>(explicit_size_.height_ * v_multiplier));
   }
   return result;
 }
