@@ -9,7 +9,10 @@ Diadem.xcodeproj/*.perspective*
 xcuserdata
 *.xcworkspace
 .git*
+*.aps
+*.opensdf
 *.sdf
+*.suo
 *.vcxproj.user
 Windows/Debug
 Windows/Release
