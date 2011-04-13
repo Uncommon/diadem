@@ -56,6 +56,12 @@
     <ClInclude Include="..\Layout.h">
       <Filter>Diadem</Filter>
     </ClInclude>
+    <ClInclude Include="..\ChangeMessenger.h">
+      <Filter>Diadem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Metrics.h">
+      <Filter>Diadem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -71,6 +77,15 @@
       <Filter>Diadem</Filter>
     </ClCompile>
     <ClCompile Include="..\Layout.cc">
+      <Filter>Diadem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Value.cc">
+      <Filter>Diadem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ChangeMessenger.cpp">
+      <Filter>Diadem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Metrics.cc">
       <Filter>Diadem</Filter>
     </ClCompile>
   </ItemGroup>

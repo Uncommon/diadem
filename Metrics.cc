@@ -34,7 +34,11 @@ void ExplicitSize::ParseWidth(const char *value) {
       width_units_ = kUnitEms;
     else
       width_units_ = kUnitPixels;
+#ifdef _WIN32
+    width_ = static_cast<float>(strtod(value, NULL));
+#else
     width_ = strtof(value, NULL);
+#endif
   }
 }
 
@@ -45,25 +49,35 @@ void ExplicitSize::ParseHeight(const char *value) {
     height_units_ = kUnitLines;
   else
     height_units_ = kUnitPixels;
+#ifdef _WIN32
+  height_ = static_cast<float>(strtod(value, NULL));
+#else
   height_ = strtof(value, NULL);
+#endif
 }
 
 int32_t ExplicitSize::CalculateWidth(const PlatformMetrics &metrics) const {
+  float result = width_;
+
   switch (width_units_) {
-    case kUnitIndent: return width_ * metrics.indent_size;
-    case kUnitEms:    return width_ * metrics.em_size;
+    case kUnitIndent: result = width_ * metrics.indent_size;
+    case kUnitEms:    result = width_ * metrics.em_size;
     case kUnitPixels:
-    default:          return width_;
+    default:          break;
   }
+  return static_cast<int32_t>(result);
 }
 
 int32_t ExplicitSize::CalculateHeight(const PlatformMetrics &metrics) const {
+  float result = height_;
+
   switch (height_units_) {
-    case kUnitLines:  return height_ * metrics.line_height;
-    case kUnitEms:    return height_ * metrics.em_size;
+    case kUnitLines:  result = height_ * metrics.line_height;
+    case kUnitEms:    result = height_ * metrics.em_size;
     case kUnitPixels:
-    default:          return height_;
+    default:          break;
   }
+  return static_cast<int32_t>(result);
 }
 
 }  // namespace Diadem
