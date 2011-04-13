@@ -9,3 +9,5 @@ Diadem.xcodeproj/*.perspective*
 xcuserdata
 *.xcworkspace
 .git*
+*.sdf
+*.vcxproj.user
