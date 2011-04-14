@@ -62,6 +62,18 @@
     <ClInclude Include="..\Metrics.h">
       <Filter>Diadem</Filter>
     </ClInclude>
+    <ClInclude Include="..\Factory.h">
+      <Filter>Diadem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Binding.h">
+      <Filter>Diadem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LabelGroup.h">
+      <Filter>Diadem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\XmlLiteParser.h">
+      <Filter>Diadem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -86,6 +98,18 @@
       <Filter>Diadem</Filter>
     </ClCompile>
     <ClCompile Include="..\Metrics.cc">
+      <Filter>Diadem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Factory.cc">
+      <Filter>Diadem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Binding.cc">
+      <Filter>Diadem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LabelGroup.cc">
+      <Filter>Diadem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\XmlLiteParser.cc">
       <Filter>Diadem</Filter>
     </ClCompile>
   </ItemGroup>

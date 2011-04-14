@@ -12,22 +12,25 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
+#include "stdafx.h"
+#include <atlbase.h>
+#include <xmllite.h>
+
 #include "Diadem/XmlLiteParser.h"
 #include "Diadem/Factory.h"
 #include "Diadem/Value.h"
 
-#include <xmllite.h>
 
 namespace {
 
 // XML node and attribute names will be plain ASCII, so it's safe to cast
 // WCHAR to char.
-Diadem::String StringFromWCHARs(WCHAR *w) {
+Diadem::String StringFromWCHARs(const WCHAR *w) {
   char *s = new char[wcslen(w)];
 
   for (int i = 0; w[i] != 0; ++i)
-    s[i] = w[i];
-  return String(s, Diadem::String::kAdoptBuffer);
+    s[i] = static_cast<char>(w[i]);
+  return Diadem::String(s, Diadem::String::kAdoptBuffer);
 }
 
 }
@@ -38,13 +41,13 @@ static Entity* ParseStream(CComPtr<IStream> &stream, const Factory &factory) {
   CComPtr<IXmlReader> reader;
 
   if (FAILED(CreateXmlReader(
-      __uuidof(IXmlReader), static_cast<void**>(&reader), NULL)))
+      __uuidof(IXmlReader), reinterpret_cast<void**>(&reader), NULL)))
     return NULL;
   if (FAILED(reader->SetInput(stream)))
     return NULL;
 
   XmlNodeType node_type;
-  FactorySession session(factory)
+  FactorySession session(factory);
 
   while (reader->Read(&node_type) == S_OK) {
 
@@ -52,7 +55,7 @@ static Entity* ParseStream(CComPtr<IStream> &stream, const Factory &factory) {
       case XmlNodeType_Element: {
           const WCHAR *node_name = NULL;
 
-          if (FAILED(reader->GetLocalName(&name, NULL)))
+          if (FAILED(reader->GetLocalName(&node_name, NULL)))
             break;
           if (FAILED(reader->MoveToFirstAttribute()))
             break;
@@ -66,7 +69,7 @@ static Entity* ParseStream(CComPtr<IStream> &stream, const Factory &factory) {
               continue;
             if (FAILED(reader->GetValue(&value, NULL)))
               continue;
-            properties.Insert(StringFromWCHARs(name), StringFromWCHARs(value))
+            properties.Insert(StringFromWCHARs(name), StringFromWCHARs(value));
           }
           session.BeginEntity(StringFromWCHARs(node_name), properties);
         break;
@@ -76,14 +79,15 @@ static Entity* ParseStream(CComPtr<IStream> &stream, const Factory &factory) {
         break;
     }
   }
+  return session.RootEntity();
 }
 
-Entity* LibXMLParser::LoadEntityFromFile(const char *path) const {
-  CComPtr<IStream> pFileStream;
+Entity* XmlLiteParser::LoadEntityFromFile(const char *path) const {
+  CComPtr<IStream> file_stream;
 
-  if (FAILED(SHCreateStreamOnFile(path, STGM_READ, &file_stream))
+  if (FAILED(SHCreateStreamOnFileA(path, STGM_READ, &file_stream)))
     return NULL;
-  return ParseStream(pFileStream, factory_);
+  return ParseStream(file_stream, factory_);
 }
 
 }  // namespace Diadem
