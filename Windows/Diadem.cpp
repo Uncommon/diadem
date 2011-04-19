@@ -1,5 +1,16 @@
-// Diadem.cpp : Defines the entry point for the application.
+// Copyright 2011 Google Inc.
 //
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License.  You may obtain a copy
+// of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+// License for the specific language governing permissions and limitations under
+// the License.
 
 #include "stdafx.h"
 #include "Diadem.h"
@@ -7,15 +18,15 @@
 #define MAX_LOADSTRING 100
 
 // Global Variables:
-HINSTANCE hInst;								// current instance
-TCHAR szTitle[MAX_LOADSTRING];					// The title bar text
-TCHAR szWindowClass[MAX_LOADSTRING];			// the main window class name
+HINSTANCE hInst;                      // current instance
+TCHAR szTitle[MAX_LOADSTRING];        // The title bar text
+TCHAR szWindowClass[MAX_LOADSTRING];  // the main window class name
 
 // Forward declarations of functions included in this code module:
-ATOM				MyRegisterClass(HINSTANCE hInstance);
-BOOL				InitInstance(HINSTANCE, int);
-LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
+ATOM              MyRegisterClass(HINSTANCE hInstance);
+BOOL              InitInstance(HINSTANCE, int);
+LRESULT CALLBACK  WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK  About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY _tWinMain(
     HINSTANCE hInstance,
@@ -35,7 +46,7 @@ int APIENTRY _tWinMain(
   MyRegisterClass(hInstance);
 
   // Perform application initialization:
-  if (!InitInstance (hInstance, nCmdShow))
+  if (!InitInstance(hInstance, nCmdShow))
     return FALSE;
 
   hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_DIADEM));
@@ -65,23 +76,23 @@ int APIENTRY _tWinMain(
 //    with it.
 //
 ATOM MyRegisterClass(HINSTANCE hInstance) {
-	WNDCLASSEX wcex;
+  WNDCLASSEX wcex;
 
-	wcex.cbSize = sizeof(WNDCLASSEX);
+  wcex.cbSize = sizeof(WNDCLASSEX);
 
-	wcex.style			= CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc	= WndProc;
-	wcex.cbClsExtra		= 0;
-	wcex.cbWndExtra		= 0;
-	wcex.hInstance		= hInstance;
-	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_DIADEM));
-	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_DIADEM);
-	wcex.lpszClassName	= szWindowClass;
-	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+  wcex.style          = CS_HREDRAW | CS_VREDRAW;
+  wcex.lpfnWndProc    = WndProc;
+  wcex.cbClsExtra     = 0;
+  wcex.cbWndExtra     = 0;
+  wcex.hInstance      = hInstance;
+  wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_DIADEM));
+  wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
+  wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW + 1);
+  wcex.lpszMenuName	  = MAKEINTRESOURCE(IDC_DIADEM);
+  wcex.lpszClassName  = szWindowClass;
+  wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-	return RegisterClassEx(&wcex);
+  return RegisterClassEx(&wcex);
 }
 
 //
@@ -97,10 +108,11 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   HWND hWnd;
 
-  hInst = hInstance; // Store instance handle in our global variable
+  hInst = hInstance;  // Store instance handle in our global variable
 
-  hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-    CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+  hWnd = CreateWindow(
+      szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 
   if (!hWnd)
     return FALSE;
@@ -121,8 +133,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 //  WM_DESTROY	- post a quit message and return
 //
 //
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
+LRESULT CALLBACK WndProc(
+    HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
   int wmId, wmEvent;
   PAINTSTRUCT ps;
   HDC hdc;
@@ -132,16 +144,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       wmId    = LOWORD(wParam);
       wmEvent = HIWORD(wParam);
       // Parse the menu selections:
-      switch (wmId)
-      {
-      case IDM_ABOUT:
-        DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-        break;
-      case IDM_EXIT:
-        DestroyWindow(hWnd);
-        break;
-      default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
+      switch (wmId) {
+        case IDM_ABOUT:
+          DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+          break;
+        case IDM_EXIT:
+          DestroyWindow(hWnd);
+          break;
+        default:
+          return DefWindowProc(hWnd, message, wParam, lParam);
       }
       break;
     case WM_PAINT:
@@ -168,7 +179,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
       return (INT_PTR)TRUE;
 
     case WM_COMMAND:
-      if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+      if ((LOWORD(wParam) == IDOK) || (LOWORD(wParam) == IDCANCEL)) {
         EndDialog(hDlg, LOWORD(wParam));
         return (INT_PTR)TRUE;
       }
