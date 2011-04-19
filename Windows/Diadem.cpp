@@ -47,6 +47,24 @@ void SetStdOutToNewConsole() {
   setvbuf( stdout, NULL, _IONBF, 0 );
 }
 
+void PressAnyKey() {
+  TCHAR  ch;
+  DWORD  mode;
+  DWORD  count;
+  HANDLE hstdin = GetStdHandle( STD_INPUT_HANDLE );
+  const char *prompt = "Press any key to continue...";
+
+  WriteConsoleA(
+      GetStdHandle(STD_OUTPUT_HANDLE),
+      prompt, strlen(prompt), &count, NULL);
+
+  GetConsoleMode( hstdin, &mode );
+  SetConsoleMode( hstdin, 0 );
+  WaitForSingleObject( hstdin, INFINITE );
+  ReadConsole( hstdin, &ch, 1, &count, NULL );
+  SetConsoleMode( hstdin, mode );
+}
+
 #define ARG_MAX 20
 
 int APIENTRY WinMain(
@@ -73,7 +91,11 @@ int APIENTRY WinMain(
 //  if ((argc > 0) && (strcmp(argv[0], "-test") == 0)) {
     SetStdOutToNewConsole();
     testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+
+    int result = RUN_ALL_TESTS();
+
+    PressAnyKey();
+    return result;
 //  }
 
   UNREFERENCED_PARAMETER(hPrevInstance);
