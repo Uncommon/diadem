@@ -113,6 +113,9 @@
     <ClInclude Include="..\..\gtest\include\gtest\internal\gtest-string.h">
       <Filter>gtest</Filter>
     </ClInclude>
+    <ClInclude Include="..\Test\XMLTest.h">
+      <Filter>Diadem\Test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -176,6 +179,12 @@
       <Filter>Diadem\Test</Filter>
     </ClCompile>
     <ClCompile Include="..\Test\FactoryTest.cc">
+      <Filter>Diadem\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Test\XMLTest.cc">
+      <Filter>Diadem\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Test\XmlLiteTest.cc">
       <Filter>Diadem\Test</Filter>
     </ClCompile>
   </ItemGroup>

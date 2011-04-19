@@ -90,4 +90,14 @@ Entity* XmlLiteParser::LoadEntityFromFile(const char *path) const {
   return ParseStream(file_stream, factory_);
 }
 
+Entity* XmlLiteParser::LoadEntityFromData(const char *data) const {
+  CComPtr<IStream> data_stream;
+
+  if (FAILED(CreateStreamOnHGlobal(NULL, true, &data_stream)))
+    return NULL;
+  if (FAILED(data_stream->Write(data, strlen(data), NULL)))
+    return NULL;
+  return ParseStream(data_stream, factory_);
+}
+
 }  // namespace Diadem
