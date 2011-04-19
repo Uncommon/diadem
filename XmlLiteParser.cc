@@ -26,10 +26,12 @@ namespace {
 // XML node and attribute names will be plain ASCII, so it's safe to cast
 // WCHAR to char.
 Diadem::String StringFromWCHARs(const WCHAR *w) {
-  char *s = new char[wcslen(w)];
+  const size_t length = wcslen(w);
+  char *s = new char[length + 1];
 
   for (int i = 0; w[i] != 0; ++i)
     s[i] = static_cast<char>(w[i]);
+  s[length] = '\0';
   return Diadem::String(s, Diadem::String::kAdoptBuffer);
 }
 
@@ -45,33 +47,34 @@ static Entity* ParseStream(CComPtr<IStream> &stream, const Factory &factory) {
     return NULL;
   if (FAILED(reader->SetInput(stream)))
     return NULL;
+  reader->SetProperty(XmlReaderProperty_DtdProcessing, DtdProcessing_Prohibit);
 
   XmlNodeType node_type;
   FactorySession session(factory);
+  HRESULT result;
 
-  while (reader->Read(&node_type) == S_OK) {
-
+  while ((result = reader->Read(&node_type)) == S_OK) {
     switch (node_type) {
       case XmlNodeType_Element: {
-          const WCHAR *node_name = NULL;
+        const WCHAR *node_name = NULL;
 
-          if (FAILED(reader->GetLocalName(&node_name, NULL)))
-            break;
-          if (FAILED(reader->MoveToFirstAttribute()))
-            break;
+        if (FAILED(reader->GetLocalName(&node_name, NULL)))
+          break;
+        if (FAILED(reader->MoveToFirstAttribute()))
+          break;
 
-          PropertyMap properties;
+        PropertyMap properties;
 
-          while (reader->MoveToNextAttribute() == S_OK) {
-            const WCHAR *name = NULL, *value = NULL;
+        while (reader->MoveToNextAttribute() == S_OK) {
+          const WCHAR *name = NULL, *value = NULL;
 
-            if (FAILED(reader->GetLocalName(&name, NULL)))
-              continue;
-            if (FAILED(reader->GetValue(&value, NULL)))
-              continue;
-            properties.Insert(StringFromWCHARs(name), StringFromWCHARs(value));
-          }
-          session.BeginEntity(StringFromWCHARs(node_name), properties);
+          if (FAILED(reader->GetLocalName(&name, NULL)))
+            continue;
+          if (FAILED(reader->GetValue(&value, NULL)))
+            continue;
+          properties.Insert(StringFromWCHARs(name), StringFromWCHARs(value));
+        }
+        session.BeginEntity(StringFromWCHARs(node_name), properties);
         break;
       }
       case XmlNodeType_EndElement:
@@ -97,6 +100,11 @@ Entity* XmlLiteParser::LoadEntityFromData(const char *data) const {
     return NULL;
   if (FAILED(data_stream->Write(data, strlen(data), NULL)))
     return NULL;
+
+  LARGE_INTEGER large;
+
+  large.QuadPart = 0;
+  data_stream->Seek(large, STREAM_SEEK_SET, NULL);
   return ParseStream(data_stream, factory_);
 }
 
