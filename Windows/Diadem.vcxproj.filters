@@ -16,6 +16,12 @@
     <Filter Include="Diadem">
       <UniqueIdentifier>{6764f78f-ca54-412c-901e-5296b2b5770f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="gtest">
+      <UniqueIdentifier>{2cd82c5b-ad47-4e5b-b3e7-76584e302aa4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Diadem\Test">
+      <UniqueIdentifier>{af40d36c-0912-4e3d-902a-f6a61edc21aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="small.ico">
@@ -74,6 +80,39 @@
     <ClInclude Include="..\XmlLiteParser.h">
       <Filter>Diadem</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\gtest.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\gtest_pred_impl.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\gtest_prod.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\gtest-death-test.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\gtest-message.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\gtest-spi.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\internal\gtest-death-test-internal.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\internal\gtest-filepath.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\internal\gtest-internal.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\internal\gtest-port.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gtest\include\gtest\internal\gtest-string.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -111,6 +150,33 @@
     </ClCompile>
     <ClCompile Include="..\XmlLiteParser.cc">
       <Filter>Diadem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gtest\src\gtest.cc">
+      <Filter>gtest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gtest\src\gtest-death-test.cc">
+      <Filter>gtest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gtest\src\gtest-filepath.cc">
+      <Filter>gtest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gtest\src\gtest-port.cc">
+      <Filter>gtest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gtest\src\gtest-test-part.cc">
+      <Filter>gtest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gtest\src\gtest-typed-test.cc">
+      <Filter>gtest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Test\ValueTest.cc">
+      <Filter>Diadem\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Test\EntityTest.cc">
+      <Filter>Diadem\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Test\FactoryTest.cc">
+      <Filter>Diadem\Test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
