@@ -13,7 +13,9 @@
 // the License.
 
 #include "stdafx.h"
+#include "fcntl.h"
 #include "Diadem.h"
+#include <gtest/gtest.h>
 
 #define MAX_LOADSTRING 100
 
@@ -28,11 +30,52 @@ BOOL              InitInstance(HINSTANCE, int);
 LRESULT CALLBACK  WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK  About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY _tWinMain(
+void SetStdOutToNewConsole() {
+  int hConHandle;
+  long lStdHandle;
+  FILE *fp;
+
+  // allocate a console for this app
+  AllocConsole();
+
+  // redirect unbuffered STDOUT to the console
+  lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
+  hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+  fp = _fdopen( hConHandle, "w" );
+  *stdout = *fp;
+
+  setvbuf( stdout, NULL, _IONBF, 0 );
+}
+
+#define ARG_MAX 20
+
+int APIENTRY WinMain(
     HINSTANCE hInstance,
     HINSTANCE hPrevInstance,
-    LPTSTR lpCmdLine,
+    LPSTR lpCmdLine,
     int nCmdShow) {
+  int argc = 0;
+  char **argv = (char**)malloc(sizeof(char*) * ARG_MAX);
+
+  argv[0] = lpCmdLine;
+  for (char *arg = lpCmdLine; *arg != '\0'; ++arg) {
+    if (*arg == ' ') {
+      ++argc;
+      argv[argc] = arg;
+      *arg = '\0';
+      if (argc >= ARG_MAX)
+        break;
+    }
+  }
+  if ((argc == 0) && (strlen(lpCmdLine) > 0))
+      argc = 1;
+      
+//  if ((argc > 0) && (strcmp(argv[0], "-test") == 0)) {
+    SetStdOutToNewConsole();
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+//  }
+
   UNREFERENCED_PARAMETER(hPrevInstance);
   UNREFERENCED_PARAMETER(lpCmdLine);
 
