@@ -12,6 +12,9 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
+#include "stdafx.h"
+#include <WinGDI.h>
+#include <WinUser.h>
 #include "NativeWindows.h"
 
 namespace {
@@ -26,28 +29,47 @@ public:
   static void Recalculate();
 
   // Half dialog units should be rounded down
-  static uint32 RoundDown(float value);
+  static uint32_t RoundDown(float value);
 
   // Pixels to DLU
-  static uint32 ToDialogX(uint32 x)
+  static uint32_t ToDialogX(uint32_t x)
     { return RoundDown(x/kPixelsPerUnitX); }
 
-  static uint32 ToDialogY(uint32 y)
+  static uint32_t ToDialogY(uint32_t y)
     { return RoundDown(y/kPixelsPerUnitY); }
 
   // DLU to pixels
-  static uint32 FromDialogX(uint32 x)
+  static uint32_t FromDialogX(uint32_t x)
     { return RoundDown(x*kPixelsPerUnitX); }
 
-  static uint32 FromDialogY(uint32 y)
+  static uint32_t FromDialogY(uint32_t y)
     { return RoundDown(y*kPixelsPerUnitY); }
   
-  static Spacing Spacing(long t, long l, long b, long r) {
+  static Diadem::Spacing Spacing(long t, long l, long b, long r) {
     return Diadem::Spacing(
         FromDialogY(t), FromDialogX(l),
         FromDialogY(b), FromDialogX(r));
   }
 };
+
+class WinFont {
+ public:
+  WinFont();
+
+  HFONT GetFont() { return font_; }
+  HDC   GetDC()   { return dc_; }
+  void  ResetFont();
+
+  static WinFont* GetInstance();
+  static HFONT MakeDialogFont();
+
+ protected:
+  HFONT font_;
+  HDC dc_;
+  static WinFont *instance_;
+};
+
+WinFont* WinFont::instance_ = NULL;
 
 void DLU::Init() {
   if ((kPixelsPerUnitX != 0) || (kPixelsPerUnitY != 0))
@@ -55,14 +77,14 @@ void DLU::Init() {
 
   TEXTMETRIC tm;
   SIZE size;
+  const HDC dc = WinFont::GetInstance()->GetDC();
 
-  ::GetTextMetrics(Win32::GetInstance().GetDC(), &tm);
-  ::GetTextExtentPoint32(
-      Win32::GetInstance().GetDC(),
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 52, &size);
+  ::GetTextMetrics(dc, &tm);
+  ::GetTextExtentPoint32A(
+      dc, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 52, &size);
 
-  const uint32 avgWidth = (size.cx/26+1)/2;
-  const uint32 avgHeight = (WORD)tm.tmHeight;
+  const uint32_t avgWidth = (size.cx/26+1)/2;
+  const uint32_t avgHeight = (WORD)tm.tmHeight;
 
   kPixelsPerUnitX = avgWidth / 4.0f;
   kPixelsPerUnitY = avgHeight / 8.0f;
@@ -74,36 +96,76 @@ void DLU::Recalculate() {
   Init();
 }
 
-uint32 DLU::RoundDown(float value) {
+uint32_t DLU::RoundDown(float value) {
   const float f = floor(value);
   const float fraction = value - f;
 
   if (fraction <= 0.5)
-    return f;
-  return ceil(value);
+    return static_cast<uint32_t>(f);
+  return static_cast<uint32_t>(ceil(value));
 }
 
 float DLU::kPixelsPerUnitX = 0, DLU::kPixelsPerUnitY = 0;
 
+WinFont::WinFont()
+   : font_(NULL), dc_(NULL) {
+  ResetFont();
+  DLU::Init();
 }
+
+
+void WinFont::ResetFont()
+{
+  if (font_ != NULL)
+    DeleteObject(font_);
+  if (dc_ != NULL)
+    DeleteDC(dc_);
+
+  dc_ = CreateCompatibleDC(NULL);
+  DASSERT(dc_ != NULL);
+
+  font_ = MakeDialogFont();
+  DASSERT(font_ != NULL);
+  SelectObject(dc_, font_);
+}
+
+HFONT WinFont::MakeDialogFont()
+{
+  NONCLIENTMETRICS metrics;
+  
+  metrics.cbSize = sizeof(metrics);
+  if (!SystemParametersInfo(
+      SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0))
+    return NULL;
+  return CreateFontIndirect(&metrics.lfMessageFont);
+}
+
+WinFont* WinFont::GetInstance() {
+  if (instance_ == NULL)
+    instance_ = new WinFont();
+  return instance_;
+}
+
+}  // namespace
 
 namespace Diadem {
 
 bool Windows::Window::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropText) == 0) {
-    SetWindowText(window_, value.Coerce<String>().Get());
+    SetWindowTextA(window_, value.Coerce<String>().Get());
     return true;
   }
   if (strcmp(name, kPropSize) == 0) {
     Size new_size = value.Coerce<Size>();
-    RECT rect = {}
-    POINT local = { rect.x, rect.y };
+    RECT rect = {};
+    POINT local = { rect.left, rect.top };
 
     // GetWindowRect is in screen coordinates, but MoveWindow is
     // relative to the parent
     GetWindowRect(window_, &rect);
     ScreenToClient(GetParent(window_), &local);
-    MoveWindow(window_, local.x, local.y, size.width, size.height);
+    MoveWindow(
+        window_, local.x, local.y, new_size.width, new_size.height, true);
     return true;
   }
   if (strcmp(name, kPropLocation) == 0) {
@@ -114,7 +176,8 @@ bool Windows::Window::SetProperty(PropertyName name, const Value &value) {
     MoveWindow(
         window_, loc.x, loc.y,
         rect.right - rect.left,
-        rect.bottom - rect.top);
+        rect.bottom - rect.top,
+        true);
     return true;
   }
   return NativeWindows::SetProperty(name, value);
@@ -137,15 +200,15 @@ Value Windows::Window::GetProperty(PropertyName name) const {
 
 String Windows::Window::GetText() const {
   // TODO(catmull): handle wide strings
-  const int length = GetWindowTextLength(window_);
+  int length = GetWindowTextLength(window_);
 
   if (length == 0)
-    return Value(String());
+    return String();
   ++length;
 
   char *text = new char[length];
 
-  GetWindowText(window_, text, length);
+  GetWindowTextA(window_, text, length);
   return String(text, String::kAdoptBuffer);
 }
 
@@ -158,6 +221,7 @@ void Windows::AppWindow::InitializeProperties(const PropertyMap &properties) {
 
 bool Windows::AppWindow::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropSize) == 0) {
+    const Size size = value.Coerce<Size>();
     RECT client = { 0, 0, 0, 0 }, bounds = { 0, 0, 0, 0 };
 
     GetWindowRect(window_, &bounds);
@@ -185,7 +249,7 @@ Value Windows::AppWindow::GetProperty(PropertyName name) const {
   return Window::GetProperty(name);
 }
 
-void Windows::AppWindow::AddChild(Native *child) const {
+void Windows::AppWindow::AddChild(Native *child) {
   SetParent(reinterpret_cast<HWND>(child->GetNativeRef()), window_);
 }
 
@@ -233,7 +297,7 @@ DWORD Windows::PushButton::GetButtonStyle() const {
 Value Windows::PushButton::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropMinimumSize) == 0) {
     return Value(Size(
-        max<uint32_t>(
+        std::max<uint32_t>(
             DLU::FromDialogX(50),
             GetLabelSize(GetText()).width + DLU::FromDialogX(20)),
         DLU::FromDialogY(14)));
@@ -244,7 +308,7 @@ Value Windows::PushButton::GetProperty(PropertyName name) const {
 Value Windows::CheckRadio::GetProperty(PropertyName name) const {
   if (strcmp(name, kPropMinimumSize) == 0) {
     return Value(Size(
-        max<uint32_t>(
+        std::max<uint32_t>(
             DLU::FromDialogX(50),
             GetLabelSize(GetText()).width + DLU::FromDialogX(20)),
         DLU::FromDialogY(14)));

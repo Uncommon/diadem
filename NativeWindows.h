@@ -58,13 +58,13 @@ class Windows {
 
     Size GetLabelSize(const String &text) const;
     String GetText() const;
-  }
+  };
 
   // <window> implementation
   class AppWindow : public Window, public WindowInterface {
    public:
-    Window();
-    ~Window();
+    AppWindow();
+    ~AppWindow();
 
     virtual void InitializeProperties(const PropertyMap &properties);
     WindowInterface* GetWindowInterface() { return this; }
@@ -75,7 +75,7 @@ class Windows {
     virtual Value GetProperty(PropertyName name) const;
     virtual void AddChild(Native *child);
 
-    void* GetNativeRef() { return window_ref_; }
+    void* GetNativeRef() { return window_; }
 
     // WindowInterface
     virtual bool ShowModeless();
