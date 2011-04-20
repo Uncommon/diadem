@@ -65,7 +65,7 @@ static Entity* ParseStream(CComPtr<IStream> &stream, const Factory &factory) {
 
         PropertyMap properties;
 
-        while (reader->MoveToNextAttribute() == S_OK) {
+        do {
           const WCHAR *name = NULL, *value = NULL;
 
           if (FAILED(reader->GetLocalName(&name, NULL)))
@@ -73,7 +73,7 @@ static Entity* ParseStream(CComPtr<IStream> &stream, const Factory &factory) {
           if (FAILED(reader->GetValue(&value, NULL)))
             continue;
           properties.Insert(StringFromWCHARs(name), StringFromWCHARs(value));
-        }
+        } while (reader->MoveToNextAttribute() == S_OK);
         session.BeginEntity(StringFromWCHARs(node_name), properties);
         break;
       }
