@@ -1,0 +1,6 @@
+#include <Carbon/Carbon.h>
+#ifdef __OBJC__
+#include <AppKit/AppKit.h>
+#endif
+
+#define DIADEM_PYTHON 1

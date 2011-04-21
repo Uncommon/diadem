@@ -1,10 +1,10 @@
 syntax: glob
 
 .DS_Store
-build
-Diadem.xcodeproj/*.mode*
-Diadem.xcodeproj/*.pbx*
-Diadem.xcodeproj/*.perspective*
+Mac/build
+Mac/Diadem.xcodeproj/*.mode*
+Mac/Diadem.xcodeproj/*.pbxuser
+Mac/Diadem.xcodeproj/*.perspective*
 *.xcscheme
 xcuserdata
 *.xcworkspace
