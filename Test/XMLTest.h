@@ -24,7 +24,7 @@ class Parser;
 // name of your subclass.
 class XMLTest : public testing::Test {
  public:
-  virtual Diadem::Parser* MakeParser(const Diadem::Factory &factory) = 0;
+  virtual Diadem::Parser* MakeParser(Diadem::Factory &factory) = 0;
 
   void SimpleTest();
   void NestedTest();

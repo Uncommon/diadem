@@ -31,6 +31,8 @@
 
 namespace Diadem {
 
+const TypeName kTypeNameInclude = "include";
+
 void Factory::RegisterBasicClasses() {
   RegisterCreator(
       kTypeNameBinding,
@@ -63,6 +65,17 @@ void Factory::RegisterBasicClasses() {
 
 Entity* Factory::CreateEntity(
       const char *class_name, const PropertyMap &properties) const {
+  if (strcmp(class_name, kTypeNameInclude) == 0) {
+    if (!properties.Exists(kPropFile) || (parser_ == NULL))
+      return NULL;
+
+    String path = properties[kPropFile].Coerce<String>();
+
+    if (finder_ != NULL)
+      path = finder_->GetFullPath(path);
+    return parser_->LoadEntityFromFile(path);
+  }
+
   if (!registry_.Exists(class_name))
     return NULL;
 

@@ -22,7 +22,7 @@ namespace {
 
 class LibXMLTest : public XMLTest {
  public:
-  Diadem::Parser* MakeParser(const Diadem::Factory &factory)
+  Diadem::Parser* MakeParser(Diadem::Factory &factory)
     { return new Diadem::LibXMLParser(factory); }
 };
 

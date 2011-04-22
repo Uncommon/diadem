@@ -20,14 +20,18 @@ class Factory;
 
 class LibXMLParser : public Parser {
  public:
-  explicit LibXMLParser(const Factory &factory) : factory_(factory) {}
-  virtual ~LibXMLParser() {}
+  explicit LibXMLParser(Factory &factory) : factory_(factory) {
+    factory_.SetParser(this);
+  }
+  virtual ~LibXMLParser() {
+    factory_.SetParser(NULL);
+  }
 
   Entity* LoadEntityFromFile(const char *path) const;
   Entity* LoadEntityFromData(const char *data) const;
 
  protected:
-  const Factory &factory_;
+  Factory &factory_;
 };
 
 }  // namespace Diadem
