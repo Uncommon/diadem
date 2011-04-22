@@ -20,7 +20,6 @@
 namespace Diadem {
 
 class Parser;
-class FileFinder;
 
 // The Factory contains a registry of entity names and the types of objects
 // that should be created for them.
@@ -28,8 +27,10 @@ class Factory : public Base {
  public:
   Factory() : parser_(NULL), finder_(NULL) { RegisterBasicClasses(); }
 
+  typedef String (*FileFinder)(const char*);
+
   void SetParser(Parser *parser) { parser_ = parser; }
-  void SetFileFinder(FileFinder *finder) { finder_ = finder; }
+  void SetFileFinder(FileFinder finder) { finder_ = finder; }
 
   typedef Entity* (*CreateEntityFunction)();
   typedef Layout* (*CreateLayoutFunction)();
@@ -141,15 +142,6 @@ class Parser : public Base {
 
   virtual Entity* LoadEntityFromFile(const char *path) const { return NULL; }
   virtual Entity* LoadEntityFromData(const char *data) const { return NULL; }
-};
-
-class FileFinder : public Base {
- public:
-  FileFinder() {}
-  virtual ~FileFinder() {}
-
-  // Returns the full path for the file in the application's resource directory.
-  virtual String GetFullPath(const char *filename) { return filename; }
 };
 
 }  // namespace Diadem

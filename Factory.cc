@@ -71,8 +71,11 @@ Entity* Factory::CreateEntity(
 
     String path = properties[kPropFile].Coerce<String>();
 
-    if (finder_ != NULL)
-      path = finder_->GetFullPath(path);
+    if (finder_ != NULL) {
+      path = (*finder_)(path);
+      if (path.IsEmpty())
+        return NULL;
+    }
     return parser_->LoadEntityFromFile(path);
   }
 

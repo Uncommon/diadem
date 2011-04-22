@@ -36,6 +36,7 @@ class Factory;
 
 class Cocoa {
  public:
+  static String GetFullPath(const char *filename);
   static void SetUpFactory(Factory *factory);
 
   // Displays a dialog to ask the user to choose a folder. Returns an empty

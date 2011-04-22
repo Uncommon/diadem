@@ -295,6 +295,15 @@ PlatformMetrics Cocoa::NativeCocoa::metrics_ = {
     14, 17, 18,
     Spacing(12, 6, 12, 6) };
 
+String Cocoa::GetFullPath(const char *filename) {
+  NSString *ns_name = [NSString stringWithUTF8String:filename];
+  NSString *path = [[NSBundle mainBundle] pathForResource:ns_name ofType:nil];
+
+  if (path == nil)
+    return String();
+  return [path UTF8String];
+}
+
 void Cocoa::SetUpFactory(Factory *factory) {
   DASSERT(factory != NULL);
   factory->RegisterNative<AppIcon>(kTypeNameAppIcon);
