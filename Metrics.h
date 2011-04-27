@@ -107,6 +107,7 @@ struct PlatformMetrics {
       line_height,  // The height of a line in the standard dialog font.
       indent_size;  // Standard horizontal indent distance for controls.
   Spacing radio_group_padding;
+  Spacing tab_view_inset;
 };
 
 enum Unit {

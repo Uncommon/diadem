@@ -22,7 +22,8 @@
 @class WindowDelegate;
 #else
 typedef void
-    NSWindow, NSView, NSMenuItem, NSAlert, NSTableView, NSTableColumn, *Class;
+    NSWindow, NSView, NSMenuItem, NSAlert, NSTableView, NSTableColumn,
+    NSTabViewItem, *Class;
 typedef void ButtonTarget, TableDelegate, WindowDelegate;
 struct NSPoint { CGFloat x, y; };
 typedef unsigned int NSButtonType;
@@ -403,6 +404,35 @@ class Cocoa {
    protected:
     NSTableColumn *column_ref_;
     ExplicitSize size_;  // Only width is used.
+  };
+
+  // <tabs> implementation
+  class Tabs : public View {
+   public:
+    Tabs() {}
+
+    virtual void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameTabs; }
+    virtual bool SetProperty(PropertyName name, const Value &value);
+    virtual Value GetProperty(PropertyName name) const;
+
+    void AddChild(Native *child);
+  };
+
+  // <tab> implementation: a tab in a tabs control
+  class Tab : public NativeCocoa {
+   public:
+    Tab() {}
+
+    virtual void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameTab; }
+    virtual bool SetProperty(PropertyName name, const Value &value);
+    virtual Value GetProperty(PropertyName name) const;
+
+    void AddChild(Native *child);
+
+   protected:
+    NSTabViewItem *tab_item_;
   };
 
  protected:

@@ -293,7 +293,11 @@ namespace Diadem {
 
 PlatformMetrics Cocoa::NativeCocoa::metrics_ = {
     14, 17, 18,
-    Spacing(12, 6, 12, 6) };
+    // IB uses 8 vertical pixels between radio groups, but that's too close to
+    // the 6 pixels within the group. AHIG doesn't say.
+    Spacing(12, 6, 12, 6),
+    // Tab pane measurements taken from IB.
+    Spacing(27, 3, 3, 3) };
 
 void Cocoa::SetUpFactory(Factory *factory) {
   DASSERT(factory != NULL);
@@ -1665,6 +1669,80 @@ Value Cocoa::ListColumn::GetProperty(PropertyName name) const {
     return Size(size_.CalculateWidth(GetPlatformMetrics()), 0);
   }
   return NativeCocoa::GetProperty(name);
+}
+
+void Cocoa::Tabs::InitializeProperties(const PropertyMap &properties) {
+  view_ref_ = [[NSTabView alloc] initWithFrame:NSMakeRect(0, 0, 50, 50)];
+  ConfigureView();
+}
+
+bool Cocoa::Tabs::SetProperty(PropertyName name, const Diadem::Value &value) {
+  if (strcmp(name, kPropValue) == 0) {
+    [(NSTabView*)view_ref_ selectTabViewItemAtIndex:value.Coerce<int32_t>()];
+    return true;
+  }
+  return View::SetProperty(name, value);
+}
+
+Value Cocoa::Tabs::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropMinimumSize) == 0) {
+    const NSSize tab_min = [(NSTabView*)view_ref_ minimumSize];
+    Size min(tab_min.width, tab_min.height);
+
+    // Get minimum size of each tab?
+    return min;
+  }
+  if (strcmp(name, kPropPadding) == 0) {
+    // AHIG says 12, IB uses 11.
+    return Spacing(12, 12, 12, 12);
+  }
+  if (strcmp(name, kPropValue) == 0) {
+    return static_cast<int32_t>([(NSTabView*)view_ref_ indexOfTabViewItem:
+        [(NSTabView*)view_ref_ selectedTabViewItem]]);
+  }
+  return View::GetProperty(name);
+}
+
+void Cocoa::Tabs::AddChild(Native *child) {
+  ScopedAutoreleasePool pool;
+
+  if ([(id)child->GetNativeRef() isKindOfClass:[NSTabViewItem class]])
+    [(NSTabView*)view_ref_
+        addTabViewItem:(NSTabViewItem*)child->GetNativeRef()];
+}
+
+void Cocoa::Tab::InitializeProperties(const PropertyMap &properties) {
+  NSString *identifier = nil;
+
+  if (properties.Exists(kPropName))
+    identifier = NSStringWithString(properties[kPropName].Coerce<String>());
+  tab_item_ = [[NSTabViewItem alloc] initWithIdentifier:identifier];
+  [tab_item_ setView:[[NSView alloc] initWithFrame:NSMakeRect(0, 0, 50, 50)]];
+}
+
+bool Cocoa::Tab::SetProperty(PropertyName name, const Diadem::Value &value) {
+  if (strcmp(name, kPropText) == 0) {
+    NSString *text = NSStringWithString(value.Coerce<String>());
+
+    [tab_item_ setLabel:text];
+    return true;
+  }
+  return NativeCocoa::SetProperty(name, value);
+}
+
+Value Cocoa::Tab::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropText) == 0)
+    return String([[tab_item_ label] UTF8String]);
+  if (strcmp(name, kPropMargins) == 0)
+    return Spacing(6, 17, 17, 17);  // IB uses this; AHIG doesn't say.
+  return NativeCocoa::GetProperty(name);
+}
+
+void Cocoa::Tab::AddChild(Native *child) {
+  ScopedAutoreleasePool pool;
+
+  if ([(id)child->GetNativeRef() isKindOfClass:[NSView class]])
+    [[tab_item_ view] addSubview:(NSView*)child->GetNativeRef()];
 }
 
 } // Diadem
