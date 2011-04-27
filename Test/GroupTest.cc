@@ -692,3 +692,27 @@ TEST_F(GroupTest, testLatentVisibility) {
   EXPECT_TRUE(label->GetProperty(Diadem::kPropVisible).Coerce<bool>());
   EXPECT_TRUE(label->GetProperty(Diadem::kPropFullyVisible).Coerce<bool>());
 }
+
+// The icon was appearing in the wrong place in this layout.
+TEST_F(GroupTest, testIconAndLabel) {
+  ReadWindowData(
+      "<window>"
+        "<group>"
+          "<appicon/>"
+          "<label text='mmmm mmmm mmmm mmmm mmmm mmmm'/>"
+        "</group>"
+      "</window>");
+  ASSERT_EQ(1, windowRoot_->ChildrenCount());
+
+  const Diadem::Entity* const group = windowRoot_->ChildAt(0);
+  ASSERT_EQ(2, group->ChildrenCount());
+  ASSERT_FALSE(group->GetLayout() == NULL);
+
+  const Diadem::Entity* const icon = group->ChildAt(0);
+  ASSERT_FALSE(icon->GetLayout() == NULL);
+
+  const Diadem::Location icon_loc = icon->GetLayout()->GetLocation();
+
+  EXPECT_EQ(0, icon_loc.x);
+  EXPECT_EQ(0, icon_loc.y);
+}

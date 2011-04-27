@@ -33,6 +33,7 @@ const PropertyName
     kPropValue      = "value";
 
 const TypeName
+    kTypeNameAppIcon    = "appicon",
     kTypeNameBox        = "box",
     kTypeNameButton     = "button",
     kTypeNameCheck      = "check",

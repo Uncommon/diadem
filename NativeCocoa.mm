@@ -297,6 +297,7 @@ PlatformMetrics Cocoa::NativeCocoa::metrics_ = {
 
 void Cocoa::SetUpFactory(Factory *factory) {
   DASSERT(factory != NULL);
+  factory->RegisterNative<AppIcon>(kTypeNameAppIcon);
   factory->RegisterNative<Box>(kTypeNameBox);
   factory->RegisterNative<Checkbox>(kTypeNameCheck);
   factory->RegisterNative<EditField>(kTypeNameEdit);
@@ -1316,6 +1317,26 @@ Value Cocoa::Image::GetProperty(PropertyName name) const {
     const NSSize image_size = [[(NSImageView*)view_ref_ image] size];
 
     return Size(image_size.width, image_size.height);
+  }
+  return Control::GetProperty(name);
+}
+
+void Cocoa::AppIcon::InitializeProperties(const PropertyMap &properties) {
+  ScopedAutoreleasePool pool;
+
+  view_ref_ = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 0, 64, 64)];
+  [(NSImageView*)view_ref_ setImage:[NSImage imageNamed:@"NSApplicationIcon"]];
+  ConfigureView();
+}
+
+Value Cocoa::AppIcon::GetProperty(PropertyName name) const {
+  if (strcmp(name, kPropMinimumSize) == 0) {
+    return Value(Size(64, 64));
+  }
+  if (strcmp(name, kPropPadding) == 0) {
+    // In the standard NSAlert nib, the icon has 19px space on the right
+    // and 12px on the bottom.
+    return Value(Spacing(12, 19, 12, 19));
   }
   return Control::GetProperty(name);
 }

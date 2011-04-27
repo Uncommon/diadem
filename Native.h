@@ -27,9 +27,9 @@ extern const PropertyName
     kPropURL, kPropValue;
 
 extern const TypeName
-    kTypeNameBox, kTypeNameButton, kTypeNameCheck, kTypeNameColumn,
-    kTypeNameCombo, kTypeNameDate, kTypeNameEdit, kTypeNameImage,
-    kTypeNameItem, kTypeNameLabel, kTypeNameLink, kTypeNameList,
+    kTypeNameAppIcon, kTypeNameBox, kTypeNameButton, kTypeNameCheck,
+    kTypeNameColumn, kTypeNameCombo, kTypeNameDate, kTypeNameEdit,
+    kTypeNameImage, kTypeNameItem, kTypeNameLabel, kTypeNameLink, kTypeNameList,
     kTypeNamePassword, kTypeNamePath, kTypeNamePopup, kTypeNameRadio,
     kTypeNameRadioGroup, kTypeNameSeparator, kTypeNameSlider, kTypeNameTab,
     kTypeNameTabs, kTypeNameWindow;

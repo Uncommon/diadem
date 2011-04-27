@@ -311,6 +311,16 @@ class Cocoa {
     virtual Value GetProperty(PropertyName name) const;
   };
 
+  // <appicon> implementation
+  class AppIcon : public Control {
+   public:
+    AppIcon() {}
+
+    virtual void InitializeProperties(const PropertyMap &properties);
+    virtual String GetTypeName() const { return kTypeNameAppIcon; }
+    virtual Value GetProperty(PropertyName name) const;
+  };
+
   // <popup> implementation
   class Popup : public Button {
    public:
