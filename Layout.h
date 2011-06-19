@@ -256,7 +256,7 @@ class LayoutContainer : public Layout {
   // Adjusts children vertically so their baselines line up.
   void AlignBaselines();
   // Returns the number of children set to fill in the layout direction.
-  uint32_t FillChildCount() const;
+  size_t FillChildCount() const;
 
   // Return true if the application is running in an RTL language, indicating
   // to ArrangeObjects that rows should be laid out in reverse order.
@@ -383,7 +383,7 @@ class Multipanel : public Group {
   virtual void CalculatePadding();
 
   // Shows the panel (child) at the given index.
-  void ShowPanel(uint32_t index);
+  void ShowPanel(size_t index);
 };
 
 // A layout entity that overrides the default space between entities.

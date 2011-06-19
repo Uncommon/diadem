@@ -95,7 +95,7 @@ Location Native::GetViewOffset() const {
   return view_location;
 }
 
-static const uint32_t kStyleCount = 3;
+static const size_t kStyleCount = 3;
 
 uint32_t Native::ParseWindowStyle(const char *style) {
   const StringConstant style_names[kStyleCount] = {
@@ -113,7 +113,7 @@ uint32_t Native::ParseWindowStyle(const char *style) {
     return 0;
   while (next != NULL) {
     word = strsep(&next, separators);
-    for (uint32_t i = 0; i < kStyleCount; ++i) {
+    for (size_t i = 0; i < kStyleCount; ++i) {
       if (strncmp(word, style_names[i], strlen(style_names[i])) == 0) {
         result |= style_bits[i];
         break;
@@ -139,7 +139,7 @@ void RadioGroup::Finalize() {
 
 bool RadioGroup::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropValue) == 0) {
-    SetSelectedIndex(value.Coerce<uint32_t>());
+    SetSelectedIndex(value.Coerce<size_t>());
     return true;
   }
   return Entity::SetProperty(name, value);
@@ -152,10 +152,10 @@ Value RadioGroup::GetProperty(PropertyName name) const {
         layout_->GetPlatformMetrics().radio_group_padding);
   }
   if (strcmp(name, kPropValue) == 0) {
-    for (uint32_t i = 0; i < ChildrenCount(); ++i) {
+    for (size_t i = 0; i < ChildrenCount(); ++i) {
       const Value value = ChildAt(i)->GetProperty(kPropValue);
 
-      if (value.IsValid() && (value.Coerce<uint32_t>() != 0))
+      if (value.IsValid() && (value.Coerce<size_t>() != 0))
         return i;
     }
     return Value();
@@ -168,13 +168,13 @@ void RadioGroup::ChildValueChanged(Entity *child) {
   const Value value = child->GetProperty(kPropValue);
 
   if (value.IsValid() && (value.Coerce<int32_t>() != 0))
-    for (uint32_t i = 0; i < ChildrenCount(); ++i)
+    for (size_t i = 0; i < ChildrenCount(); ++i)
       if (child == ChildAt(i))
         SetSelectedIndex(i);
 }
 
-void RadioGroup::SetSelectedIndex(uint32_t index) {
-  for (uint32_t i = 0; i < ChildrenCount(); ++i)
+void RadioGroup::SetSelectedIndex(size_t index) {
+  for (size_t i = 0; i < ChildrenCount(); ++i)
     ChildAt(i)->SetProperty(kPropValue, (i == index) ? 1 : 0);
 }
 

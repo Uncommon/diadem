@@ -1579,7 +1579,7 @@ Value Cocoa::List::GetProperty(PropertyName name) const {
       size.height = [[table_view_ headerView] frame].size.height +
           explicit_size.height_ * row_height;
     }
-    for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+    for (size_t i = 0; i < entity_->ChildrenCount(); ++i) {
       size.width += entity_->ChildAt(i)->GetProperty(
           kPropMinimumSize).Coerce<Size>().width + kColumnWidthFudge;
     }

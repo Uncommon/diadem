@@ -48,9 +48,9 @@ class Entity : public Base {
   // Entities form a tree with parent-child relationships.
   Entity* GetParent() { return parent_; }
   const Entity* GetParent() const { return parent_; }
-  uint32_t ChildrenCount() const { return children_.size(); }
-  Entity* ChildAt(uint32_t index) { return children_[index]; }
-  const Entity* ChildAt(uint32_t index) const { return children_[index]; }
+  size_t ChildrenCount() const { return children_.size(); }
+  Entity* ChildAt(size_t index) { return children_[index]; }
+  const Entity* ChildAt(size_t index) const { return children_[index]; }
   virtual void AddChild(Entity *child);
   void RemoveChild(Entity *child);
 
@@ -66,7 +66,7 @@ class Entity : public Base {
   String GetPath() const;
   // Returns the index of the child, counting only children with the same type
   // name.
-  uint32_t ChildIndexByType(const Entity *child) const;
+  size_t ChildIndexByType(const Entity *child) const;
 
   // Returns the type name that would be used for the entity in a resource file.
   // Delegates to the Native or Layout object.
@@ -132,7 +132,7 @@ class Entity : public Base {
   typedef void (*ButtonCallback)(Entity *target, void *data);
 
   // Sets the function to be called when a control is clicked.
-  void SetButtonCallback(ButtonCallback callback, void *data = NULL) {
+  void SetButtonCallback(ButtonCallback callback, void *data) {
     button_callback_ = callback;
     button_data_ = data;
   }
@@ -177,7 +177,7 @@ class RootEntity : public Entity {
   RootEntity() {}
 
   ChangeMessenger* GetChangeMessenger()             { return &messenger_; }
-  ChangeMessenger const* GetChangeMessenger() const { return &messenger_; }
+  const ChangeMessenger* GetChangeMessenger() const { return &messenger_; }
 
  protected:
   ChangeMessenger messenger_;

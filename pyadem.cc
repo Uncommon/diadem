@@ -70,7 +70,7 @@ class PyListData : public Diadem::ListDataInterface {
     Py_DECREF(data_);
   }
 
-  virtual Diadem::String GetCellText(uint32_t row, const char *column) const {
+  virtual Diadem::String GetCellText(size_t row, const char *column) const {
     GILState gil;
     PyObject *result = PyObject_CallMethodObjArgs(
         data_, PyString_FromString("GetCellText"),
@@ -84,13 +84,13 @@ class PyListData : public Diadem::ListDataInterface {
       return Diadem::String();
     return PyString_AsString(result);
   }
-  virtual void SetRowChecked(uint32_t row, bool check) {
+  virtual void SetRowChecked(size_t row, bool check) {
     GILState gil;
     PyObject_CallMethodObjArgs(
         data_, PyString_FromString("SetRowChecked"),
         PyLong_FromUnsignedLong(row), PyBool_FromLong(check), NULL);
   }
-  virtual bool GetRowChecked(uint32_t row) const {
+  virtual bool GetRowChecked(size_t row) const {
     GILState gil;
     PyObject *result = PyObject_CallMethodObjArgs(
         data_, PyString_FromString("GetRowChecked"),

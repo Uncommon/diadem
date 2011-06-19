@@ -384,7 +384,7 @@ bool LayoutContainer::SetProperty(const char *name, const Value &value) {
     // either before or after the children, depending on the new setting.
     if (new_visible)
       visible_ = new_visible;
-    for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+    for (size_t i = 0; i < entity_->ChildrenCount(); ++i) {
       Entity *child = entity_->ChildAt(i);
 
       if (new_visible) {
@@ -456,7 +456,7 @@ void LayoutContainer::SetLocation(const Location &loc) {
   // If the native object is a superview, then subviews will be moved
   // automatically. Otherwise, children need to be notified of the change.
   if ((entity_->GetNative() == NULL) || (!entity_->GetNative()->IsSuperview()))
-    for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+    for (size_t i = 0; i < entity_->ChildrenCount(); ++i) {
       Layout *layout_child = entity_->ChildAt(i)->GetLayout();
 
       if (layout_child != NULL)
@@ -466,7 +466,7 @@ void LayoutContainer::SetLocation(const Location &loc) {
 
 void LayoutContainer::ParentLocationChanged(const Location &offset) {
   if (offset != Location())
-    for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+    for (size_t i = 0; i < entity_->ChildrenCount(); ++i) {
       Layout *layout_child = entity_->ChildAt(i)->GetLayout();
 
       if (layout_child != NULL)
@@ -474,10 +474,10 @@ void LayoutContainer::ParentLocationChanged(const Location &offset) {
     }
 }
 
-uint32_t LayoutContainer::FillChildCount() const {
-  uint32_t count = 0;
+size_t LayoutContainer::FillChildCount() const {
+  size_t count = 0;
 
-  for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+  for (size_t i = 0; i < entity_->ChildrenCount(); ++i) {
     const Layout* const child = entity_->ChildAt(i)->GetLayout();
 
     if ((child == NULL) || !child->IsInLayout())
@@ -488,7 +488,7 @@ uint32_t LayoutContainer::FillChildCount() const {
   return count;
 }
 
-static const uint32_t kMaxLayoutIterations = 3;
+static const size_t kMaxLayoutIterations = 3;
 
 void LayoutContainer::SetObjectSizes(
     const Size &s, Size *new_size, uint32_t *extra) {
@@ -499,7 +499,7 @@ void LayoutContainer::SetObjectSizes(
   // For some objects, such as wrapped text, changing their size in one
   // direction will affect their minimum size in the other. When that happens,
   // the object will call InvalidateLayout, and the loop will be executed again.
-  for (uint32_t i = 0; !layout_valid && (i < kMaxLayoutIterations); ++i) {
+  for (size_t i = 0; !layout_valid && (i < kMaxLayoutIterations); ++i) {
     layout_valid = true;
     if (cached_min_size_ == Size())
       cached_min_size_ = GetMinimumSize();
@@ -514,7 +514,7 @@ void LayoutContainer::SetObjectSizes(
     const uint32_t fill = (fill_count == 0) ? 0 : (*extra / fill_count);
     uint32_t remainder  = (fill_count == 0) ? 0 : (*extra % fill_count);
 
-    for (uint32_t j = 0; j < entity_->ChildrenCount(); ++j) {
+    for (size_t j = 0; j < entity_->ChildrenCount(); ++j) {
       Layout* const child = entity_->ChildAt(j)->GetLayout();
 
       if ((child == NULL) || !child->IsInLayout())
@@ -585,10 +585,10 @@ void LayoutContainer::ArrangeObjects(const Size &new_size, uint32_t extra) {
 
   int32_t cross_extra;
   bool first = true;
-  const uint32_t end = reverse_row ? UINT32_MAX : entity_->ChildrenCount();
+  const size_t end = reverse_row ? SIZE_T_MAX : entity_->ChildrenCount();
   const uint8_t inc = reverse_row ? -1 : 1;
 
-  for (uint32_t i = reverse_row ? (entity_->ChildrenCount() - 1) : 0;
+  for (size_t i = reverse_row ? (entity_->ChildrenCount() - 1) : 0;
        i != end; i += inc) {
     Layout *child = entity_->ChildAt(i)->GetLayout();
 
@@ -637,7 +637,7 @@ void LayoutContainer::AlignBaselines() {
   Layout *best_items[3] = { NULL, NULL, NULL };
   int32_t baselines[3] = { 0, 0, GetSize().height };
   int32_t center_height = 0;
-  uint32_t i;
+  size_t i;
   Layout *child = NULL;
 
   for (i = 0; i < entity_->ChildrenCount(); ++i) {
@@ -710,7 +710,7 @@ Size LayoutContainer::CalculateMinimumSize() const {
       StreamDim(max_size_) = StreamDim(min_size);
     }
 
-    for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+    for (size_t i = 0; i < entity_->ChildrenCount(); ++i) {
       const Layout* const child = entity_->ChildAt(i)->GetLayout();
 
       if ((child == NULL) || !child->IsInLayout())
@@ -776,7 +776,7 @@ void LayoutContainer::SetLocationImp(const Location &loc) {
 void LayoutContainer::ResizeToMinimum() {
   cached_min_size_ = Size();
 
-  for (uint32_t i = 0; i < kMaxLayoutIterations; ++i) {
+  for (size_t i = 0; i < kMaxLayoutIterations; ++i) {
     const Size min = GetMinimumSize();
 
     if (min == GetSize())
@@ -824,7 +824,7 @@ void Group::CalculatePadding() {
   if (entity_->ChildrenCount() != 0) {
     Spacing new_min_padding;
     Layout *front = NULL, *back = NULL, *child;
-    uint32_t i;
+    size_t i;
 
     for (i = 0; i < entity_->ChildrenCount(); ++i) {
       child = entity_->ChildAt(i)->GetLayout();
@@ -910,7 +910,7 @@ void Multipanel::Finalize() {
 void Multipanel::CalculatePadding() {
   Spacing new_min_padding;
 
-  for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+  for (size_t i = 0; i < entity_->ChildrenCount(); ++i) {
     Entity* const child = entity_->ChildAt(i);
 
     if (child->GetLayout() == NULL)
@@ -946,7 +946,7 @@ void Multipanel::CalculatePadding() {
 
 bool Multipanel::SetProperty(PropertyName name, const Value &value) {
   if (strcmp(name, kPropValue) == 0) {
-    ShowPanel(value.Coerce<uint32_t>());
+    ShowPanel(value.Coerce<size_t>());
     return true;
   }
   if (strcmp(name, kPropVisible) == 0) {
@@ -971,7 +971,7 @@ void Multipanel::SetObjectSizes(
     const Size &s, Size *new_size, uint32_t *extra) {
   bool layout_valid = false;
 
-  for (uint32_t i = 0; !layout_valid && (i < kMaxLayoutIterations); ++i) {
+  for (size_t i = 0; !layout_valid && (i < kMaxLayoutIterations); ++i) {
     layout_valid = true;
     if (cached_min_size_ == Size())
       cached_min_size_ = GetMinimumSize();
@@ -980,7 +980,7 @@ void Multipanel::SetObjectSizes(
         std::max(s.height, cached_min_size_.height));
     SetSizeImp(*new_size);
 
-    for (uint32_t j = 0; j < entity_->ChildrenCount(); ++j) {
+    for (size_t j = 0; j < entity_->ChildrenCount(); ++j) {
       Layout *child = entity_->ChildAt(j)->GetLayout();
 
       if ((child == NULL) || !child->IsInLayout())
@@ -1009,14 +1009,14 @@ void Multipanel::ArrangeObjects(const Size &new_size, uint32_t extra) {
   // Extra parens so this isn't parsed as a function
   const Value location_value((Location()));
 
-  for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i)
+  for (size_t i = 0; i < entity_->ChildrenCount(); ++i)
     entity_->ChildAt(i)->SetProperty(kPropLocation, location_value);
 }
 
 Size Multipanel::CalculateMinimumSize() const {
   Size min;
 
-  for (uint32_t i = 0; i < entity_->ChildrenCount(); ++i) {
+  for (size_t i = 0; i < entity_->ChildrenCount(); ++i) {
     Layout *child_layout = entity_->ChildAt(i)->GetLayout();
 
     if (child_layout == NULL)
@@ -1032,9 +1032,9 @@ Size Multipanel::CalculateMinimumSize() const {
   return min;
 }
 
-void Multipanel::ShowPanel(uint32_t index) {
+void Multipanel::ShowPanel(size_t index) {
   value_ = index;
-  for (uint32_t child_index = 0, panel_index = 0;
+  for (size_t child_index = 0, panel_index = 0;
        child_index < entity_->ChildrenCount(); ++child_index) {
     if (entity_->ChildAt(child_index)->GetLayout() == NULL)
       continue;

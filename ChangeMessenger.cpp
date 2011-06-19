@@ -48,7 +48,7 @@ String ChangeMessenger::GetPropertyPath(
     return String();
 
   // 1 for period, 1 for terminator
-  const uint32_t length = strlen(name) + 1 + strlen(property) + 1;
+  const size_t length = strlen(name) + 1 + strlen(property) + 1;
   char *path = new char[length];
 
   snprintf(path, length, "%s.%s", name, property);

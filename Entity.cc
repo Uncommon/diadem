@@ -61,7 +61,7 @@ String Entity::GetTypeName() const {
   return String();
 }
 
-const uint32_t kMaxPathLength = 256;
+const size_t kMaxPathLength = 256;
 
 String Entity::GetPath() const {
   char path[kMaxPathLength];
@@ -76,7 +76,7 @@ String Entity::GetPath() const {
           String() : GetParent()->GetPath();
 
       snprintf(
-          path, kMaxPathLength, "%s/%s%d",
+          path, kMaxPathLength, "%s/%s%zu",
           parent_path.Get(), my_name.Get(),
           GetParent()->ChildIndexByType(this));
     }
@@ -86,12 +86,12 @@ String Entity::GetPath() const {
   return String(path);
 }
 
-uint32_t Entity::ChildIndexByType(const Entity *child) const {
+size_t Entity::ChildIndexByType(const Entity *child) const {
   DASSERT(child != NULL);
   const String child_type = child->GetTypeName();
   uint32 count = 0;
 
-  for (uint32_t i = 0; i < ChildrenCount(); ++i) {
+  for (size_t i = 0; i < ChildrenCount(); ++i) {
     if (ChildAt(i) == child)
       return count + 1;
     if (ChildAt(i)->GetTypeName() == child_type)
@@ -125,7 +125,7 @@ const Window* Entity::GetWindow() const {
 }
 
 void Entity::FactoryFinalize() {
-  for (uint32_t i = 0; i < children_.size(); ++i)
+  for (size_t i = 0; i < children_.size(); ++i)
     children_[i]->FactoryFinalize();
   if (layout_ != NULL)
     layout_->Finalize();
@@ -139,7 +139,7 @@ void Entity::FactoryFinalize() {
 
 void Entity::AddNativeChild(Entity *child) {
   if (child->GetNative() == NULL) {
-    for (uint32_t i = 0; i < child->ChildrenCount(); ++i) {
+    for (size_t i = 0; i < child->ChildrenCount(); ++i) {
       AddNativeChild(child->ChildAt(i));
     }
   } else {

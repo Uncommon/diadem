@@ -110,7 +110,7 @@ class RadioGroup : public Entity {
   virtual String GetTypeName() const { return kTypeNameRadioGroup; }
 
  protected:
-  void SetSelectedIndex(uint32_t index);
+  void SetSelectedIndex(size_t index);
 };
 
 enum ButtonType { kAcceptButton, kCancelButton, kOtherButton };
@@ -172,11 +172,11 @@ class ListDataInterface {
   virtual ~ListDataInterface() {}
 
   // Returns the text content for the given row and column.
-  virtual String GetCellText(uint32_t row, const char *column) const = 0;
+  virtual String GetCellText(size_t row, const char *column) const = 0;
   // The user has clicked the row's checkbox.
-  virtual void SetRowChecked(uint32_t row, bool check) = 0;
+  virtual void SetRowChecked(size_t row, bool check) = 0;
   // Returns true if the given row should be checked.
-  virtual bool GetRowChecked(uint32_t row) const = 0;
+  virtual bool GetRowChecked(size_t row) const = 0;
   // Notification that the list object has been deleted. The data object may
   // delete itself inside this callback.
   virtual void ListDeleted() {}

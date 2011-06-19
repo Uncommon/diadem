@@ -378,13 +378,13 @@ class Cocoa {
     virtual Value GetProperty(PropertyName name) const;
 
     ListDataInterface* GetData() { return data_; }
-    uint32_t GetRowCount() const { return row_count_; }
+    size_t GetRowCount() const { return row_count_; }
 
    protected:
     NSTableView *table_view_;
     TableDelegate *table_delegate_;
     ListDataInterface *data_;
-    uint32_t row_count_;
+    size_t row_count_;
   };
 
   // <column> implementation

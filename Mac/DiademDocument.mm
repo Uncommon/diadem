@@ -133,15 +133,15 @@ class ListData : public Diadem::ListDataInterface {
  public:
   ListData() {}
 
-  virtual Diadem::String GetCellText(uint32_t row, const char *column) const {
+  virtual Diadem::String GetCellText(size_t row, const char *column) const {
     char *text = new char[strlen(column) + 8];
 
-    sprintf(text, "%s %d", column, row);
+    sprintf(text, "%s %zu", column, row);
     return Diadem::String(text, Diadem::String::kAdoptBuffer);
   }
 
-  virtual void SetRowChecked(uint32_t row, bool check) {}
-  virtual bool GetRowChecked(uint32_t row) const { return false; }
+  virtual void SetRowChecked(size_t row, bool check) {}
+  virtual bool GetRowChecked(size_t row) const { return false; }
 };
 
 @implementation DiademController
@@ -176,7 +176,7 @@ class ListData : public Diadem::ListDataInterface {
         Diadem::kPropData, (Diadem::ListDataInterface*)listData_);
     entity->SetProperty(Diadem::kPropRowCount, 2);
   } else {
-    for (uint32_t i = 0; i < entity->ChildrenCount(); ++i)
+    for (size_t i = 0; i < entity->ChildrenCount(); ++i)
       [self attachListData:entity->ChildAt(i)];
   }
 }
@@ -308,7 +308,7 @@ class ListData : public Diadem::ListDataInterface {
     [marginsPath fill];
   }
 
-  for (uint32_t i = 0; i < entity->ChildrenCount(); ++i)
+  for (size_t i = 0; i < entity->ChildrenCount(); ++i)
     [self drawEntityFrame:entity->ChildAt(i) offset:loc];
   [context restoreGraphicsState];
 }
