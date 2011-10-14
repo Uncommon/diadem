@@ -102,8 +102,8 @@ class MultiMap : public std::multimap<K, V> {
     Inherited::insert(std::make_pair(key, value));
   }
   bool exists(const K &key, const V &value) const {
-    for (typename Inherited::const_iterator i = lower_bound(key);
-        i != upper_bound(key); ++i)
+    for (typename Inherited::const_iterator i = this->lower_bound(key);
+        i != this->upper_bound(key); ++i)
       if (i->second == value)
         return true;
     return false;
@@ -114,7 +114,7 @@ class MultiMap : public std::multimap<K, V> {
 
     while (i != Inherited::end()) {
       if (i->second == value) {
-        erase(i);
+        this->erase(i);
         i = Inherited::begin();
       } else {
         ++i;
