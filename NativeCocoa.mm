@@ -20,7 +20,7 @@
 // Interface Guidelines (AHIG), and the distances that Interface Builder (IB)
 // snaps to. Conflicts are resolved by judgment call.
 
-@interface TableDelegate : NSObject
+@interface TableDelegate : NSObject <NSTableViewDelegate, NSTableViewDataSource>
 {
 @public
   Diadem::Cocoa::List *list_;
@@ -80,7 +80,7 @@ Diadem::ButtonType ButtonTypeFromNSAlertButton(NSInteger button) {
 
 } // namespace
 
-@interface WindowDelegate : NSObject {
+@interface WindowDelegate : NSObject<NSWindowDelegate> {
   Diadem::Cocoa::Window *window_;
 }
 @end
@@ -326,7 +326,9 @@ String Cocoa::ChooseFolder(const String &initial_path) {
   [panel setCanChooseFiles:NO];
   [panel setCanChooseDirectories:YES];
   [panel setAllowsMultipleSelection:NO];
-  [panel runModalForDirectory:initial file:nil types:nil];
+  if (initial != nil)
+    [panel setDirectoryURL:[NSURL fileURLWithPath:initial]];
+  [panel runModal];
 
   NSArray *urls = [panel URLs];
 
@@ -341,16 +343,17 @@ String Cocoa::ChooseNewPath(
     const String &initial_name) {
   ScopedAutoreleasePool pool;
   NSSavePanel *panel = [NSSavePanel savePanel];
-  NSString *path = nil, *name = nil;
 
   if (!prompt.IsEmpty())
     [panel setPrompt:[NSString stringWithUTF8String:prompt.Get()]];
   if (!initial_path.IsEmpty())
-    path = [NSString stringWithUTF8String:initial_path.Get()];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:
+        [NSString stringWithUTF8String:initial_path.Get()]]];
   if (!initial_name.IsEmpty())
-    name = [NSString stringWithUTF8String:initial_name.Get()];
+    [panel setNameFieldStringValue:
+        [NSString stringWithUTF8String:initial_name.Get()]];
 
-  const NSInteger result = [panel runModalForDirectory:path file:name];
+  const NSInteger result = [panel runModal];
 
   if (result == NSOKButton)
     return String([[[panel URL] path] UTF8String]);
@@ -1539,8 +1542,9 @@ bool Cocoa::List::SetProperty(PropertyName name, const Value &value) {
   }
   if (strcmp(name, kPropValue) == 0) {
     ScopedAutoreleasePool pool;
+    NSIndexSet *index = [NSIndexSet indexSetWithIndex:value.Coerce<int32_t>()];
 
-    [table_view_ selectRow:value.Coerce<int32_t>() byExtendingSelection:NO];
+    [table_view_ selectRowIndexes:index byExtendingSelection:NO];
     return true;
   }
   if (strcmp(name, kPropRowCount) == 0) {
