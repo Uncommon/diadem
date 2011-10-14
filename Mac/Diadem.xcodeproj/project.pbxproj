@@ -237,8 +237,10 @@
 				DD18348C124C2AB100FF34FB /* Frameworks */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 			);
+			indentWidth = 2;
 			name = Diadem;
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		08FB7795FE84155DC02AAC07 /* diadem */ = {
 			isa = PBXGroup;
