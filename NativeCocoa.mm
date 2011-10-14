@@ -197,7 +197,7 @@ Diadem::ButtonType ButtonTypeFromNSAlertButton(NSInteger button) {
         [pathControl_ setURL:[NSURL fileURLWithPath:parent]];
 
         NSMutableArray *cells =
-            [[pathControl_ pathComponentCells] mutableCopy];
+            [[[pathControl_ pathComponentCells] mutableCopy] autorelease];
         NSImage *folder_icon = [[NSWorkspace sharedWorkspace]
               iconForFileType:NSFileTypeForHFSTypeCode(kFolderFileType)];
 

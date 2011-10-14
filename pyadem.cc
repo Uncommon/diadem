@@ -490,9 +490,9 @@ static void Window_dealloc(PyademWindow *self) {
   if (self != NULL) {
     delete self->window;
     self->entity.object = NULL;  // deleted by ~Window
+    Py_XDECREF(self->close_callback);
+    Entity_dealloc(&self->entity);
   }
-  Py_XDECREF(self->close_callback);
-  Entity_dealloc(&self->entity);
 }
 
 static PyObject* Window_showModeless(PyademWindow *self) {

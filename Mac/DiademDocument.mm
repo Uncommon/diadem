@@ -73,7 +73,7 @@ class ListData;
 - (BOOL)readFromData:(NSData *)data
               ofType:(NSString *)typeName
                error:(NSError **)outError {
-  NSMutableData *terminatedData = [data mutableCopy];
+  NSMutableData *terminatedData = [[data mutableCopy] autorelease];
 
   [terminatedData appendBytes:"" length:1];
 
