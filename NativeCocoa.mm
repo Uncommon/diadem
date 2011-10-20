@@ -88,7 +88,8 @@ Diadem::ButtonType ButtonTypeFromNSAlertButton(NSInteger button) {
 @implementation WindowDelegate
 
 - (id)initWithNativeWindow:(Diadem::Cocoa::Window*)window {
-  if ([super init] == nil)
+  self = [super init];
+  if (self == nil)
     return nil;
   window_ = window;
   return self;
@@ -116,7 +117,8 @@ Diadem::ButtonType ButtonTypeFromNSAlertButton(NSInteger button) {
 @implementation ButtonTarget
 
 - (id)initWithButton:(Diadem::Cocoa::Button*)button {
-  if ([super init] == nil)
+  self = [super init];
+  if (self == nil)
     return nil;
   button_ = button;
   [(NSButton*)button->GetNativeRef() setTarget:self];
@@ -152,7 +154,8 @@ Diadem::ButtonType ButtonTypeFromNSAlertButton(NSInteger button) {
 @implementation PathBoxControl
 
 - (id)initWithFrame:(NSRect)frame {
-  if ([super initWithFrame:frame] == nil)
+  self = [super initWithFrame:frame];
+  if (self == nil)
     return nil;
 
   NSRect sub_rect = NSInsetRect(frame, 1, 1);

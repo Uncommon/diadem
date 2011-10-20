@@ -147,7 +147,8 @@ class ListData : public Diadem::ListDataInterface {
 @implementation DiademController
 
 - (id)initWithEntity:(Diadem::Entity*)entity {
-  if ([super init] == nil)
+  self = [super init];
+  if (self == nil)
     return nil;
   entity_ = entity;
   [self setWindow:(NSWindow*)entity->GetNative()->GetNativeRef()];
@@ -196,7 +197,8 @@ class ListData : public Diadem::ListDataInterface {
 @implementation OverlayView
 
 - (id)initWithFrame:(NSRect)frame entity:(Diadem::Entity*)entity {
-  if ([super initWithFrame:frame] == nil)
+  self = [super initWithFrame:frame];
+  if (self == nil)
     return nil;
 
   entity_ = entity;
